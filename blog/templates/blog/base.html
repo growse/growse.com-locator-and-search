@@ -1,0 +1,59 @@
+{%spaceless%}
+<!DOCTYPE html> 
+<html> 
+	<head> 
+		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+		<meta name="google-site-verification" content="Sr-L2EMmHr-hc4npzb8p1f7zi9ew1Iev84ly519r1p4" /> 
+		<title>{% block title %}{% endblock %}growse.com</title> 
+		<link type="text/css" rel="stylesheet" href="http://res.growse.com/mincache/www.css" /> 
+		<link rel="alternate" title="RSS Feed" href="http://www.growse.com/news/rss/" type="application/rss+xml" /> 
+		<script type="text/javascript" src="http://res.growse.com/mincache/www.js"></script> 
+		<script type="text/javascript" src="http://res.growse.com/js/www/prettify.js"></script> 
+		<script type="text/javascript"> 
+			function clearsearch() {
+				var searchbox = document.getElementById('searchbox');
+				if (searchbox.value == 'Search') {
+					searchbox.value='';
+				}
+			}
+		</script> 
+	</head> 
+	<body>
+		<div id="container"> 
+			<div id="header"> 
+				<div id="menu">
+					{% include "blog/nav.html" %}
+				</div> 
+				<p id="headertext">growse.com</p> 
+			</div> 
+			<div id="content"> 
+				<div id="search"> 
+					<form action="/search/" method="post"> 
+						<p> 
+							{% csrf_token %}
+							<input onclick="clearsearch()" id="searchbox" type="text" name="a" value="Search" class="searchtext" /> 
+							<input type="image" alt="go" src="http://res.growse.com/img/www/orangeblack/search.png" class="searchimage" /> 
+						</p> 
+					</form> 
+				</div> 
+				{% block content %}
+				{% endblock %}	
+			</div> 
+			<div id="footer"> 
+				Fin.
+			</div> 
+		</div> 
+		<script type="text/javascript"> 
+			if (window.location.href.substring(0,22)=='http://www.growse.com/') {
+				var pageTracker = _gat._getTracker("UA-185490-7");
+				pageTracker._setDomainName("www.growse.com");
+				pageTracker._trackPageview();
+			}
+
+			$(document).ready(function() {
+					prettyPrint();
+			});
+		</script> 
+	</body> 
+</html> 
+{%endspaceless%}

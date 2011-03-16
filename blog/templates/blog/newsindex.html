@@ -1,0 +1,18 @@
+{% extends "blog/base.html" %}
+
+{% block title %}
+news :: 
+{% endblock %}
+
+{% block content %}
+<h1>News</h1>
+<p>The story of my life. As told by me. For more amusing anecdotes, please <a href="/news/archive/" title="News archive">visit the archive</a>.</p>
+{% if top5articles %}
+	{% for article in top5articles %}
+		<h2>{{article.title}}</h2>
+		<p class="newstime">{{article.datestamp}}</h2>
+		<p>{{article.body|safe}}</p>
+		<p><a href="/news/comments/{{article.shorttitle}}/" title="More ({{article.comment__count}} comments)">More ({{article.comment__count}} comments)</a></p>
+	{% endfor %}
+{% endif %}
+{% endblock %}

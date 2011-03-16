@@ -1,0 +1,17 @@
+{% extends "blog/base.html" %}
+
+{% block title %}
+archive :: news :: 
+{% endblock %}
+
+{% block content %}
+<h1>News Archive for {{month|date:"F"}}, {{year}}</h1>
+{% if archivearticles %}
+	{% for article in archivearticles %}
+		<h2>{{article.title}}</h2>
+		<p class="newstime">{{article.datestamp}}</h2>
+		<p>{{article.body|safe}}</p>
+		<p><a href="/news/comments/{{article.shorttitle}}/" title="More ({{article.comment__count}} comments)">More ({{article.comment__count}} comments)</a></p>
+	{% endfor %}
+{% endif %}
+{% endblock %}

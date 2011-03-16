@@ -1,0 +1,62 @@
+{% extends "blog/base.html" %}
+
+{% block title %}
+{{article.title}} :: {{article.type|lower}} ::  
+{% endblock %}
+
+{% block content %}
+<h1>{{article.type|lower|capfirst}}</h1>
+{% if article.type == 'NEWS'%}
+<div id="newsnav">
+	{%if prevarticle%}
+	<p id="newsnavleft">
+	<a href="/news/comments/{{prevarticle.shorttitle}}/">&laquo; {{prevarticle.title}}</a>
+	</p>
+	{%endif%}
+	{%if nextarticle%}
+	<p id="newsnavright">
+	<a href="/news/comments/{{nextarticle.shorttitle}}/">{{nextarticle.title}} &raquo;</a>
+	</p>
+	{%endif%}
+</div>
+{%endif%}
+<p class="clear" />
+
+<h2>{{article.title}}</h2>
+{% if article.datestamp != None %}
+<p class="newstime">{{article.datestamp}}</p>
+{% endif %}
+{{article.body|safe}}
+
+{% if article.type == 'NEWS' %}
+	{% if comments.count != 0 %}
+	<h2>Comments</h2>
+	{% endif %}
+	
+	{% for comment in comments %}
+	<div class="comment_title">
+		{% if comment.website and  comment.website|length >= 1 %}
+		<a href="{{comment.formattedwebsite}}" title="{{comment.name}}">{{comment.name}}</a>
+		{% else %}
+		{{comment.name}}
+		{% endif %}
+		- {{comment.datestamp}}
+	</div>
+	<div style="white-space: pre-line;" class="comment_body"><p>{{comment.comment}}</p></div>
+	{% endfor %}
+	
+	<h2>Add a new comment</h2>
+	<form action="" method="post">
+		<fieldset>
+			{%csrf_token%}
+			<p class="hohoho">Do not fill this out:<input type="text" name="email" value="" /></p>
+			<p><label for="name">Name:</label> <input type="text" id="name" name="name" value="" class="text" /></p>
+			<p><label for="website">Website:</label> <input type="text" id="website" name="website" value="" class="text" /></p>
+			<p><label for="comment">Comment:</label> <textarea rows="8" cols="40" id="comment" name="comment"></textarea></p>
+			<p><label></label><input class="submitbtn" type="submit" accesskey="s" value="Submit" /></p>
+		</fieldset>
+	</form>
+
+{% endif %}
+
+{% endblock %}

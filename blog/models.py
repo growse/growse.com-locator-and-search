@@ -13,7 +13,7 @@ import re
 
 class Article(models.Model):
     id = models.AutoField(primary_key=True)
-    datestamp = models.DateTimeField()
+    datestamp = models.DateTimeField(null=True, blank=True)
     title = models.CharField(max_length=255)
     shorttitle = models.CharField(unique=True, max_length=255)
     description = models.TextField(null=True)

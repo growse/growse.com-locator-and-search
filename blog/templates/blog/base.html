@@ -5,10 +5,9 @@
 		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
 		<meta name="google-site-verification" content="Sr-L2EMmHr-hc4npzb8p1f7zi9ew1Iev84ly519r1p4" /> 
 		<title>{% block title %}{% endblock %}growse.com</title> 
-		<link type="text/css" rel="stylesheet" href="http://res.growse.com/mincache/www.css" /> 
+		<link type="text/css" rel="stylesheet" href="http://cdn1.res.growse.com/mincache/www.css" /> 
 		<link rel="alternate" title="RSS Feed" href="http://www.growse.com/news/rss/" type="application/rss+xml" /> 
-		<script type="text/javascript" src="http://res.growse.com/mincache/www.js"></script> 
-		<script type="text/javascript" src="http://res.growse.com/js/www/prettify.js"></script> 
+		<script type="text/javascript" src="http://cdn1.res.growse.com/mincache/www.js"></script> 
 		<script type="text/javascript"> 
 			function clearsearch() {
 				var searchbox = document.getElementById('searchbox');
@@ -32,7 +31,7 @@
 						<p> 
 							{% csrf_token %}
 							<input onclick="clearsearch()" id="searchbox" type="text" name="a" value="Search" class="searchtext" /> 
-							<input type="image" alt="go" src="http://res.growse.com/img/www/orangeblack/search.png" class="searchimage" /> 
+							<input type="image" alt="go" src="http://cdn1.res.growse.com/img/www/orangeblack/search.png" class="searchimage" /> 
 						</p> 
 					</form> 
 				</div> 
@@ -50,9 +49,6 @@
 				pageTracker._trackPageview();
 			}
 
-			$(document).ready(function() {
-					prettyPrint();
-			});
 		</script> 
 	</body> 
 </html> 

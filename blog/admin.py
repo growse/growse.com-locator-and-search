@@ -10,7 +10,7 @@ class CommentInline(admin.TabularInline):
 	extra = 0
 
 class ArticleAdmin(admin.ModelAdmin):
-	fields = ['datestamp','title','body','type']
+	fields = ['datestamp','title','markdown','type']
 	inlines = [CommentInline]
 	list_display = ('title','datestamp')
 	list_filter = ['datestamp']

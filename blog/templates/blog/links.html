@@ -7,7 +7,8 @@ links ::
 {% block content %}
 <h1>Links</h1> 
 <p>Stuff that I've randomly found interesting on the internet.</p> 
-<div id="links"><img src="http://cdn1.res.growse.com/img/www/orangeblack/twitterloader.gif" alt="loading..." /></div>
+<p>Annoyingly, delicious have broken their API. Until that works, nothing works. Boo.</p>
+<!--<div id="links"><img src="http://cdn1.res.growse.com/img/www/orangeblack/twitterloader.gif" alt="loading..." /></div>-->
 <script type="text/javascript">
 	function parseLinks(data) {
 		var linklist={};
@@ -32,5 +33,5 @@ links ::
 		});
 	}
 </script> 
-<script type="text/javascript" src="http://feeds.delicious.com/v2/json/growse/?count=1000&callback=parseLinks"></script>
+<!--<script type="text/javascript" src="http://feeds.delicious.com/v2/json/growse/?count=1000&ampcallback=parseLinks"></script>-->
 {% endblock %}

@@ -1,4 +1,3 @@
-{%spaceless%}
 <!DOCTYPE html> 
 <html> 
 	<head> 
@@ -6,9 +5,18 @@
 		<meta name="google-site-verification" content="Sr-L2EMmHr-hc4npzb8p1f7zi9ew1Iev84ly519r1p4" /> 
 		<title>{% block title %}{% endblock %}growse.com</title> 
 		<link rel="shortcut icon" type="image/ico" href="http://cdn1.res.growse.com/img/www/orangeblack/favicon.ico" />
-		<link type="text/css" rel="stylesheet" href="http://cdn1.res.growse.com/mincache/www.css" /> 
 		<link rel="alternate" title="RSS Feed" href="http://www.growse.com/news/rss/" type="application/rss+xml" /> 
+		{% if debug_mode%}
+		<link type="text/css" rel="stylesheet" href="http://res.growse.com/css/www/style.css" /> 
+		<script type="text/javascript" src="http://res.growse.com/js/common/jquery-1.6.4.min.js"></script> 
+		<script type="text/javascript" src="http://res.growse.com/js/common/ga.js"></script> 
+		<script type="text/javascript" src="http://res.growse.com/js/common/highcharts.js"></script> 
+		<script type="text/javascript" src="http://res.growse.com/js/www/twitter.js"></script> 
+		<script type="text/javascript" src="http://res.growse.com/js/www/scripts.js"></script> 
+		{%else%}
+		<link type="text/css" rel="stylesheet" href="http://cdn1.res.growse.com/mincache/www.css" /> 
 		<script type="text/javascript" src="http://cdn1.res.growse.com/mincache/www.js"></script> 
+		{% endif %}
 		<script type="text/javascript"> 
 			function clearsearch() {
 				var searchbox = document.getElementById('searchbox');
@@ -21,27 +29,27 @@
 	<body>
 		<div id="container"> 
 			<div id="header"> 
-				<div id="menu">
+				<nav>
 					{% include "blog/nav.html" %}
-				</div> 
-				<p id="headertext">growse.com</p> 
+				</nav> 
+				<div id="headerimage"><span>growse.com</span></div> 
 			</div> 
 			<div id="content"> 
 				<div id="search"> 
 					<form action="/search/" method="post"> 
-						<p> 
+						<fieldset> 
 							{% csrf_token %}
-							<input onclick="clearsearch()" id="searchbox" type="text" name="a" value="Search" class="searchtext" /> 
+							<input onclick="growse.clearSearch();" id="searchbox" type="text" name="a" value="Search" class="searchtext" /> 
 							<input type="image" alt="go" src="http://cdn1.res.growse.com/img/www/orangeblack/search.png" class="searchimage" /> 
-						</p> 
+						</fieldset>
 					</form> 
 				</div> 
 				{% block content %}
 				{% endblock %}	
 			</div> 
-			<div id="footer"> 
+			<footer> 
 				Fin.
-			</div> 
+			</footer> 
 		</div> 
 		<script type="text/javascript"> 
 			if (window.location.href.substring(0,22)=='http://www.growse.com/') {
@@ -53,4 +61,3 @@
 		</script> 
 	</body> 
 </html> 
-{%endspaceless%}

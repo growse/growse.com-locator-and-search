@@ -34,19 +34,23 @@
 	</div>
 </div>
 <script type="text/javascript">
-	getTwitters('twitter_div', {
-		id: 'growse',
-		count: 4,
-		enableLinks: true,
-		ignoreReplies: true,
-		clearContents: true,
+	$(document).ready(function() {
+		growse.getLocation();
+		growse.spamwatchGraph();
+		getTwitters('twitter_div', {
+			id: 'growse',
+			count: 4,
+			enableLinks: true,
+			ignoreReplies: true,
+			clearContents: true,
+		});
 	});
 </script>
 <script type="text/javascript">
-	var so = new SWFObject("http://res.growse.com/swf/amline/amline.swf", "amline", "500", "200", "8", "#222222");
-	so.addVariable("settings_file", encodeURIComponent("http://res.growse.com/spamwatch/settings.xml"));
-	so.addVariable("data_file", encodeURIComponent("http://res.growse.com/spamwatch/data.txt"));
-	so.write("spamwatch");
+//	var so = new SWFObject("http://res.growse.com/swf/amline/amline.swf", "amline", "500", "200", "8", "#222222");
+//	so.addVariable("settings_file", encodeURIComponent("http://res.growse.com/spamwatch/settings.xml"));
+//	so.addVariable("data_file", encodeURIComponent("http://res.growse.com/spamwatch/data.txt"));
+//	so.write("spamwatch");
 </script>
 <p style="clear:both;"></p> 
 {% endblock %}

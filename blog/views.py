@@ -9,6 +9,10 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from blog.models import Article
 from blog.models import Comment
 
+def photos(request):
+	c=RequestContext(request);
+	return render_to_response('blog/photos.html',{'pagetitle':'Photos','nav':'photos'},c);
+
 def projectsindex(request):
 	c=RequestContext(request);
 	projects = Article.objects.filter(type='PROJECTS').order_by('-datestamp')

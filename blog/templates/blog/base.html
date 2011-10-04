@@ -8,7 +8,11 @@
 		<link rel="alternate" title="RSS Feed" href="http://www.growse.com/news/rss/" type="application/rss+xml" /> 
 		{% if debug_mode%}
 		<link type="text/css" rel="stylesheet" href="http://res.growse.com/css/www/style.css" /> 
+		<link type="text/css" rel="stylesheet" href="http://res.growse.com/css/www/photos.css" /> 
 		<script type="text/javascript" src="http://res.growse.com/js/common/jquery-1.6.4.min.js"></script> 
+		<script type="text/javascript" src="http://res.growse.com/js/common/jquery.galleriffic.js"></script> 
+		<script type="text/javascript" src="http://res.growse.com/js/common/jquery.opacityrollover.js"></script> 
+		<script type="text/javascript" src="http://res.growse.com/js/common/jquery.history.js"></script> 
 		<script type="text/javascript" src="http://res.growse.com/js/common/ga.js"></script> 
 		<script type="text/javascript" src="http://res.growse.com/js/common/highcharts.js"></script> 
 		<script type="text/javascript" src="http://res.growse.com/js/www/twitter.js"></script> 
@@ -17,14 +21,6 @@
 		<link type="text/css" rel="stylesheet" href="http://cdn1.res.growse.com/mincache/www.{{site_version}}.css" /> 
 		<script type="text/javascript" src="http://cdn1.res.growse.com/mincache/www.{{site_version}}.js"></script> 
 		{% endif %}
-		<script type="text/javascript"> 
-			function clearsearch() {
-				var searchbox = document.getElementById('searchbox');
-				if (searchbox.value == 'Search') {
-					searchbox.value='';
-				}
-			}
-		</script> 
 	</head> 
 	<body>
 		<div id="container"> 
@@ -39,7 +35,7 @@
 					<form action="/search/" method="post"> 
 						<fieldset> 
 							{% csrf_token %}
-							<input onclick="growse.clearSearch();" id="searchbox" type="text" name="a" value="Search" class="searchtext" /> 
+							<input placeholder="Search" id="searchbox" type="text" name="a" class="searchtext" /> 
 							<input type="image" alt="go" src="http://cdn1.res.growse.com/img/www/orangeblack/search.png" class="searchimage" /> 
 						</fieldset>
 					</form> 
@@ -51,13 +47,6 @@
 				Fin.
 			</footer> 
 		</div> 
-		<script type="text/javascript"> 
-			if (window.location.href.substring(0,22)=='http://www.growse.com/') {
-				var pageTracker = _gat._getTracker("UA-185490-7");
-				pageTracker._setDomainName("www.growse.com");
-				pageTracker._trackPageview();
-			}
-
-		</script> 
+		<script type="text/javascript"> if (window.location.href.substring(0,22)=='http://www.growse.com/') {var pageTracker = _gat._getTracker("UA-185490-7");	pageTracker._setDomainName("www.growse.com");pageTracker._trackPageview();}</script> 
 	</body> 
-</html> 
+</html>

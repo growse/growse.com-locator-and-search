@@ -50,9 +50,9 @@
 		<fieldset>
 			{%csrf_token%}
 			<p class="hohoho">Do not fill this out:<input type="text" name="email" value="" /></p>
-			<p><label for="name">Name:</label> <input type="text" id="name" name="name" value="" class="text" /></p>
-			<p><label for="website">Website:</label> <input type="text" id="website" name="website" value="" class="text" /></p>
-			<p><label for="comment">Comment:</label> <textarea rows="8" cols="40" id="comment" name="comment"></textarea></p>
+			<p><label for="name">Name:</label> <input type="text" id="name" name="name" value="" class="text" required /></p>
+			<p><label for="website">Website:</label> <input type="url" id="website" name="website" value="" class="text" /></p>
+			<p><label for="comment">Comment:</label> <textarea rows="8" cols="40" id="comment" name="comment" required></textarea></p>
 			<p><label></label><input class="submitbtn" type="submit" accesskey="s" value="Submit" /></p>
 		</fieldset>
 	</form>

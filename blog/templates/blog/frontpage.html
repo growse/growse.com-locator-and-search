@@ -18,7 +18,7 @@
 	<div class="homepanel">
 		<h1>Spams</h1>
 		<div id="spamwatch">
-			<p>Flash isn't installed :(</p> 
+			<p>Hmmm. Something went wrong. :(</p> 
 		</div> 
 		<p class="homepagesmall"><a href="/projects/spamwatch/">WTF is spamwatch?</a></p>
 	</div>
@@ -26,7 +26,7 @@
 <div id="homeright">
 	<div class="homepanel centertext" id="homepicturepanel">
 		<h1>Pictures</h1>
-		<iframe width="285" height="290" src="http://photos.growse.com/min.html"><p>Bzzt. No iframes = no picture goodness.</p></iframe>
+		<div id="randomphoto"></div>
 	</div>
 	<div class="homepanel">
 		<h1>Places</h1>
@@ -35,8 +35,10 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function() {
+		growse.loadFrontPage();
 		growse.getLocation();
 		growse.spamwatchGraph();
+
 		getTwitters('twitter_div', {
 			id: 'growse',
 			count: 4,
@@ -45,12 +47,6 @@
 			clearContents: true,
 		});
 	});
-</script>
-<script type="text/javascript">
-//	var so = new SWFObject("http://res.growse.com/swf/amline/amline.swf", "amline", "500", "200", "8", "#222222");
-//	so.addVariable("settings_file", encodeURIComponent("http://res.growse.com/spamwatch/settings.xml"));
-//	so.addVariable("data_file", encodeURIComponent("http://res.growse.com/spamwatch/data.txt"));
-//	so.write("spamwatch");
 </script>
 <p style="clear:both;"></p> 
 {% endblock %}

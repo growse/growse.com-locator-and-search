@@ -1,0 +1,35 @@
+{% extends "blog/base.html" %}
+
+{% block title %}
+{{pagetitle|lower}} :: 
+{% endblock %}
+
+{% block content %}
+<h1>Some nice pictures</h1>
+<div class="content">
+	<div id="controls"></div>
+	<div id="slideshow-container">
+		<div id="loading"></div>
+		<div id="slideshow"></div>
+	</div>
+</div>
+<div id="thumbs">
+	<ul class="thumbs noscript">
+		<li>
+			<a class="thumb" href=""><img /></a>
+			<div class="caption">
+			<div class="download"><a></a></div>
+			<div class="image-title"></div>
+			<div class="image-desc"></div>
+			<div class="image-auth"></div>
+		</li>
+	</ul>
+</div>
+<p style="clear:right;"></p>
+<p style="clear:left;"></p>
+<script type="text/javascript">
+	$(document).ready(function() { 
+			growse.loadPhotoGallery();
+			});
+</script>
+{% endblock %}

@@ -34,19 +34,7 @@
 	</div>
 </div>
 <script type="text/javascript">
-	$(document).ready(function() {
-		growse.loadFrontPage();
-		growse.getLocation();
-		growse.spamwatchGraph();
-
-		getTwitters('twitter_div', {
-			id: 'growse',
-			count: 4,
-			enableLinks: true,
-			ignoreReplies: true,
-			clearContents: true,
-		});
-	});
+	$(document).ready(function() {growse.loadFrontPage();});
 </script>
 <p style="clear:both;"></p> 
 {% endblock %}

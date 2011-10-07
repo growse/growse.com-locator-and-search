@@ -7,13 +7,22 @@ growse = function() {
 			growse.getLocation();
 			growse.spamwatchGraph();
 			growse.loadRandomPhoto();
-			getTwitters('twitter_div', {
-				id: 'growse',
-				count: 4,
-				enableLinks: true,
-				ignoreReplies: true,
-				clearContents: true
-			 });
+			growse.getTweets();
+		},
+		getTweets: function() {
+			$.getJSON("http://res.growse.com/nocache/twitter.js",function(data) {
+				var max = 4;
+				var counter=0;
+				$('#twitter_div').empty();
+				var list = $('<ul></ul>');
+				$.each(data,function(i,tweet) {
+					if (tweet.in_reply_to_status_id == null && counter<max) {
+					list.append('<li>'+tweet.text+'</li>');
+					counter+=1;
+					}
+				});
+				$('#twitter_div').append(list);
+			});
 		},
 		getLocation: function() {
 			$.getJSON("http://res.growse.com/nocache/latitude.js",function(data) {

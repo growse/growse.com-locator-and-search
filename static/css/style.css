@@ -263,6 +263,12 @@ Homepage
 	margin: 5px;
 }
 
+#twitter_div ul li span {
+	line-height: 10px;
+	margin: 0;
+	font-size: 10px;
+}
+
 /**********************
 Content
 *********************/

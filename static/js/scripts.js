@@ -17,12 +17,17 @@ growse = function() {
 				var list = $('<ul></ul>');
 				$.each(data,function(i,tweet) {
 					if (tweet.in_reply_to_status_id == null && counter<max) {
-					list.append('<li>'+tweet.text+'</li>');
-					counter+=1;
+						
+						list.append('<li>'+growse.replaceURLWithHTMLLinks(tweet.text)+'<br /><span><a href="https://twitter.com/growse/status/'+tweet.id_str+'">'+prettyDate(tweet.created_at)+'</a></span></li>');
+						counter+=1;
 					}
 				});
 				$('#twitter_div').append(list);
 			});
+		},
+		replaceURLWithHTMLLinks: function(text) {
+			var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+			return text.replace(exp,"<a href='$1'>$1</a>");
 		},
 		getLocation: function() {
 			$.getJSON("http://res.growse.com/nocache/latitude.js",function(data) {
@@ -206,3 +211,40 @@ growse = function() {
 		}
 	};
 }();
+
+/*
+ * JavaScript Pretty Date
+ * Copyright (c) 2008 John Resig (jquery.com)
+ * Licensed under the MIT license.
+ */
+
+// Takes an ISO time and returns a string representing how
+// long ago the date represents.
+function prettyDate(time){
+	var date = new Date((time || "").replace(/-/g,"/").replace(/[TZ]/g," ")),
+		diff = (((new Date()).getTime() - date.getTime()) / 1000),
+		day_diff = Math.floor(diff / 86400);
+			
+	if ( isNaN(day_diff) || day_diff < 0 || day_diff >= 31 )
+		return;
+			
+	return day_diff == 0 && (
+			diff < 60 && "just now" ||
+			diff < 120 && "1 minute ago" ||
+			diff < 3600 && Math.floor( diff / 60 ) + " minutes ago" ||
+			diff < 7200 && "1 hour ago" ||
+			diff < 86400 && Math.floor( diff / 3600 ) + " hours ago") ||
+		day_diff == 1 && "Yesterday" ||
+		day_diff < 7 && day_diff + " days ago" ||
+		day_diff < 31 && Math.ceil( day_diff / 7 ) + " weeks ago";
+}
+
+// If jQuery is included in the page, adds a jQuery plugin to handle it as well
+if ( typeof jQuery != "undefined" )
+	jQuery.fn.prettyDate = function(){
+		return this.each(function(){
+			var date = prettyDate(this.title);
+			if ( date )
+				jQuery(this).text( date );
+		});
+	};

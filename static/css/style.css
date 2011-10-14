@@ -108,7 +108,7 @@ iframe {
 	padding-left: 20px;
 }
 
-#header {
+header {
 	border-radius: 20px 20px 0 0;
 	height: 80px;
 	background: #333;
@@ -326,6 +326,25 @@ ul#linkstable {
 ul#linkstable li {
 }
 
+article header {
+	border-radius: 0px;
+	height: auto;
+	background: none
+}
+
+article header h1 {
+	border: 0;
+	margin: 0;
+	font-size: 1.3em;
+	color: #f90;
+	padding: 0;
+}
+
+article header time {
+	font-size: 10px;
+	margin-top: 0;	
+}
+
 /****************
 Generics
 ****************/
@@ -390,10 +409,6 @@ Generics
 	overflow:hidden;
 }
 
-.newstime {
-	font-size: 10px;
-	margin-top: 0;	
-}
 
 .homepagesmall {
 	margin: 0;

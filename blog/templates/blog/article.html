@@ -22,12 +22,15 @@
 {%endif%}
 <p class="clear" />
 
-<h2>{{article.title}}</h2>
-{% if article.datestamp != None %}
-<p class="newstime">{{article.datestamp}}</p>
-{% endif %}
-{{article.body|safe}}
-
+<article>
+	<header>
+		<h1>{{article.title}}</h1>
+		{% if article.datestamp != None %}
+		<time datetime="{{article.datestamp|date:"c"}}Z" pubdate="pubdate">{{article.datestamp|date:"l d N Y @H:i"}}</time>
+		{% endif %}
+	</header>
+	{{article.body|safe}}
+</article>
 {% if article.type == 'NEWS' %}
 	{% if comments.count != 0 %}
 	<h2>Comments</h2>

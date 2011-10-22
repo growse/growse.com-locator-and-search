@@ -7,31 +7,34 @@ links ::
 {% block content %}
 <h1>Links</h1> 
 <p>Stuff that I've randomly found interesting on the internet.</p> 
-<p>Annoyingly, delicious have broken their API. Until that works, nothing works. Boo.</p>
-<!--<div id="links"><img src="http://cdn1.res.growse.com/img/www/orangeblack/twitterloader.gif" alt="loading..." /></div>-->
+<div id="links"><img src="http://cdn1.res.growse.com/img/www/orangeblack/twitterloader.gif" alt="loading..." /></div>
 <script type="text/javascript">
+	
+	$(document).ready(function() {
+		$.ajax({type:"GET",url:"http://res.growse.com/links.xml",dataType:"xml",success: function(data) {
+			var linklist={};
+			$(data).find('post').each(function() {
+				var tag = $(this).attr('tag');
+				var link = [];
+				link.description = $(this).attr('description');
+				link.url = $(this).attr('href');
+				if (linklist[tag]==undefined) {
+					linklist[tag]=[];
+				}
+				linklist[tag].push(link);
+			})
+			$('#links img').remove();
+			$.each(linklist,function(key,value) {
+				$('#links').append(new jQuery('<h2>'+key+'</h2>'));
+				var list = new jQuery('<ul></ul>');
+				for (var x=0; x< value.length;x++) {
+					list.append(new jQuery('<li><a title=\"'+value[x].description+'\" href=\"'+value[x].href+'\">'+value[x].description+'</a></li>'));
+				}
+			$('#links').append(list);
+			});
+		}});	
+	});
 	function parseLinks(data) {
-		var linklist={};
-
-		for (var y=0;y<data.length;y++) {
-			if (linklist[data[y].t[0]]==undefined) {
-				linklist[data[y].t[0]]=[];
-
-			}
-			linklist[data[y].t[0]].push(data[y]);
-		}
-
-		
-		$('#links img').remove();
-		$.each(linklist,function(key,value) {
-			$('#links').append(new jQuery('<h2>'+key+'</h2>'));
-			var list = new jQuery('<ul></ul>');
-			for (var x=0; x< value.length;x++) {
-				list.append(new jQuery('<li><a title=\"'+value[x].d+'\" href=\"'+value[x].u+'\">'+value[x].d+'</a></li>'));
-			}
-		$('#links').append(list);
-		});
 	}
 </script> 
-<!--<script type="text/javascript" src="http://feeds.delicious.com/v2/json/growse/?count=1000&ampcallback=parseLinks"></script>-->
 {% endblock %}

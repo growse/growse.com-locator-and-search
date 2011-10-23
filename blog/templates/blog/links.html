@@ -28,7 +28,7 @@ links ::
 				$('#links').append(new jQuery('<h2>'+key+'</h2>'));
 				var list = new jQuery('<ul></ul>');
 				for (var x=0; x< value.length;x++) {
-					list.append(new jQuery('<li><a title=\"'+value[x].description+'\" href=\"'+value[x].href+'\">'+value[x].description+'</a></li>'));
+					list.append(new jQuery('<li><a title=\"'+value[x].description+'\" href=\"'+value[x].url+'\">'+value[x].description+'</a></li>'));
 				}
 			$('#links').append(list);
 			});

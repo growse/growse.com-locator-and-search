@@ -8,10 +8,14 @@ archive :: news ::
 <h1>News Archive for {{month|date:"F"}}, {{year}}</h1>
 {% if archivearticles %}
 	{% for article in archivearticles %}
-		<h2>{{article.title}}</h2>
-		<p class="newstime">{{article.datestamp}}</h2>
-		<p>{{article.body|safe}}</p>
-		<p><a href="/news/comments/{{article.shorttitle}}/" title="More ({{article.comment__count}} comments)">More ({{article.comment__count}} comments)</a></p>
+		<article>
+                        <header>
+                                <h1>{{article.title}}</h1>
+                                <time datetime="{{article.datestamp|date:"c"}}Z" pubdate="pubdate">{{article.datestamp|date:"l d N Y @H:i"}}</time>
+                        </header>
+                        {{article.body|safe}}
+                        <p><a href="/news/comments/{{article.shorttitle}}/" title="{{article.comment__count}} comments">{{article.comment__count}} comments</a></p>
+                </article>
 	{% endfor %}
 {% endif %}
 {% endblock %}

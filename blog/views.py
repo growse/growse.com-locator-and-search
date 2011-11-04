@@ -2,12 +2,13 @@ import datetime
 from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.template import RequestContext
-from django.shortcuts import render_to_response, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Count
 from django.http import Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from blog.models import Article
 from blog.models import Comment
+from blog.mobile_render_to_response import render_to_response
 
 def photos(request):
 	c=RequestContext(request);
@@ -78,10 +79,10 @@ def article(request, article_shorttitle):
 		comments = Comment.objects.filter(article__id=article.id).order_by("datestamp");
 		return render_to_response('blog/article.html', {'nextarticle':nextarticle,'prevarticle':prevarticle,'comments':comments,'article':article,'nav':article.type.lower()},c)
 
-def frontpage(request):
+def frontpage(request,template='blog/frontpage.html'):
 	c=RequestContext(request);
 	article = Article.objects.exclude(datestamp=None).annotate(Count('comment')).order_by('-datestamp')[0];
-	return render_to_response('blog/frontpage.html',{'article':article,'nav':''},c)
+	return render_to_response(template,{'article':article,'nav':''},c)
 
 def search(request,searchterm=None,page=1):
 	c=RequestContext(request);

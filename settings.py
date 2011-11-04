@@ -78,6 +78,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 	'blog.context_processors.debug_mode',
 	'blog.context_processors.site_version',
 	'django.contrib.auth.context_processors.auth',
+	'django.core.context_processors.request',
 )
 
 MIDDLEWARE_CLASSES = (

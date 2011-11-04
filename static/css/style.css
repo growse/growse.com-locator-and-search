@@ -341,7 +341,9 @@ article header h1 {
 }
 
 article header time {
+	line-height: 10px;
 	font-size: 10px;
+	display: block;
 	margin-top: 0;	
 }
 

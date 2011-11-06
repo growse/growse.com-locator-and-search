@@ -1,0 +1,375 @@
+/***************************************
+Growse.com styling
+Orangeblack.
+***************************************/
+
+/***************************************
+Standard HTML elements
+***************************************/
+
+body {
+	font-size: 14px;
+	font-family: "Trebuchet MS",Tahoma, "Bitstream Vera Sans", Sans-serif;
+	color: #aaa;
+	background: #111;
+	padding: 0;
+	margin: 0;
+	height: 100%;
+	text-align:center;
+}
+
+#container {
+	background: #222;
+	text-align: left;
+	margin: 0;
+	padding: 0px;
+	width: 100%;
+}
+
+h1 {
+	font-size: 2em;
+	margin: 0.4em 0;
+	padding: 0;
+	border-bottom: 1px dotted #555;
+}
+
+h2 {
+	margin: 0;
+	font-size: 1.3em;
+	color: #f90;
+	padding: 0;
+}
+
+a {
+	text-decoration: none;
+	color: #5577dd;
+}
+
+a img {
+	border: 0;
+}
+
+p {
+	margin: 1em 0;
+}
+
+.commentform fieldset {
+	border: 0;
+	padding: 0;
+}
+
+.commentform fieldset input, fieldset textarea, input, textarea { 
+	margin: 0;
+	padding: 2px;
+	color: #aaa;
+	font-size: 11px;
+	border: 1px solid #666666;
+	font-family: Tahoma, Bitstream Vera Sans, Sans-serif;
+	background: #222;
+}
+
+.commentform fieldset input, .commentform fieldset textarea {
+	width: 296px;
+}
+
+.commentform fieldset label,.commentform fieldset input.textfield,.commentform fieldset textarea.textfield {
+	display: block;
+	width: 200px;
+	float: left;
+	margin-bottom: 10px;
+}
+
+.commentform fieldset label {
+	text-align: right;
+	width: 55px;
+	padding-right: 20px;
+}
+
+iframe {
+	border: 0;
+}
+
+/* pretty bullets on our lists */
+#content ul {
+	padding: 0;
+	list-style-type: none;
+}
+
+#content ul li.code {
+	background: #223;
+}
+
+#content ul li {
+	line-height: 16px;
+	background: url('http://res.growse.com/img/www/orangeblack/growse.com.sprite2.png') -0px -185px no-repeat;
+	margin-left: 5px;
+	padding-left: 20px;
+}
+
+header {
+	height: 60px;
+	background: #333;
+}
+
+#headerimage {
+}
+
+#headerimage span {
+	float:right;
+	color: #f90;
+	font-size: 2.5em;
+	line-height: 30px;
+	margin-right: 10px;
+}
+
+nav ul {
+	margin: 5px 0 0 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+nav li {
+	float: left;
+	text-align: center;
+	margin: 0 10px;
+}
+
+nav li.here {
+	background-color: #222;
+}
+
+nav a {
+	color: #fff;
+	font-size: 1.2em;
+	display: block;
+}
+
+#randomlinks {
+	display: none;
+}
+/********
+Search box
+*********/
+
+#search {
+	margin: 0;
+	padding: 0;
+}
+
+#search fieldset {
+	border: 0;
+	margin: 0;
+	padding 0;
+}
+
+#search fieldset input {
+	background: none;
+}
+
+#search .searchtext {
+	text-align: right;
+	height: 13px;
+}
+
+#search .searchimage {
+	padding:0;
+	margin: 0;
+	margin: -5px 0;
+	border: 0;
+	display: inline;
+}
+
+/******************
+Homepage
+*******************/
+
+#homeleft {
+	float: left;
+	width: 620px;
+}
+
+#homeright {
+	float: left;
+	width: 300px;
+	margin-left: 10px;
+}
+
+.homepanel {
+	border: 1px solid #666;
+	padding: 5px;
+	margin-bottom: 10px;
+}
+
+.homepanel h1 {
+	margin: -6px -5px 5px -5px;
+	padding: 5px;
+	color: #f90;
+	background: #223;
+	border: solid #666;
+	border-width: 1px 0;
+	text-align: left;
+	font-size: 1.5em;
+}
+
+.homepanel ul {
+	list-style-type:none;
+	margin:0;
+	padding: 0;
+}
+
+.homepanel ul li {
+	margin: 5px;
+}
+
+#twitter_div ul li span {
+	line-height: 10px;
+	margin: 0;
+	font-size: 10px;
+}
+
+/**********************
+Content
+*********************/
+
+#content {
+	padding: 0 10px 10px 10px;
+}
+
+#newscrumb {
+	float: right;
+	margin: 0;
+}
+
+#newsnav {
+	margin: 0px 0 3em 0;
+}
+
+#newsnavleft{
+	float: left;
+}
+
+#newsnavright {
+	float: right;
+	text-align: right;
+}
+
+#newsnavleft,#newsnavright {
+	margin: 0;
+	padding:0px;
+	width: 380px;
+}
+
+.code {
+	font-family: monospace;
+	border: 1px solid #556;
+	white-space: pre;
+	overflow: auto;
+	padding: 5px;
+	color: #ddd;
+	background: #223;
+}
+
+footer {
+	font-size: 85%;
+	background-color: #333;
+	padding: 10px;
+	text-align: right;
+}
+
+ul#linkstable {
+	list-style-type: none;
+}
+
+ul#linkstable li {
+}
+
+section header, article header {
+	border-radius: 0px;
+	height: auto;
+	background: none
+}
+
+article header h1 {
+	border: 0;
+	margin: 0;
+	font-size: 1.3em;
+	color: #f90;
+	padding: 0;
+}
+
+article header time {
+	line-height: 10px;
+	font-size: 10px;
+	display: block;
+	margin-top: 0;	
+}
+
+/****************
+Generics
+****************/
+
+.searchresult {
+	border: 1px solid #556;
+	margin-bottom: 15px;
+	background: #223;
+	padding: 5px;
+}
+
+.searchresult h2 a {
+	color: #f90;
+	border-bottom: 1px dotted #f90;
+}
+
+.comment_title {
+	margin: 5px 0;
+}
+
+.comment_body {
+	background: #223;
+	border: 1px solid #556;
+	padding: 0px 5px;
+	margin-bottom: 10px;
+}
+
+
+.commentform input.submitbtn {
+	background: #333;
+	width: 70px;
+}
+
+.right {
+	float: right;
+}
+
+.left {
+	float: left;
+}
+.hohoho {
+	display: none;
+}
+
+.centertext {
+	text-align: center;
+}
+.clear {
+	clear:both;
+}
+
+.prop {
+	float:right;
+	width: 1px;
+	min-height: 313px;
+	height: 313px;
+}
+
+.clear_prop {
+	clear:both;
+	height:1px;
+	overflow:hidden;
+}
+
+
+.homepagesmall {
+	margin: 0;
+	font-size: 10px;
+}

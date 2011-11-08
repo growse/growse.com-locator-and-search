@@ -2,18 +2,23 @@
 <!DOCTYPE html> 
 <html lang="en"> 
 	<head> 
+		<title>{% block title %}{% endblock %}growse.com</title>
+
 		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
 		<meta name="google-site-verification" content="Sr-L2EMmHr-hc4npzb8p1f7zi9ew1Iev84ly519r1p4" />
-		<meta name="viewport" content="width=device-width,user-scalable=yes,target-densitydpi=device-dpi" />
-		<!--		<meta name="viewport" content="target-densitydpi=device-dpi">-->
+		<meta name="viewport" content="width=device-width,user-scalable=yes,initial-scale=1.0" />
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-		<title>{% block title %}{% endblock %}growse.com</title> 
+		
+		<link rel="apple-touch-icon" href="http://cdn1.res.growse.com/img/www/orangeblack/touch-icon.png" />
+		<link rel="apple-touch-icon-precomposed" href="http://cdn1.res.growse.com/img/www/orangeblack/touch-icon.png" />
 		<link rel="shortcut icon" type="image/ico" href="http://cdn1.res.growse.com/img/www/orangeblack/favicon.ico" />
 		<link rel="alternate" title="RSS Feed" href="http://www.growse.com/news/rss/" type="application/rss+xml" /> 
+		
 		{% if debug_mode%}
 		<link type="text/css" rel="stylesheet" href="http://res.growse.com/css/www/style.mobile.css" /> 
 		<link type="text/css" rel="stylesheet" href="http://res.growse.com/css/www/photos.css" /> 
+		
 		<script type="text/javascript" src="http://res.growse.com/js/common/jquery-1.6.4.min.js"></script> 
 		<script type="text/javascript" src="http://res.growse.com/js/common/jquery.galleriffic.js"></script> 
 		<script type="text/javascript" src="http://res.growse.com/js/common/jquery.opacityrollover.js"></script> 
@@ -28,21 +33,24 @@
 	</head> 
 	<body>
 		<div id="container"> 
-			<header> 
+			<header>
+				<div id="mobilebuttons">
+			       		<a href="#" onclick="$('#search').fadeToggle('fast');"><img src="http://res.growse.com/img/www/orangeblack/searchbtn.png" /></a>
+			       		<a href="#" onclick="$('nav').fadeToggle('fast');"><img src="http://res.growse.com/img/www/orangeblack/menu.png"  /></a>
+				</div>
 				<div id="headerimage"><span>growse.com</span></div> 
-				<div id="search"> 
-					<form action="/search/" method="post"> 
-						<fieldset> 
-							{% csrf_token %}
-							<input placeholder="Search" id="searchbox" type="text" name="a" class="searchtext" /> 
-							<input type="image" alt="go" src="http://cdn1.res.growse.com/img/www/orangeblack/search.png" class="searchimage" /> 
-						</fieldset>
-					</form> 
-				</div> 
-				<nav>
-					{% include "blog/nav.html" %}
-				</nav> 
 			</header>
+			<div id="search"> 
+				<form action="/search/" method="post"> 
+					<fieldset> 
+						{% csrf_token %}
+						<input placeholder="Search" id="searchbox" type="text" name="a" class="searchtext" /> 
+					</fieldset>
+				</form> 
+			</div> 
+			<nav>
+				{% include "blog/nav.html" %}
+			</nav> 
 			<div id="content"> 
 				{% block content %}
 				{% endblock %}	

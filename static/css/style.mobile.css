@@ -108,7 +108,7 @@ iframe {
 
 header {
 	height: 60px;
-	background: #333;
+	background: #111;
 }
 
 #headerimage {
@@ -117,30 +117,49 @@ header {
 #headerimage span {
 	float:right;
 	color: #f90;
-	font-size: 2.5em;
+	font-size: 3.5em;
 	line-height: 30px;
 	margin-right: 10px;
 }
 
+header #mobilebuttons {
+	margin-top:5px;
+	float: left;
+}
+header #mobilebuttons a {
+	margin-left: 10px;
+}
+
+nav {
+	display: none;
+}
+
 nav ul {
-	margin: 5px 0 0 0;
+	margin: 0px 0 0 0;
 	padding: 0;
 	list-style-type: none;
 }
 
 nav li {
-	float: left;
-	text-align: center;
-	margin: 0 10px;
+	border-top: 1px solid #444;
+	border-bottom: 1px solid #222;
+	padding: 5px 10px;
+	background-color: #333;
 }
 
 nav li.here {
 	background-color: #222;
 }
 
+nav a.news {
+	background: url('http://res.growse.com/img/www/orangeblack/growse.com.sprite2.png') -0px -0px no-repeat;
+	background-size: 50%;
+}
+
 nav a {
 	color: #fff;
-	font-size: 1.2em;
+	font-size: 2.2em;
+	width: 100%;
 	display: block;
 }
 
@@ -152,31 +171,32 @@ Search box
 *********/
 
 #search {
+	display: none;
 	margin: 0;
 	padding: 0;
+	border-top: 1px solid #444;
+	border-bottom: 1px solid #222;
+	background: #333;
+
 }
 
 #search fieldset {
 	border: 0;
 	margin: 0;
 	padding 0;
+	text-align: center;
 }
 
 #search fieldset input {
+	font-size: 1.5em;
+	margin: auto 0;
+	border-radius: 4px; 
 	background: none;
+	height: 40px;
+	width: 90%;
 }
 
 #search .searchtext {
-	text-align: right;
-	height: 13px;
-}
-
-#search .searchimage {
-	padding:0;
-	margin: 0;
-	margin: -5px 0;
-	border: 0;
-	display: inline;
 }
 
 /******************

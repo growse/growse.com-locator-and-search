@@ -107,7 +107,7 @@ iframe {
 }
 
 header {
-	height: 60px;
+	height: 50px;
 	background: #111;
 }
 
@@ -117,7 +117,7 @@ header {
 #headerimage span {
 	float:right;
 	color: #f90;
-	font-size: 3.5em;
+	font-size: 2.5em;
 	line-height: 30px;
 	margin-right: 10px;
 }
@@ -153,7 +153,7 @@ nav li.here {
 
 nav a.news {
 	background: url('http://res.growse.com/img/www/orangeblack/growse.com.sprite2.png') -0px -0px no-repeat;
-	background-size: 50%;
+	background-size: 70%;
 }
 
 nav a {

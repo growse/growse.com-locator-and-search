@@ -204,7 +204,7 @@ Search box
 #search fieldset {
 	border: 0;
 	margin: 0;
-	padding 0;
+	padding: 0;
 }
 
 
@@ -215,7 +215,6 @@ Search box
 
 #search .searchimage {
 	padding:0;
-	margin: 0;
 	margin: -5px 0;
 	border: 0;
 	display: inline;

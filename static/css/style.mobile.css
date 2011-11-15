@@ -151,11 +151,6 @@ nav li.here {
 	background-color: #222;
 }
 
-nav a.news {
-	background: url('http://res.growse.com/img/www/orangeblack/growse.com.sprite2.png') -0px -0px no-repeat;
-	background-size: 100%;
-}
-
 nav a {
 	color: #ddd;
 	font-size: 2.2em;

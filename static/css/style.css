@@ -53,6 +53,7 @@ a img {
 
 p {
 	margin: 1em 0;
+	line-height: 20px;
 }
 
 .commentform fieldset {

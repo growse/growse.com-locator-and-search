@@ -82,12 +82,14 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.gzip.GZipMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 ROOT_URLCONF = 'growse_com.urls'
@@ -111,6 +113,16 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
+
+CACHES = {
+		'default': {
+			'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+			'LOCATION': '/var/tmp/django_cach',
+		}
+	}
+
+CACHE_MIDDLEWARE_KEY_PREFIX='growse_com'
+CACHE_MIDDLEWARE_SECONDS=300
 
 FORCE_SCRIPT_NAME = ''
 

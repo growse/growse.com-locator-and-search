@@ -66,23 +66,17 @@ p {
 	border: 1px solid #666666;
 	font-family: Tahoma, Bitstream Vera Sans, Sans-serif;
 	background: #222;
+	width: 90%;
 }
 
 .commentform fieldset input, .commentform fieldset textarea {
-	width: 296px;
 }
 
 .commentform fieldset label,.commentform fieldset input.textfield,.commentform fieldset textarea.textfield {
 	display: block;
-	width: 200px;
-	float: left;
-	margin-bottom: 10px;
 }
 
 .commentform fieldset label {
-	text-align: right;
-	width: 55px;
-	padding-right: 20px;
 }
 
 iframe {
@@ -176,9 +170,9 @@ Search box
 }
 
 #search fieldset {
+	padding: 0;
 	border: 0;
 	margin: 0;
-	padding 0;
 	text-align: center;
 }
 
@@ -271,7 +265,7 @@ Content
 #newsnavleft,#newsnavright {
 	margin: 0;
 	padding:0px;
-	width: 380px;
+	width: 40%;
 }
 
 .code {

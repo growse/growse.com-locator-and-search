@@ -1,10 +1,11 @@
 from django.conf.urls.defaults import *
+from django.views.generic.simple import direct_to_template
 from blog.rssfeed import RssFeed
-# Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    (r'^robots\.txt$',direct_to_template,{'template':'robots.txt','mimetype':'text/plain'}),
     (r'^cp/', include(admin.site.urls)),
     (r'^news/rss/$',RssFeed()),
     (r'^news/comments/(?P<article_shorttitle>.+)/$','blog.views.article'),
@@ -18,9 +19,7 @@ urlpatterns = patterns('',
     (r'^projects/$', 'blog.views.projectsindex'),
     (r'^videos/$', 'blog.views.videosindex'),
     (r'^misc/$', 'blog.views.miscindex'),
-    #(r'^locationfinder/$', 'blog.views.locationfinder'),
     (r'^links/$', 'blog.views.links'),
-    #(r'^links/content/$', 'blog.views.linkscontent'),
     (r'^search/(?P<searchterm>.+)/(?P<page>\d+)/$','blog.views.search'),
     (r'^search/(?P<searchterm>.+)/$','blog.views.search'),
     (r'^search/$','blog.views.search'),

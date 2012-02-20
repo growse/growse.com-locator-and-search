@@ -2,10 +2,13 @@ from django.conf.urls.defaults import *
 from django.views.generic.simple import direct_to_template
 from blog.rssfeed import RssFeed
 from django.contrib import admin
+from sitemaps import BlogSitemap
 admin.autodiscover()
+sitemaps = {'blog': BlogSitemap}
 
 urlpatterns = patterns('',
     (r'^robots\.txt$',direct_to_template,{'template':'robots.txt','mimetype':'text/plain'}),
+    (r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps}),
     (r'^cp/', include(admin.site.urls)),
     (r'^news/rss/$',RssFeed()),
     (r'^news/comments/(?P<article_shorttitle>.+)/$','blog.views.article'),

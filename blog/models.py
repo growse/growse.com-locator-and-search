@@ -30,7 +30,11 @@ class Article(models.Model):
 		if not self.id:
 			self.datestamp = datetime.datetime.now()
 		super(Article, self).save(*args, **kwargs)
-	
+	def get_absolute_url(self):
+		if self.type == 'NEWS':
+			return "/news/comments/"+self.shorttitle+"/"
+		else:
+			return "/"+self.type.lower()+"/"+self.shorttitle+"/"
 	class Meta:
 		db_table = u'articles'
 	def __unicode__(self):

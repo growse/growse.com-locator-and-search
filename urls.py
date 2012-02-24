@@ -2,9 +2,12 @@ from django.conf.urls.defaults import *
 from django.views.generic.simple import direct_to_template
 from blog.rssfeed import RssFeed
 from django.contrib import admin
-from sitemaps import BlogSitemap
+from sitemaps import BlogSitemap,FlatSitemap
 admin.autodiscover()
-sitemaps = {'blog': BlogSitemap}
+sitemaps = {
+	'blog': BlogSitemap,
+	'flat': FlatSitemap,
+	}
 
 urlpatterns = patterns('',
     (r'^robots\.txt$',direct_to_template,{'template':'robots.txt','mimetype':'text/plain'}),

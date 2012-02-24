@@ -10,3 +10,14 @@ class BlogSitemap(Sitemap):
 
     def lastmod(self, obj):
         return obj.datestamp
+
+class FlatSitemap(Sitemap):
+	changefreq = "weekly"
+	priority = 0.8
+	lastmod = date
+	def items(self):
+		return ['/','/news/','/misc/','/projects/','/links/','/photos/']
+	def location(self,obj):
+		return obj
+
+

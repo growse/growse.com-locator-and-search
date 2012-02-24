@@ -1,0 +1,44 @@
+{% extends "blog/base.html" %}
+
+{% block title %}
+{{searchterm}} :: search :: 
+{% endblock %}
+
+{% block content %}
+<h1>Search Results</h1>
+<p>You looked for <strong>{{searchterm}}</strong>. I found {{results.paginator.count}} things that might have something to do with this.</p>
+	{% if results.paginator.count != 0 %}
+		<p>
+		{% if results.has_previous %}
+		<a href="/search/{{searchterm}}/1/" title="First Page">First</a> :: <a href="/search/{{searchterm}}/{{results.previous_page_number}}/" title="Page {{results.previous_page_number}}">Prev</a>
+		{% else %}
+		First :: Prev
+		{% endif %}
+		:: Page {{results.number}} of {{results.paginator.num_pages}} :: 
+		{% if results.has_next %}
+		<a href="/search/{{searchterm}}/{{results.next_page_number}}/" title="Page {{results.next_page_number}}">Next</a> :: <a href="/search/{{searchterm}}/{{results.paginator.num_pages}}/" title="Last Page">Last</a>
+		{% else %}
+		Next :: Last
+		{% endif %}
+		</p>
+	{% endif %}
+
+	<ul>
+		{% for result in results.object_list %}
+		<div class="searchresult">
+			<h2>
+				{%if result.type == 'NEWS'%}
+				<a href="/news/comments/{{result.shorttitle}}/">{{result.title}}</a>
+				{% else %}
+				<a href="/{{result.type|lower}}/{{result.shorttitle}}/">{{result.title}}</a>
+
+				{% endif %}
+				{%if result.datestamp != None %}
+				- {{result.datestamp}}
+				{%endif%}
+			</h2>
+			<p>... {{result.headline|safe}} ...</p>
+		</div>
+		{% endfor %}
+	</ul>
+{% endblock %}

@@ -9,32 +9,6 @@ links ::
 <p>Stuff that I've randomly found interesting on the internet.</p> 
 <div id="links"><img src="http://cdn1.res.growse.com/img/www/orangeblack/twitterloader.gif" alt="loading..." /></div>
 <script type="text/javascript">
-	
-	$(document).ready(function() {
-		$.ajax({type:"GET",url:"http://res.growse.com/links.xml",dataType:"xml",success: function(data) {
-			var linklist={};
-			$(data).find('post').each(function() {
-				var tag = $(this).attr('tag');
-				var link = [];
-				link.description = $(this).attr('description');
-				link.url = $(this).attr('href');
-				if (linklist[tag]==undefined) {
-					linklist[tag]=[];
-				}
-				linklist[tag].push(link);
-			})
-			$('#links img').remove();
-			$.each(linklist,function(key,value) {
-				$('#links').append(new jQuery('<h2>'+key+'</h2>'));
-				var list = new jQuery('<ul></ul>');
-				for (var x=0; x< value.length;x++) {
-					list.append(new jQuery('<li><a title=\"'+value[x].description+'\" href=\"'+value[x].url+'\">'+value[x].description+'</a></li>'));
-				}
-			$('#links').append(list);
-			});
-		}});	
-	});
-	function parseLinks(data) {
-	}
+	$(document).ready(growse.getLinks);
 </script> 
 {% endblock %}

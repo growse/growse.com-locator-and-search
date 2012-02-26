@@ -36,6 +36,30 @@ growse = function() {
 				$('#twitterlocation_div p').html("<a href=\"http://maps.google.com?q="+coords+"\"><img src="+url+" /></a>");
 			});
 		},
+		getLinks: function() {
+			$.getJSON('http://res.growse.com/nocache/links.js', function(data) {
+				var linklist={};
+				$(data).each(function() {
+					var tag = this.t[0];
+					var link = [];
+					link.description = this.d;
+					link.url = this.u;
+					if (linklist[tag]==undefined) {
+						linklist[tag]=[];
+					}
+					linklist[tag].push(link);
+				});
+				$('#links img').remove();
+				$.each(linklist,function(key,value) {
+					$('#links').append(new jQuery('<h2>'+key+'</h2>'));
+					var list = new jQuery('<ul></ul>');
+					for (var x=0; x< value.length;x++) {
+						list.append(new jQuery('<li><a title=\"'+value[x].description+'\" href=\"'+value[x].url+'\">'+value[x].description+'</a></li>'));
+					}
+					$('#links').append(list);
+				});
+			});
+		},
 		loadRandomPhoto: function() {
 			$.getJSON("http://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=4115e4c68bbb89a0193cf80bc8554ab2&photoset_id=72157624918832108&privacy_filter=1&extras=url_s%2C+url_m%2C+url_o&format=json&jsoncallback=?", function(data){
 				if (data.photoset==undefined) {
@@ -147,7 +171,7 @@ growse = function() {
 				}
 
 				// Initialize history plugin.
-				// The callback is called at once by present location.hash. 
+				// The callback is called at once by present location.hash.
 				$.historyInit(pageload,'index.html');
 
 				// set onlick event for buttons using the jQuery 1.3 live method
@@ -157,8 +181,8 @@ growse = function() {
 					var hash = this.href;
 					hash = hash.replace(/^.*#/, '');
 
-					// moves to a new page. 
-					// pageload is called at once. 
+					// moves to a new page.
+					// pageload is called at once.
 					// hash don't contain "#", "?"
 					$.historyLoad(hash);
 					return false;
@@ -213,10 +237,10 @@ growse = function() {
 }();
 
 /*
- * JavaScript Pretty Date
- * Copyright (c) 2008 John Resig (jquery.com)
- * Licensed under the MIT license.
- */
+	* JavaScript Pretty Date
+	* Copyright (c) 2008 John Resig (jquery.com)
+	* Licensed under the MIT license.
+	*/
 
 // Takes an ISO time and returns a string representing how
 // long ago the date represents.

@@ -9,14 +9,17 @@
 
 <p class="clear" />
 
-<article>
+<article itemscope itemtype="http://schema.org/blogposting" >
 	<header>
-		<h1>{{article.title}}</h1>
+		<h1 itemprop="name headline">{{article.title}}</h1>
 		{% if article.datestamp != None %}
 		<time datetime="{{article.datestamp|date:"c"}}Z" pubdate="pubdate">{{article.datestamp|date:"l d N Y @H:i"}}</time>
 		{% endif %}
+		<meta itemprop="author" content="Andrew Rowson" />
 	</header>
-	{{article.body|safe}}
+	<section itemprop="articleBody">
+		{{article.body|safe}}
+	</section>
 </article>
 {% if article.type == 'NEWS' %}
 	<div id="newsnav">

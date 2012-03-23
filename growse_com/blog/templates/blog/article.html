@@ -20,13 +20,13 @@
 	{%endif%}
 </div>
 {%endif%}
-<p class="clear" />
+<p class="clear"></p>
 
 <article itemscope itemtype="http://schema.org/blogposting">
 	<header>
 		<h1 itemprop="name headline">{{article.title}}</h1>
 		{% if article.datestamp != None %}
-		<time datetime="{{article.datestamp|date:"c"}}Z" pubdate="pubdate">{{article.datestamp|date:"l d N Y @H:i"}}</time>
+		<time datetime="{{article.datestamp|date:"c"}}">{{article.datestamp|date:"l d N Y @H:i"}}</time>
 		{% endif %}
 		<meta itemprop="author" content="Andrew Rowson" />
 	</header>
@@ -52,7 +52,7 @@
 	{% endfor %}
 	
 	<h2>Add a new comment</h2>
-	<form class="commentform" action="" method="post">
+	<form class="commentform" method="post">
 		<fieldset>
 			{%csrf_token%}
 			<p class="hohoho">Do not fill this out:<input type="text" name="email" value="" /></p>

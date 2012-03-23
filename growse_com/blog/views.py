@@ -6,9 +6,9 @@ from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Count
 from django.http import Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from blog.models import Article
-from blog.models import Comment
-from blog.mobile_render_to_response import render_to_response
+from growse_com.blog.models import Article
+from growse_com.blog.models import Comment
+from growse_com.blog.mobile_render_to_response import render_to_response
 
 def photos(request):
 	c=RequestContext(request);

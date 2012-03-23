@@ -41,6 +41,8 @@ LANGUAGE_CODE = 'en-uk'
 
 SITE_ID = 1
 
+USE_TZ = True
+
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = False
@@ -56,12 +58,14 @@ MEDIA_ROOT = ''
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = '/media/'
+
+STATIC_URL = '/media/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/'
+#ADMIN_MEDIA_PREFIX = '/media/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'g%l6i8$k8oc2%ck(i65a=0z7es@a4%oc9h2rrop=v^lmoy2+$y'
@@ -75,8 +79,8 @@ TEMPLATE_LOADERS = (
 
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-	'blog.context_processors.debug_mode',
-	'blog.context_processors.site_version',
+	'growse_com.blog.context_processors.debug_mode',
+	'growse_com.blog.context_processors.site_version',
 	'django.contrib.auth.context_processors.auth',
 	'django.core.context_processors.request',
 )
@@ -108,7 +112,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.sitemaps',
-    'blog',
+    'growse_com.blog',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

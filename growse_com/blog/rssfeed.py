@@ -1,6 +1,6 @@
 import datetime
 from django.contrib.syndication.views import Feed
-from blog.models import Article
+from growse_com.blog.models import Article
 
 class RssFeed(Feed):
 	title="growse.com"

@@ -1,6 +1,6 @@
-from blog.models import Article
-from blog.models import Comment
-from blog.models import Footerline
+from growse_com.blog.models import Article
+from growse_com.blog.models import Comment
+from growse_com.blog.models import Footerline
 from django.contrib import admin
 
 class CommentInline(admin.TabularInline):

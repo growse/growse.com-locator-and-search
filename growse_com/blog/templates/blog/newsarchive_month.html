@@ -11,7 +11,7 @@ archive :: news ::
 		<article>
                         <header>
                                 <h1>{{article.title}}</h1>
-                                <time datetime="{{article.datestamp|date:"c"}}Z" pubdate="pubdate">{{article.datestamp|date:"l d N Y @H:i"}}</time>
+                                <time datetime="{{article.datestamp|date:"c"}}">{{article.datestamp|date:"l d N Y @H:i"}}</time>
                         </header>
                         {{article.body|safe}}
                         <p><a href="/news/comments/{{article.shorttitle}}/" title="{{article.comment__count}} comments">{{article.comment__count}} comments</a></p>

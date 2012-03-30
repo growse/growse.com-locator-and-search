@@ -1,5 +1,4 @@
-{%spaceless%}
-<!DOCTYPE html> 
+{%spaceless%}<!DOCTYPE html> 
 <html lang="en"> 
 	<head> 
 		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
@@ -11,18 +10,13 @@
 		{% if debug_mode%}
 		<link type="text/css" rel="stylesheet" href="http://res.growse.com/css/www/style.css" /> 
 		<link type="text/css" rel="stylesheet" href="http://res.growse.com/css/www/photos.css" /> 
-		<script type="text/javascript" src="http://res.growse.com/js/common/jquery-1.6.4.min.js"></script> 
-		<script type="text/javascript" src="http://res.growse.com/js/common/jquery.galleriffic.js"></script> 
-		<script type="text/javascript" src="http://res.growse.com/js/common/jquery.opacityrollover.js"></script> 
-		<script type="text/javascript" src="http://res.growse.com/js/common/jquery.history.js"></script> 
-		<script type="text/javascript" src="http://res.growse.com/js/common/ga.js"></script> 
-		<script type="text/javascript" src="http://res.growse.com/js/common/highcharts.js"></script> 
-		<script type="text/javascript" src="http://res.growse.com/js/www/scripts.js"></script> 
 		{%else%}
 		<link type="text/css" rel="stylesheet" href="http://cdn1.res.growse.com/mincache/www.{{site_version}}.css" /> 
-		<script type="text/javascript" src="http://cdn1.res.growse.com/mincache/www.{{site_version}}.js"></script> 
 		{% endif %}
-		<!-- {%now "d"%}-->
+		<script type="text/javascript">;(function (a) {_q = function () { return a; };$ = function (f) {typeof f === "function" && a.push(arguments);return $;};jQuery = $.ready = $;} ([]));</script>
+		{% if april_first%}
+		<style>#container {-moz-transform: scaleX(-1);-o-transform: scaleX(-1);-webkit-transform: scaleX(-1);transform: scaleX(-1)filter: FlipH;-ms-filter: "FlipH";}</style>
+		{%endif%}
 	</head> 
 	<body>
 		<div id="container"> 
@@ -49,7 +43,18 @@
 			Almost everything (c) 2002-{% now "Y" %} <a rel="author" href="https://plus.google.com/105730305908005594688">Andrew Rowson</a>. If you break anything because of something you read here, that's your own problem.
 			</footer> 
 		</div> 
+		{% if debug_mode%}
+		<script type="text/javascript" src="http://res.growse.com/js/common/jquery.js"></script> 
+		<script type="text/javascript" src="http://res.growse.com/js/common/jquery.galleriffic.js"></script> 
+		<script type="text/javascript" src="http://res.growse.com/js/common/jquery.opacityrollover.js"></script> 
+		<script type="text/javascript" src="http://res.growse.com/js/common/jquery.history.js"></script> 
+		<script type="text/javascript" src="http://res.growse.com/js/common/ga.js"></script> 
+		<script type="text/javascript" src="http://res.growse.com/js/common/highcharts.js"></script> 
+		<script type="text/javascript" src="http://res.growse.com/js/www/scripts.js"></script> 
+		{%else%}
+		<script type="text/javascript" src="http://cdn1.res.growse.com/mincache/www.{{site_version}}.js"></script> 
 		<script type="text/javascript"> if (window.location.href.substring(0,22)=='http://www.growse.com/') {var pageTracker = _gat._getTracker("UA-185490-7");	pageTracker._setDomainName("www.growse.com");pageTracker._trackPageview();}</script> 
+		{%endif%}
+		<script type="text/javascript">(function (i, s, q, l) {for (q = window._q(), l = q.length; i < l; ) {$.apply(this, s.call(q[i++]));}window._q = undefined;} (0, Array.prototype.slice));</script>
 	</body> 
-</html>
-{%endspaceless%}
+</html>{%endspaceless%}

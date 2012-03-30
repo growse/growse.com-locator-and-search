@@ -81,6 +81,7 @@ TEMPLATE_LOADERS = (
 TEMPLATE_CONTEXT_PROCESSORS = (
 	'growse_com.blog.context_processors.debug_mode',
 	'growse_com.blog.context_processors.site_version',
+	'growse_com.blog.context_processors.date_bools',
 	'django.contrib.auth.context_processors.auth',
 	'django.core.context_processors.request',
 )

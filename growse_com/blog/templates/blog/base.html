@@ -5,13 +5,13 @@
 		<meta name="google-site-verification" content="Sr-L2EMmHr-hc4npzb8p1f7zi9ew1Iev84ly519r1p4" /> 
 		<meta name="description" content="Various thoughts, happenings, projects and other things going on in the world of Andrew Rowson" />
 		<title>{% block title %}{% endblock %}growse.com</title> 
-		<link rel="shortcut icon" type="image/ico" href="http://cdn1.res.growse.com/img/www/orangeblack/favicon.ico" />
+		<link rel="shortcut icon" type="image/ico" href="http://{{cdn_url}}/img/www/orangeblack/favicon.ico" />
 		<link rel="alternate" title="RSS Feed" href="http://www.growse.com/news/rss/" type="application/rss+xml" /> 
 		{% if debug_mode%}
 		<link type="text/css" rel="stylesheet" href="http://res.growse.com/css/www/style.css" /> 
 		<link type="text/css" rel="stylesheet" href="http://res.growse.com/css/www/photos.css" /> 
 		{%else%}
-		<link type="text/css" rel="stylesheet" href="http://cdn1.res.growse.com/mincache/www.{{site_version}}.css" /> 
+		<link type="text/css" rel="stylesheet" href="http://{{cdn_url}}/mincache/www.{{site_version}}.css" /> 
 		{% endif %}
 		<script type="text/javascript">;(function (a) {_q = function () { return a; };$ = function (f) {typeof f === "function" && a.push(arguments);return $;};jQuery = $.ready = $;} ([]));</script>
 		{% if april_first%}
@@ -52,7 +52,7 @@
 		<script type="text/javascript" src="http://res.growse.com/js/common/highcharts.js"></script> 
 		<script type="text/javascript" src="http://res.growse.com/js/www/scripts.js"></script> 
 		{%else%}
-		<script type="text/javascript" src="http://cdn1.res.growse.com/mincache/www.{{site_version}}.js"></script> 
+		<script type="text/javascript" src="http://{{cdn_url}}/mincache/www.{{site_version}}.js"></script> 
 		<script type="text/javascript"> if (window.location.href.substring(0,22)=='http://www.growse.com/') {var pageTracker = _gat._getTracker("UA-185490-7");	pageTracker._setDomainName("www.growse.com");pageTracker._trackPageview();}</script> 
 		{%endif%}
 		<script type="text/javascript">(function (i, s, q, l) {for (q = window._q(), l = q.length; i < l; ) {$.apply(this, s.call(q[i++]));}window._q = undefined;} (0, Array.prototype.slice));</script>

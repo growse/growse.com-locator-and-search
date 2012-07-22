@@ -87,6 +87,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'djangosecure.middleware.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -94,6 +95,14 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
 )
+
+SECURE_SSL_REDIRECT=True
+SECURE_FRAME_DENY=True
+SECURE_HSTS_SECONDS=300
+SECURE_HSTS_INCLUDE_SUBDOMAINS=True
+SECURE_CONTENT_TYPE_NOSNIFF=True
+SECURE_BROWSER_XSS_FILTER=True
+SESSION_COOKIE_SECURE=True
 
 ROOT_URLCONF = 'growse_com.urls'
 
@@ -116,6 +125,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+	'djangosecure',
 )
 
 CACHES = {

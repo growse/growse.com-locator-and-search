@@ -10,7 +10,7 @@ growse = function() {
 			growse.getTweets();
 		},
 		getTweets: function() {
-			$.getJSON("http://res.growse.com/nocache/twitter.js",function(data) {
+			$.getJSON("//res.growse.com/nocache/twitter.js",function(data) {
 				var max = 4;
 				var counter=0;
 				$('#twitter_div').empty();
@@ -30,14 +30,14 @@ growse = function() {
 			return text.replace(exp,"<a href='$1'>$1</a>");
 		},
 		getLocation: function() {
-			$.getJSON("http://res.growse.com/nocache/latitude.js",function(data) {
+			$.getJSON("//res.growse.com/nocache/latitude.js",function(data) {
 					var coords = data.features[0].geometry.coordinates[1]+','+data.features[0].geometry.coordinates[0];
-					var url = 'http://maps.googleapis.com/maps/api/staticmap?markers=color:red|'+coords+'&zoom=13&size=285x200&sensor=false';
-				$('#twitterlocation_div p').html("<a href=\"http://maps.google.com?q="+coords+"\"><img src="+url+" /></a>");
+					var url = '//maps.googleapis.com/maps/api/staticmap?markers=color:red|'+coords+'&zoom=13&size=285x200&sensor=false';
+				$('#twitterlocation_div p').html("<a href=\"//maps.google.com?q="+coords+"\"><img src="+url+" /></a>");
 			});
 		},
 		getLinks: function() {
-			$.getJSON('http://res.growse.com/nocache/links.js', function(data) {
+			$.getJSON('//res.growse.com/nocache/links.js', function(data) {
 				var linklist={};
 				$(data).each(function() {
 					var tag = this.t[0];
@@ -61,7 +61,7 @@ growse = function() {
 			});
 		},
 		loadRandomPhoto: function() {
-			$.getJSON("http://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=4115e4c68bbb89a0193cf80bc8554ab2&photoset_id=72157624918832108&privacy_filter=1&extras=url_s%2C+url_m%2C+url_o&format=json&jsoncallback=?", function(data){
+			$.getJSON("//secure.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=4115e4c68bbb89a0193cf80bc8554ab2&photoset_id=72157624918832108&privacy_filter=1&extras=url_s%2C+url_m%2C+url_o&format=json&jsoncallback=?", function(data){
 				if (data.photoset==undefined) {
 					document.write(data.message);
 				} else {
@@ -72,7 +72,7 @@ growse = function() {
 			});
 		},
 		loadPhotoGallery: function() {
-			$.getJSON("http://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=4115e4c68bbb89a0193cf80bc8554ab2&photoset_id=72157624918832108&privacy_filter=1&extras=url_sq%2C+url_m%2C+url_o&format=json&jsoncallback=?", function(data){
+			$.getJSON("//secure.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=4115e4c68bbb89a0193cf80bc8554ab2&photoset_id=72157624918832108&privacy_filter=1&extras=url_sq%2C+url_m%2C+url_o&format=json&jsoncallback=?", function(data){
 				if (data.photoset==undefined) {
 					document.write(data.message);
 				} else {
@@ -195,7 +195,7 @@ growse = function() {
 			});
 		},
 		spamwatchGraph: function() {
-			$.getJSON("http://res.growse.com/spamwatch/data.work.txt", function (data) {
+			$.getJSON("//res.growse.com/spamwatch/data.work.txt", function (data) {
 				var chart = new Highcharts.Chart({
 					chart: {
 						renderTo: 'spamwatch',

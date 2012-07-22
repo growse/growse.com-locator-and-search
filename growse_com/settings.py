@@ -7,7 +7,7 @@ ADMINS = (
     ('Andrew Rowson', 'andrew@growse.com'),
 )
 CDN_URL = (
-		'growseres1.growsecom.netdna-cdn.com'
+		'growseres1-growsecom.netdna-ssl.com'
 	#'cdn1.res.growse.com'
 )
 

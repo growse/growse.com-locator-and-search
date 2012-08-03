@@ -1,6 +1,7 @@
 def debug_mode(request):
 	from django.conf import settings
-	return {'debug_mode': settings.DEBUG}
+	from django.core.cache import cache 
+	return {'debug_mode': settings.DEBUG,'cache':cache}
 
 def site_version(request):
 	from django.conf import settings

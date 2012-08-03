@@ -85,7 +85,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.cache.UpdateCacheMiddleware',
+#    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'djangosecure.middleware.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -93,7 +93,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.gzip.GZipMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',
+#    'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 SECURE_SSL_REDIRECT=True
@@ -128,15 +128,15 @@ INSTALLED_APPS = (
 	'djangosecure',
 )
 
-CACHES = {
-		'default': {
-			'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-			'LOCATION': '/var/tmp/django_cache',
-		}
-	}
-
-CACHE_MIDDLEWARE_KEY_PREFIX='growse_com'
-CACHE_MIDDLEWARE_SECONDS=300
+#CACHES = {
+#		'default': {
+#			'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+#			'LOCATION': '/var/tmp/django_cache',
+#		}
+#	}
+#
+#CACHE_MIDDLEWARE_KEY_PREFIX='growse_com'
+#CACHE_MIDDLEWARE_SECONDS=300
 
 FORCE_SCRIPT_NAME = ''
 

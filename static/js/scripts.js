@@ -119,8 +119,8 @@ growse = function() {
 					// Initialize Advanced Galleriffic Gallery
 					var gallery = $('#thumbs').galleriffic({
 						delay:					 2500,
-						numThumbs:				 15,
-						preloadAhead:			10,
+						numThumbs:				 30,
+						preloadAhead:			30,
 						enableTopPager:			true,
 						enableBottomPager:		 false,
 						maxPagesToShow:			7,
@@ -132,8 +132,8 @@ growse = function() {
 						renderNavControls:		 true,
 						playLinkText:			'Play Slideshow',
 						pauseLinkText:			 'Pause Slideshow',
-						prevLinkText:			'&lsaquo; Previous Photo',
-						nextLinkText:			'Next Photo &rsaquo;',
+						prevLinkText:			'&lsaquo; Previous',
+						nextLinkText:			'Next &rsaquo;',
 						nextPageLinkText:		'Next &rsaquo;',
 						prevPageLinkText:		'&lsaquo; Prev',
 						enableHistory:			 false,

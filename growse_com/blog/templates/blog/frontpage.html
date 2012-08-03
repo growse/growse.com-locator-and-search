@@ -8,22 +8,15 @@
 		<p id="newscrumb"><a href="/news/rss/" title="RSS Feed"><img src="//growseres1-growsecom.netdna-ssl.com/img/www/orangeblack/feedicon.png" alt="RSS Feed" /></a></p> 
 		<p>Here's what's been going on.</p>
 		<h2>{{article.title}}</h2>
-		{{article.body|safe|truncatewords_html:"100"}}
+		{{article.body|safe}}
 		<p><a href="/news/comments/{{article.shorttitle}}/" title="More ({{article.comment__count}} comments)">More ({{article.comment__count}} comments)</a></p> 
 	</div>
+</div>
+<div id="homeright">
 	<div class="homepanel"> 
 	        <h1>Thoughts</h1>  
 	        <div id="twitter_div"><p style="text-align: center;"><img src="//growseres1-growsecom.netdna-ssl.com/img/www/orangeblack/twitterloader.gif" alt="loading twitter" /></p></div>
 	</div> 
-	<div class="homepanel">
-		<h1>Spams</h1>
-		<div id="spamwatch">
-			<p>Hmmm. Something went wrong. :(</p> 
-		</div> 
-		<p class="homepagesmall"><a href="/projects/spamwatch/">WTF is spamwatch?</a></p>
-	</div>
-</div>
-<div id="homeright">
 	<div class="homepanel centertext" id="homepicturepanel">
 		<h1>Pictures</h1>
 		<div id="randomphoto"></div>

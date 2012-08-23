@@ -104,7 +104,7 @@ iframe {
 
 #content ul li {
 	line-height: 16px;
-	background: url('//growseres1-growsecom.netdna-ssl.com/img/www/orangeblack/growse.com.sprite2.png') -0px -185px no-repeat;
+	background: url('../img/growse.com.sprite2.png') -0px -185px no-repeat;
 	margin-left: 5px;
 	padding-left: 20px;
 }
@@ -116,7 +116,7 @@ header {
 }
 
 #headerimage {
-	background: url('//growseres1-growsecom.netdna-ssl.com/img/www/orangeblack/growse.com.sprite2.png') 0px -90px no-repeat ;
+	background: url('../img/growse.com.sprite2.png') 0px -90px no-repeat ;
 	width: 370px;
 	float: right;
 	height: 80px;
@@ -157,7 +157,7 @@ nav a {
 
 
 nav a.news {
-	background: url('//growseres1-growsecom.netdna-ssl.com/img/www/orangeblack/growse.com.sprite2.png') -0px -0px no-repeat;
+	background: url('../img/growse.com.sprite2.png') -0px -0px no-repeat;
 }
 
 nav li.first,nav li.first a:hover {
@@ -165,22 +165,22 @@ nav li.first,nav li.first a:hover {
 }
 
 nav a.projects {
-	background: url('//growseres1-growsecom.netdna-ssl.com/img/www/orangeblack/growse.com.sprite2.png') -80px -0px no-repeat;
+	background: url('../img/growse.com.sprite2.png') -80px -0px no-repeat;
 }
 
 
 nav a.pictures {
-	background: url('//growseres1-growsecom.netdna-ssl.com/img/www/orangeblack/growse.com.sprite2.png') -160px -0px no-repeat;
+	background: url('../img/growse.com.sprite2.png') -160px -0px no-repeat;
 }
 
 nav a.videos {
-	background: url('//growseres1-growsecom.netdna-ssl.com/img/www/orangeblack/growse.com.sprite2.png') -240px -0px no-repeat;
+	background: url('../img/growse.com.sprite2.png') -240px -0px no-repeat;
 }
 nav a.misc {
-	background: url('//growseres1-growsecom.netdna-ssl.com/img/www/orangeblack/growse.com.sprite2.png') -320px -0px no-repeat;
+	background: url('../img/growse.com.sprite2.png') -320px -0px no-repeat;
 }
 nav a.links {
-	background: url('//growseres1-growsecom.netdna-ssl.com/img/www/orangeblack/growse.com.sprite2.png') -400px -0px no-repeat;
+	background: url('../img/growse.com.sprite2.png') -400px -0px no-repeat;
 }
 
 nav a:hover {

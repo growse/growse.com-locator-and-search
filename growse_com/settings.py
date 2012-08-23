@@ -1,5 +1,5 @@
 # Django settings for growse_com project.
-
+import sys
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -8,7 +8,6 @@ ADMINS = (
 )
 CDN_URL = (
 		'growseres1-growsecom.netdna-ssl.com'
-	#'cdn1.res.growse.com'
 )
 
 MANAGERS = ADMINS
@@ -56,9 +55,35 @@ MEDIA_ROOT = ''
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '/'
+STATIC_ROOT='/var/www/growse.com/res/django-static/'
+STATICFILES_DIRS=('/home/growse/django-sites/growse_com/static/',)
+STATIC_URL = '//growseres1-growsecom.netdna-ssl.com/django-static/'
+STATICFILES_STORAGE='pipeline.storage.PipelineCachedStorage'
+PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
+PIPELINE_CSS = {
+    'www': {
+        'source_filenames': (
+          'css/*.css',
+        ),
+        'output_filename': 'css/www.css',
+        'extra_context': {
+            'media': 'screen,projection',
+        },
+    },
+}
+PIPELINE_JS = {
+    'stats': {
+        'source_filenames': (
+          'js/jquery-*.min.js',
+          'js/jquery.*.js',
+          'js/scripts.js',
+        ),
+        'output_filename': 'js/www.js',
+    }
+}
+PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.cssmin.CssminCompressor'
+PIPELINE_JS_COMPRESSOR = None 
 
-STATIC_URL = '/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -96,14 +121,18 @@ MIDDLEWARE_CLASSES = (
 #    'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
-SECURE_SSL_REDIRECT=True
-SECURE_FRAME_DENY=True
-SECURE_HSTS_SECONDS=300
-SECURE_HSTS_INCLUDE_SUBDOMAINS=True
-SECURE_CONTENT_TYPE_NOSNIFF=True
-SECURE_BROWSER_XSS_FILTER=True
-SESSION_COOKIE_SECURE=True
 
+if not 'runserver' in sys.argv and not  'runserver_plus':
+	SECURE_SSL_REDIRECT=False
+	SECURE_FRAME_DENY=False
+	SECURE_HSTS_SECONDS=300
+	SECURE_HSTS_INCLUDE_SUBDOMAINS=True
+	SECURE_CONTENT_TYPE_NOSNIFF=True
+	SECURE_BROWSER_XSS_FILTER=True
+	SESSION_COOKIE_SECURE=True
+else:
+	SECURE_SSL_REDIRECT=False
+	
 ROOT_URLCONF = 'growse_com.urls'
 
 TEMPLATE_DIRS = (
@@ -114,6 +143,7 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
+	'django.contrib.staticfiles',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -126,6 +156,7 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 	'djangosecure',
+	'pipeline',		
 )
 
 #CACHES = {

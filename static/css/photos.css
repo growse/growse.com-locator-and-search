@@ -43,7 +43,7 @@ div#loading {
 	position: absolute;
 	top: 0;
 	left: 0;
-	background-image: url('../../img/www/loader.gif');
+	background-image: url('../img/twitterloader.gif');
 	background-repeat: no-repeat;
 	background-position: center;
 	width: 550px;

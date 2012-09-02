@@ -6,7 +6,6 @@ def debug_mode(request):
 def site_version(request):
 	from django.conf import settings
 	return {
-			'site_version': settings.SITE_VERSION,
 			'cdn_url': settings.CDN_URL
 			}
 

@@ -1,6 +1,9 @@
 # Django settings for growse_com project.
 import sys
-DEBUG = True
+if not 'runserver' in sys.argv:
+	DEBUG=False
+else:
+	DEBUG=True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -55,9 +58,12 @@ MEDIA_ROOT = ''
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-STATIC_ROOT='/var/www/growse.com/res/django-static/'
+STATIC_ROOT='/var/www/growse.com/res/django-static/www/'
 STATICFILES_DIRS=('/home/growse/django-sites/growse_com/static/',)
-STATIC_URL = '//growseres1-growsecom.netdna-ssl.com/django-static/'
+if DEBUG:
+	STATIC_URL='//res.growse.com/django-static/www/'
+else:
+	STATIC_URL = '//growseres1-growsecom.netdna-ssl.com/django-static/www/'
 STATICFILES_STORAGE='pipeline.storage.PipelineCachedStorage'
 PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
 PIPELINE_CSS = {
@@ -72,7 +78,7 @@ PIPELINE_CSS = {
     },
 }
 PIPELINE_JS = {
-    'stats': {
+    'www': {
         'source_filenames': (
           'js/jquery-*.min.js',
           'js/jquery.*.js',
@@ -83,6 +89,9 @@ PIPELINE_JS = {
 }
 PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.cssmin.CssminCompressor'
 PIPELINE_JS_COMPRESSOR = None 
+PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'
+PIPELINE_YUI_BINARY = '/usr/bin/yui-compressor'
+PIPELINE_DISABLE_WRAPPER = True
 
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a

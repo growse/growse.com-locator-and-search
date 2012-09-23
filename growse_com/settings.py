@@ -69,7 +69,7 @@ PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
 PIPELINE_CSS = {
     'www': {
         'source_filenames': (
-          'css/*.css',
+          'css/*.scss',
         ),
         'output_filename': 'css/www.css',
         'extra_context': {
@@ -87,6 +87,9 @@ PIPELINE_JS = {
         'output_filename': 'js/www.js',
     }
 }
+PIPELINE_COMPILERS = (
+    'pipeline_compass.compiler.CompassCompiler',
+)
 PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.cssmin.CssminCompressor'
 PIPELINE_JS_COMPRESSOR = None 
 PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'

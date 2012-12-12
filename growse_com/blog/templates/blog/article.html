@@ -26,7 +26,7 @@
 	<header>
 		<h1 itemprop="name headline">{{article.title}}</h1>
 		{% if article.datestamp != None %}
-		<time datetime="{{article.datestamp|date:"c"}}">{{article.datestamp|date:"l d N Y @H:i"}}</time>
+		<time itemprop="datePublished" datetime="{{article.datestamp|date:"c"}}">{{article.datestamp|date:"l d N Y H:i"}}</time>
 		{% endif %}
 		<meta itemprop="author" content="Andrew Rowson" />
 	</header>

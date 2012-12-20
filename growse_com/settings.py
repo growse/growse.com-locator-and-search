@@ -56,8 +56,11 @@ MEDIA_ROOT = ''
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-STATIC_ROOT = '/var/www/growse.com/res/django-static/www/'
-STATICFILES_DIRS = ('/home/growse/django-sites/growse_com/static/',)
+if DEBUG:
+    STATIC_ROOT = 'static-root'
+else:
+    STATIC_ROOT = '/var/www/growse.com/res/django-static/www/'
+STATICFILES_DIRS = ('static/',)
 if DEBUG:
     STATIC_URL = '//res.growse.com/django-static/www/'
 else:

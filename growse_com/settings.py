@@ -1,27 +1,25 @@
 # Django settings for growse_com project.
 import sys
 if not 'runserver' in sys.argv:
-	DEBUG=False
+    DEBUG = True
 else:
-	DEBUG=True
+    DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     ('Andrew Rowson', 'andrew@growse.com'),
 )
-CDN_URL = (
-		'growseres1-growsecom.netdna-ssl.com'
-)
+CDN_URL = ('growseres1-growsecom.netdna-ssl.com')
 
 MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'growse_com_django',                      # Or path to database file if using sqlite3.
-        'USER': 'growse',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'USER': 'growse_com',                      # Not used with sqlite3.
+        'PASSWORD': 'abominable',                  # Not used with sqlite3.
+        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
@@ -58,18 +56,18 @@ MEDIA_ROOT = ''
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-STATIC_ROOT='/var/www/growse.com/res/django-static/www/'
-STATICFILES_DIRS=('/home/growse/django-sites/growse_com/static/',)
+STATIC_ROOT = '/var/www/growse.com/res/django-static/www/'
+STATICFILES_DIRS = ('/home/growse/django-sites/growse_com/static/',)
 if DEBUG:
-	STATIC_URL='//res.growse.com/django-static/www/'
+    STATIC_URL = '//res.growse.com/django-static/www/'
 else:
-	STATIC_URL = '//growseres1-growsecom.netdna-ssl.com/django-static/www/'
-STATICFILES_STORAGE='pipeline.storage.PipelineCachedStorage'
+    STATIC_URL = '//growseres1-growsecom.netdna-ssl.com/django-static/www/'
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
 PIPELINE_CSS = {
     'www': {
         'source_filenames': (
-          'css/*.scss',
+            'css/*.scss',
         ),
         'output_filename': 'css/www.css',
         'extra_context': {
@@ -80,9 +78,9 @@ PIPELINE_CSS = {
 PIPELINE_JS = {
     'www': {
         'source_filenames': (
-          'js/jquery-*.min.js',
-          'js/jquery.*.js',
-          'js/scripts.js',
+            'js/jquery-*.min.js',
+            'js/jquery.*.js',
+            'js/scripts.js',
         ),
         'output_filename': 'js/www.js',
     }
@@ -91,7 +89,7 @@ PIPELINE_COMPILERS = (
     'pipeline_compass.compiler.CompassCompiler',
 )
 PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.cssmin.CssminCompressor'
-PIPELINE_JS_COMPRESSOR = None 
+PIPELINE_JS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'
 PIPELINE_YUI_BINARY = '/usr/bin/yui-compressor'
 PIPELINE_DISABLE_WRAPPER = True
@@ -109,20 +107,18 @@ SECRET_KEY = 'g%l6i8$k8oc2%ck(i65a=0z7es@a4%oc9h2rrop=v^lmoy2+$y'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
 )
 
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-	'growse_com.blog.context_processors.debug_mode',
-	'growse_com.blog.context_processors.site_version',
-	'growse_com.blog.context_processors.date_bools',
-	'django.contrib.auth.context_processors.auth',
-	'django.core.context_processors.request',
+    'growse_com.blog.context_processors.debug_mode',
+    'growse_com.blog.context_processors.site_version',
+    'growse_com.blog.context_processors.date_bools',
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.request',
 )
 
 MIDDLEWARE_CLASSES = (
-#    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'djangosecure.middleware.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -130,21 +126,20 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.gzip.GZipMiddleware',
-#    'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 
-if not 'runserver' in sys.argv:
-	SECURE_SSL_REDIRECT=True
-	SECURE_FRAME_DENY=True
-	SECURE_HSTS_SECONDS=300
-	SECURE_HSTS_INCLUDE_SUBDOMAINS=False
-	SECURE_CONTENT_TYPE_NOSNIFF=True
-	SECURE_BROWSER_XSS_FILTER=True
-	SESSION_COOKIE_SECURE=True
+if DEBUG:
+    SECURE_SSL_REDIRECT = False
+    SECURE_FRAME_DENY = True
+    SECURE_HSTS_SECONDS = 300
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SESSION_COOKIE_SECURE = True
 else:
-	SECURE_SSL_REDIRECT=False
-	
+    SECURE_SSL_REDIRECT = False
+
 ROOT_URLCONF = 'growse_com.urls'
 
 TEMPLATE_DIRS = (
@@ -155,7 +150,7 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-	'django.contrib.staticfiles',
+    'django.contrib.staticfiles',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -167,8 +162,8 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-	'djangosecure',
-	'pipeline',		
+    'djangosecure',
+    'pipeline',
 )
 
 #CACHES = {
@@ -184,6 +179,6 @@ INSTALLED_APPS = (
 FORCE_SCRIPT_NAME = ''
 
 try:
-	    from local_settings import *
+    from local_settings import *
 except ImportError:
-	    pass
+    pass

@@ -21,7 +21,6 @@
     {% if comments.count != 0 %}
     <h2>Comments</h2>
     {% endif %}
-    
     {% for comment in comments %}
     <div class="comment_title">
         {% if comment.website and  comment.website|length >= 1 %}
@@ -33,7 +32,6 @@
     </div>
     <div style="white-space: pre-line;" class="comment_body"><p>{{comment.comment}}</p></div>
     {% endfor %}
-    
     <h2>Add a new comment</h2>
     <form class="commentform" method="post">
         <fieldset>

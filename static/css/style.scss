@@ -2,39 +2,45 @@ body {
     font-size: 13px;
     font-family: "Trebuchet MS",Tahoma,"Bitstream Vera Sans",Sans-serif;
     color: #aaa;
-    background: #111;
     padding: 0;
     margin: 0;
     height: 100%;
     text-align: center;
 }
 
+.here {
+    background-color: #222;
+    border: 0;
+}
 #container {
-    background: #111;
+    background: #333;
     text-align: left;
     vertical-align: middle;
     margin: 0;
     padding: 0;
+    scroll: width: 16px;
     nav {
+        overflow-y: scroll;
+        background: #111;
         position: fixed;
         float: left;
         width: 200px;
         ul {
-            border: 1px solid green;
             list-style-type: none;
             margin:0;
             padding:0;
             li {
-                height: 4em;
-                .here {
-                    background-color: #222;
+                a {
+                    height: 4em;
+                    padding: 1em;
+                    display: block;
+                    border-top: 1px solid #222;
                 }
             }
         }
     }
     #content {
         background-color: #222;
-        border: 1px solid pink;
         height: 100%;
         margin: 0 200px;
         padding: 2em;

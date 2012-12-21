@@ -65,7 +65,10 @@ def article(request, article_shorttitle=''):
         spamfilter = request.POST.get('email')
         if spamfilter is None or len(spamfilter) == 0:
             Comment.objects.create(name=name, website=website, comment=comment, article=article, ip=request.META['REMOTE_ADDR'])
-            send_mail('New Comment on growse.com', 'Someone posted a comment on growse.com. Over at http://www.growse.com/news/comments/' + article.shorttitle + '/', 'hubfour@growse.com', ['comments@growse.com'], fail_silently=False)
+            try:
+                send_mail('New Comment on growse.com', 'Someone posted a comment on growse.com. Over at http://www.growse.com/news/comments/' + article.shorttitle + '/', 'hubfour@growse.com', ['comments@growse.com'], fail_silently=False)
+            except:
+                pass
         return redirect("/news/comments/" + article_shorttitle + "/")
     else:
         articlenavlist = Article.objects.all().order_by('-datestamp')

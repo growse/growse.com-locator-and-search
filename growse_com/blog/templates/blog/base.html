@@ -19,8 +19,8 @@
         <div id="container"> 
             <nav>
             <ul>
-                {% for article in articlenavlist%}
-                    <li>{{article.title}}</li>
+                {% for navitem in articlenavlist%}
+                <li><a href="/news/comments/{{navitem.shorttitle}}/" title="{{navitem.title}}" {%if article.id == navitem.id%}class="here"{%endif%}>{{navitem.title}}</a></li>
                 {%endfor%}
             </ul>
             </nav>

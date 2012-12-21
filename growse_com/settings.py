@@ -62,10 +62,11 @@ else:
     STATIC_ROOT = '/var/www/growse.com/res/django-static/www/'
 STATICFILES_DIRS = ('static/',)
 if DEBUG:
-    STATIC_URL = '//res.growse.com/django-static/www/'
+    STATIC_URL = '/static-css/'
 else:
     STATIC_URL = '//growseres1-growsecom.netdna-ssl.com/django-static/www/'
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+if not DEBUG:
+    STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
 PIPELINE_CSS = {
     'www': {
@@ -91,10 +92,10 @@ PIPELINE_JS = {
 PIPELINE_COMPILERS = (
     'pipeline_compass.compiler.CompassCompiler',
 )
-PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.cssmin.CssminCompressor'
+PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'
-PIPELINE_YUI_BINARY = '/usr/bin/yui-compressor'
+#PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'
+#PIPELINE_YUI_BINARY = '/bin/yui-compressor'
 PIPELINE_DISABLE_WRAPPER = True
 
 

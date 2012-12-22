@@ -1,3 +1,17 @@
+$default-prefixes: webkit moz ms o;
+
+@mixin build-prefix-values($property, $value, $prefixes: $default-prefixes) {
+    @each $prefix in $prefixes {
+        -#{$prefix}-#{$property}: #{$value};
+    }
+    #{$property}: #{$value};
+} 
+
+@mixin prefixtime($property, $value) {
+    @include build-prefix-values($property, $value);
+}
+
+
 body {
     font-size: 13px;
     font-family: "Trebuchet MS",Tahoma,"Bitstream Vera Sans",Sans-serif;
@@ -40,6 +54,18 @@ body {
             }
         }
     }
+    header {
+        float: right;
+        #titletext {
+            width: 1em;
+            color: #f90;
+            font-size: 6em;
+            margin-right: -1em;
+            margin-top: 0.3em;
+            @include prefixtime('transform','rotate(90deg)');
+            @include prefixtime('transform-origin','0 0');
+        }
+    }
     #content {
         background-color: #222;
         height: 100%;
@@ -47,6 +73,7 @@ body {
         padding: 2em;
         article header {
             height: auto;
+            float: none;
             background: none;
             h1 {
                 border: 0;

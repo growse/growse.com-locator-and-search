@@ -17,6 +17,7 @@
     </head> 
     <body>
         <div id="container"> 
+            <header><div id="titletext">growse.com</div></header>
             <nav>
             <ul>
                 {% for navitem in articlenavlist%}
@@ -35,7 +36,7 @@
             <div id="content"> 
                 {% block content %}
                 {% endblock %}
-            </div> 
+            </div>
             <footer>
             Almost everything (c) 2002-{% now "Y" %} <a rel="author" href="https://plus.google.com/105730305908005594688">Andrew Rowson</a>. If you break anything because of something you read here, that's your own problem.
             </footer> 

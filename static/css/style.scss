@@ -20,11 +20,12 @@ body {
     padding: 0;
     scroll: width: 16px;
     nav {
-        overflow-y: scroll;
+        overflow-y: hidden;
         background: #111;
         position: fixed;
         float: left;
         width: 200px;
+        height: 100%;
         ul {
             list-style-type: none;
             margin:0;

@@ -22,6 +22,14 @@
                 {% for navitem in articlenavlist%}
                 <li><a href="/news/comments/{{navitem.shorttitle}}/" title="{{navitem.title}}" {%if article.id == navitem.id%}class="here"{%endif%}>{{navitem.title}}</a></li>
                 {%endfor%}
+                <script type="text/javascript">
+                    $(function() {
+                            var percentagedown = ($('.here').position().top / $(window).height())*100;
+                            if (percentagedown > 50) {
+                                $('nav').scrollTop($('.here').position().top - ($(window).height()/2) + ($('nav ul li:first').height() / 2));
+                            }
+                    });
+                </script>
             </ul>
             </nav>
             <div id="content"> 

@@ -8,7 +8,8 @@
         <meta name="description" content="Various thoughts, happenings, projects and other things going on in the world of Andrew Rowson" />
         <title>{% block title %}{% endblock %}growse.com</title> 
         <link rel="shortcut icon" type="image/ico" href="//{{cdn_url}}/img/www/orangeblack/favicon.ico" />
-        <link rel="alternate" title="RSS Feed" href="//www.growse.com/news/rss/" type="application/rss+xml" /> 
+        <link rel="alternate" title="RSS Feed" href="//www.growse.com/news/rss/" type="application/rss+xml" />
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400|Quando' rel='stylesheet' type='text/css'>
         {% compressed_css 'www' %}
         <script type="text/javascript">;(function (a) {_q = function () { return a; };$ = function (f) {typeof f === "function" && a.push(arguments);return $;};jQuery = $.ready = $;} ([]));</script>
         {% if april_first%}
@@ -17,7 +18,17 @@
     </head> 
     <body>
         <div id="container"> 
-            <header><div id="titletext">growse.com</div></header>
+            <header>
+            <div id="titletext">growse.com</div>
+            <div id="search">
+                <form action="/search/" method="post">
+                    <fieldset>
+                        {% csrf_token %}
+                        <input placeholder="Search" id="searchbox" type="text" name="a" class="searchtext" />
+                    </fieldset>
+                </form>
+            </div>
+            </header>
             <nav>
             <ul>
                 {% for navitem in articlenavlist%}

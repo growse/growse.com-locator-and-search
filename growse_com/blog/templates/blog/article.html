@@ -7,21 +7,18 @@
 {% block content %}
 <article itemscope itemtype="http://schema.org/blogposting">
     <header>
+    <time itemprop="datePublished" datetime="{{article.datestamp|date:"c"}}"><p>{{article.datestamp|date:"N"}} <span class="day">{{article.datestamp|date:"d"}}</span><span class="year">{{article.datestamp|date:"Y"}}</span></p></time>
         <h1 itemprop="name headline">{{article.title}}</h1>
-        {% if article.datestamp != None %}
-        <time itemprop="datePublished" datetime="{{article.datestamp|date:"c"}}">{{article.datestamp|date:"l d N Y H:i"}}</time>
-        {% endif %}
         <meta itemprop="author" content="Andrew Rowson" />
     </header>
     <section itemprop="articleBody">
         {{article.body|safe}}
     </section>
 </article>
-{% if article.type == 'NEWS' %}
-    {% if comments.count != 0 %}
+{% if comments.count != 0 %}
     <h2>Comments</h2>
-    {% endif %}
-    {% for comment in comments %}
+{% endif %}
+{% for comment in comments %}
     <div class="comment_title">
         {% if comment.website and  comment.website|length >= 1 %}
         <a href="{{comment.formattedwebsite}}" title="{{comment.name}}">{{comment.name}}</a>
@@ -31,7 +28,7 @@
         - {{comment.datestamp}}
     </div>
     <div style="white-space: pre-line;" class="comment_body"><p>{{comment.comment}}</p></div>
-    {% endfor %}
+{% endfor %}
     <h2>Add a new comment</h2>
     <form class="commentform" method="post">
         <fieldset>
@@ -43,7 +40,5 @@
             <p><label></label><input class="submitbtn" type="submit" accesskey="s" value="Submit" /></p>
         </fieldset>
     </form>
-
-{% endif %}
 
 {% endblock %}

@@ -57,16 +57,23 @@ body {
         }
     }
     header {
-        font-family: 'Open Sans', Sans-serif;
+        width: 200px;
         font-weight: 400;
         float: right;
-        #titletext {
-            color: #f90;
-            width: 200px;
+        div {
             text-align: center;
-            font-size: 2.2em;
-            margin: 0em 0 1em 0;
-            font-weight: bolder;
+            margin: 1em;
+        }
+        #titletext {
+            a{
+                font-family: 'Open Sans', Sans-serif;
+                color: #f90;
+                width: 200px;
+                text-align: center;
+                font-size: 2.2em;
+                margin: 0em 0 1em 0;
+                font-weight: bolder;
+            }
         }
         fieldset {
             border: 0;
@@ -83,10 +90,12 @@ body {
         padding: 2em;
         article {
             header {
+                width: auto;
                 height: auto;
                 float: none;
                 background: none;
                 h1 {
+                    font-family: 'Open Sans', Sans-serif;
                     border: 0;
                     margin: 0;
                     font-size: 2.5em;
@@ -94,13 +103,53 @@ body {
                     font-weight: lighter;
                 }
                 time {
-                    float: right;
-                    line-height: 10px;
-                    font-size: 10px;
                     display: block;
-                    margin-top: 0;
+                    margin: 0 1em 1em 1em;
+                    float: right;
+                    width: 60px;
+                    height: 60px;
+                    p {
+                        @include prefixtime('box-shadow','0px 0px 6px rgba(0,0,0,0.3);');
+                        background: #333;
+                        font-family: 'Open Sans', sans-serif; 
+                        font-size: 16px; font-weight: bolder;
+                        text-align: center;
+                        color: #aaa;
+                        text-transform: uppercase;
+                        line-height: normal;
+                        margin: 0;
+                        padding: 0;
+                        border-radius: 5px;
+                        span {
+                            color: #aaa;
+                            background: #444;
+                            font-size: 20px;
+                            font-weight: bold;
+                            display: block;
+                            padding: 0px 0 0px 0;
+                        }
+                        span.year {
+                            border-radius: 0 0 5px 5px;
+                            font-size: 10px;
+                            background: #333;
+                            color: #aaa;
+                            padding: 3px 0;
+                        }
+                    }
                 }
             }
+            .code {
+                font-family: 'Droid Sans Mono', monospace;
+                border: 1px solid #556;
+                white-space: pre;
+                overflow: auto;
+                padding: 5px;
+                color: #ddd;
+                background: #223;
+            }
+        }
+        h2 {
+            font-family: 'Open Sans', Sans-serif;
         }
     }
 }
@@ -174,15 +223,6 @@ iframe {
     display: none;
 }
 
-.code {
-    font-family: 'Droid Sans Mono', monospace;
-    border: 1px solid #556;
-    white-space: pre;
-    overflow: auto;
-    padding: 5px;
-    color: #ddd;
-    background: #223;
-}
 
 footer {
     font-size: 85%;

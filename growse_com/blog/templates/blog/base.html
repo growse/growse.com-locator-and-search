@@ -19,15 +19,16 @@
     <body>
         <div id="container"> 
             <header>
-            <div id="titletext">growse.com</div>
-            <div id="search">
-                <form action="/search/" method="post">
-                    <fieldset>
-                        {% csrf_token %}
-                        <input placeholder="Search" id="searchbox" type="text" name="a" class="searchtext" />
-                    </fieldset>
-                </form>
-            </div>
+                <div id="titletext"><a href="/" title="Home">growse.com</a></div>
+                <div id="about">I write things here.</div>
+                <div id="search">
+                    <form action="/search/" method="post">
+                        <fieldset>
+                            {% csrf_token %}
+                            <input placeholder="Search for things" id="searchbox" type="text" name="a" class="searchtext" />
+                        </fieldset>
+                    </form>
+                </div>
             </header>
             <nav>
             <ul>

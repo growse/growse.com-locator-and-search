@@ -19,8 +19,8 @@
     <body>
         <div id="container"> 
             <header>
-                <div id="titletext"><a href="/" title="Home">growse.com</a></div>
-                <div id="about">I write things here.</div>
+                <h1 id="titletext"><a href="/" title="Home">growse.com</a></h1>
+                <h2 id="about">I write things here.</h2>
                 <div id="search">
                     <form action="/search/" method="post">
                         <fieldset>
@@ -28,6 +28,23 @@
                             <input placeholder="Search for things" id="searchbox" type="text" name="a" class="searchtext" />
                         </fieldset>
                     </form>
+                </div>
+                <div id="previous">
+                    <h2>Previous things</h2>
+                    <ul>
+    {% for archive in archives %}
+        {% if archive.newyear %}
+            {% if not forloop.first %}
+                </ul>
+            {% endif %}
+            <h2>{{archive.month|date:"Y"}}</h2>
+            <ul>
+        {% endif %}
+        <li><a href="/news/archive/{{archive.month|date:"Y"}}/{{archive.month|date:"m"}}/" title="{{archive.month|date:"F"}} {{archive.month|date:"Y"}} ({{archive.title__count}} entries)">{{archive.month|date:"F"}}</a> ({{archive.title__count}} entries)</li>
+        {%if forloop.last %}
+            </ul>
+        {% endif %}
+    {% endfor %}
                 </div>
             </header>
             <nav>

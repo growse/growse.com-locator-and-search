@@ -36,7 +36,6 @@ body {
     scroll: width: 16px;
     nav {
         overflow: hidden;
-        background: #111;
         position: fixed;
         float: left;
         width: 200px;
@@ -46,6 +45,7 @@ body {
             margin:0;
             padding:0;
             li {
+                background: #111;
                 @include prefixtime('box-shadow','0px 2px 2px rgba(10, 10, 10, 0.75)')
                 a {
                     height: 4em;
@@ -64,22 +64,31 @@ body {
             text-align: center;
             margin: 1em;
         }
-        #titletext {
-            a{
-                font-family: 'Open Sans', Sans-serif;
+        h1 {
+            text-align: center;
+            a {
                 color: #f90;
-                width: 200px;
-                text-align: center;
-                font-size: 2.2em;
-                margin: 0em 0 1em 0;
-                font-weight: bolder;
             }
+        }
+        h2 {
+            text-align: center;
+            font-family: 'Open Sans', Sans;
+            font-size: 1.2em;
         }
         fieldset {
             border: 0;
             input {
                 padding: 0.5em;
                 background-color: #333;
+                width: 10em;
+            }
+        }
+        #previous {
+            text-align: left;
+            ul {
+                list-style-type:none;
+                margin: 0;
+                padding: 0;
             }
         }
     }
@@ -95,6 +104,7 @@ body {
                 float: none;
                 background: none;
                 h1 {
+                    text-align: left;
                     font-family: 'Open Sans', Sans-serif;
                     border: 0;
                     margin: 0;
@@ -104,10 +114,10 @@ body {
                 }
                 time {
                     display: block;
-                    margin: 0 1em 1em 1em;
+                    margin: 0 0 1em 1em;
                     float: right;
-                    width: 60px;
-                    height: 60px;
+                    width: 5em;
+                    height: 4em;
                     p {
                         @include prefixtime('box-shadow','0px 0px 6px rgba(0,0,0,0.3);');
                         background: #333;

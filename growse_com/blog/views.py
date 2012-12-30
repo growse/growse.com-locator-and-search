@@ -82,7 +82,8 @@ def article(request, article_shorttitle=''):
             if nextarticle.count() != 0:
                 nextarticle = nextarticle[0]
         comments = Comment.objects.filter(article__id=article.id).order_by("datestamp")
-        return render_to_response('blog/article.html', {'articlenavlist': articlenavlist, 'comments': comments, 'article': article, 'nav': article.type.lower()}, c)
+        archives = Article.objects.filter(type='NEWS').extra(select={'month': "DATE_TRUNC('month',datestamp)"}).values('month').annotate(Count('title')).order_by('-month')
+        return render_to_response('blog/article.html', {'archives': archives, 'articlenavlist': articlenavlist, 'comments': comments, 'article': article, 'nav': article.type.lower()}, c)
 
 def search(request,searchterm=None,page=1):
     c=RequestContext(request);

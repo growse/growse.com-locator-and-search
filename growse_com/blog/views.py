@@ -7,30 +7,17 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from growse_com.blog.models import Article
 from growse_com.blog.models import Comment
 
+
 def photos(request):
-    c=RequestContext(request);
-    return render_to_response('blog/photos.html',{'pagetitle':'Photos','nav':'photos'},c);
+    c = RequestContext(request)
+    return render_to_response('blog/photos.html', {'pagetitle': 'Photos', 'nav': 'photos'}, c)
 
-def projectsindex(request):
-    c=RequestContext(request);
-    projects = Article.objects.filter(type='PROJECTS').order_by('-datestamp')
-    return render_to_response('blog/articleindex.html',{'articles':projects,'pagetitle':'Projects','nav':'projects'},c)
-
-
-def miscindex(request):
-    c=RequestContext(request);
-    misc = Article.objects.filter(type='MISC').order_by('-datestamp')
-    return render_to_response('blog/articleindex.html',{'articles':misc,'pagetitle':'Misc','nav':'misc'},c)
-
-def videosindex(request):
-    c=RequestContext(request);
-    videos = Article.objects.filter(type='VIDEOS').order_by('-datestamp')
-    return render_to_response('blog/articleindex.html',{'articles':videos,'pagetitle':'Videos','nav':'videos'},c)
 
 def newsindex(request):
     c=RequestContext(request);
     top5articles = Article.objects.filter(type='NEWS').annotate(Count('comment')).order_by('-datestamp')[:5]
     return render_to_response('blog/newsindex.html',{'top5articles':top5articles,'nav':'news'},c)
+
 
 def newsarchive_month(request,newsarchive_year,newsarchive_month):
     c=RequestContext(request);

@@ -46,34 +46,28 @@ class Article(models.Model):
         return self.title
 
 
-class Footerline(models.Model):
-    id = models.AutoField(primary_key=True)
-    text = models.TextField()
-
-    class Meta:
-        db_table = u'footerlines'
-
-    def __unicode__(self):
-        return self.text
-
 class Comment(models.Model):
     id = models.AutoField(primary_key=True)
     article = models.ForeignKey(Article)
     datestamp = models.DateTimeField()
     name = models.CharField(max_length=255)
-    website = models.CharField(null=True,max_length=255)
+    website = models.CharField(null=True, max_length=255)
     comment = models.TextField()
     ip = models.IPAddressField(null=True)
-    def save(self,*args, **kwargs):
+
+    def save(self, *args, **kwargs):
         if not self.id:
             self.datestamp = datetime.datetime.now()
         super(Comment, self).save(*args, **kwargs)
+
     class Meta:
         db_table = u'comments'
+
     def __unicode__(self):
         return self.name
+
     def formattedwebsite(self):
         if not self.website.startswith('http'):
-            return 'http://'+self.website
+            return 'http://' + self.website
         else:
             return self.website

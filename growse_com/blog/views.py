@@ -39,17 +39,18 @@ def newsarchive_month(request,newsarchive_year,newsarchive_month):
         raise Http404
     return render_to_response('blog/newsarchive_month.html',{'archivearticles':articles,'year':newsarchive_year,'month':articles[0].datestamp},c);
 
+
 def newsarchive(request):
-    c=RequestContext(request);
-    archivehtml = "";
+    c = RequestContext(request)
+    archivehtml = ""
     archives = Article.objects.filter(type='NEWS').extra(select={'month':"DATE_TRUNC('month',datestamp)"}).values('month').annotate(Count('title')).order_by('-month')
-    prevyear=None
+    prevyear = None
     for archive in archives:
         if archive["month"].year != prevyear:
-            archive["newyear"]=True
+            archive["newyear"] = True
             prevyear = archive["month"].year
-        archivehtml+=str(archive["month"].month)
-    return render_to_response('blog/newsarchive.html',{'archives':archives,'nav':'news'},c)
+        archivehtml += str(archive["month"].month)
+    return render_to_response('blog/newsarchive.html', {'archives': archives, 'nav': 'news'}, c)
 
 
 def article(request, article_shorttitle=''):
@@ -83,6 +84,11 @@ def article(request, article_shorttitle=''):
                 nextarticle = nextarticle[0]
         comments = Comment.objects.filter(article__id=article.id).order_by("datestamp")
         archives = Article.objects.filter(type='NEWS').extra(select={'month': "DATE_TRUNC('month',datestamp)"}).values('month').annotate(Count('title')).order_by('-month')
+        prevyear=None
+        for archive in archives:
+            if archive["month"].year != prevyear:
+                archive["newyear"]=True
+                prevyear = archive["month"].year
         return render_to_response('blog/article.html', {'archives': archives, 'articlenavlist': articlenavlist, 'comments': comments, 'article': article, 'nav': article.type.lower()}, c)
 
 def search(request,searchterm=None,page=1):

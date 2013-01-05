@@ -85,10 +85,34 @@ body {
         }
         #previous {
             text-align: left;
-            ul {
+            ul#previousyears {
                 list-style-type:none;
-                margin: 0;
+                margin: 0 0 0 1em;
                 padding: 0;
+                li {
+                    margin: 0.2em 0 0 0;
+                }
+                li:before {
+                    content: "";
+                    border-color: transparent #f90;
+                    border-style: solid;
+                    border-width: 0.35em 0 0.35em 0.45em;
+                    display: block;
+                    height: 0;
+                    width: 0;
+                    left: -1em;
+                    top: 0.9em;
+                    position: relative;
+                }
+                ul {
+                    display: none;
+                    list-style-type:none;
+                    margin: 0 0 0 0.2em;
+                    padding: 0;
+                    li {
+                        margin:0;
+                    }
+                }
             }
         }
     }

@@ -1,7 +1,7 @@
 # Django settings for growse_com project.
 import sys
 if not 'runserver' in sys.argv:
-    DEBUG = True
+    DEBUG = False
 else:
     DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -15,12 +15,8 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'growse_com_django',                      # Or path to database file if using sqlite3.
-        'USER': 'growse_com',                      # Not used with sqlite3.
-        'PASSWORD': 'abominable',                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'growse_com.db',                      # Or path to database file if using sqlite3.
     }
 }
 
@@ -105,7 +101,7 @@ PIPELINE_DISABLE_WRAPPER = True
 #ADMIN_MEDIA_PREFIX = '/media/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'g%l6i8$k8oc2%ck(i65a=0z7es@a4%oc9h2rrop=v^lmoy2+$y'
+SECRET_KEY = ''
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (

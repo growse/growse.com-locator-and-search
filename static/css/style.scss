@@ -172,6 +172,12 @@ body {
                     }
                 }
             }
+            nav {
+                float: none;
+                position: relative;
+                width: auto;
+                height: auto;
+            }
             .code {
                 font-family: 'Droid Sans Mono', monospace;
                 border: 1px solid #556;
@@ -180,6 +186,10 @@ body {
                 padding: 5px;
                 color: #ddd;
                 background: #223;
+            }
+            ul#searchresults {
+                margin: 0;
+                padding: 0;
             }
         }
         h2 {
@@ -197,7 +207,7 @@ a {
 }
 
 p {
-    margin: 1em 0;
+    margin: 0.5em 0;
     line-height: 20px;
 }
 
@@ -276,9 +286,12 @@ ul#linkstable {
     margin-bottom: 15px;
     background: #223;
     padding: 5px;
-    h2 a {
-        color: #f90;
-        border-bottom: 1px dotted #f90;
+    h2 {
+        margin-top: 0.3em;
+        a {
+            color: #f90;
+            border-bottom: 1px dotted #f90;
+        }
     }
 }
 

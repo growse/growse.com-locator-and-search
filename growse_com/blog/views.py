@@ -13,33 +13,6 @@ def photos(request):
     return render_to_response('blog/photos.html', {'pagetitle': 'Photos', 'nav': 'photos'}, c)
 
 
-def newsindex(request):
-    c=RequestContext(request);
-    top5articles = Article.objects.filter(type='NEWS').annotate(Count('comment')).order_by('-datestamp')[:5]
-    return render_to_response('blog/newsindex.html',{'top5articles':top5articles,'nav':'news'},c)
-
-
-def newsarchive_month(request,newsarchive_year,newsarchive_month):
-    c=RequestContext(request);
-    articles=Article.objects.filter(type='NEWS').filter(datestamp__year=newsarchive_year).filter(datestamp__month=newsarchive_month).annotate(Count('comment')).order_by('datestamp');
-    if len(articles)==0:
-        raise Http404
-    return render_to_response('blog/newsarchive_month.html',{'archivearticles':articles,'year':newsarchive_year,'month':articles[0].datestamp},c);
-
-
-def newsarchive(request):
-    c = RequestContext(request)
-    archivehtml = ""
-    archives = Article.objects.filter(type='NEWS').extra(select={'month':"DATE_TRUNC('month',datestamp)"}).values('month').annotate(Count('title')).order_by('-month')
-    prevyear = None
-    for archive in archives:
-        if archive["month"].year != prevyear:
-            archive["newyear"] = True
-            prevyear = archive["month"].year
-        archivehtml += str(archive["month"].month)
-    return render_to_response('blog/newsarchive.html', {'archives': archives, 'nav': 'news'}, c)
-
-
 def article(request, article_shorttitle=''):
     c = RequestContext(request)
     if article_shorttitle == '':
@@ -71,20 +44,21 @@ def article(request, article_shorttitle=''):
                 nextarticle = nextarticle[0]
         comments = Comment.objects.filter(article__id=article.id).order_by("datestamp")
         archives = Article.objects.filter(type='NEWS').extra(select={'month': "DATE_TRUNC('month',datestamp)"}).values('month').annotate(Count('title')).order_by('-month')
-        prevyear=None
+        prevyear = None
         for archive in archives:
             if archive["month"].year != prevyear:
-                archive["newyear"]=True
+                archive["newyear"] = True
                 prevyear = archive["month"].year
         return render_to_response('blog/article.html', {'archives': archives, 'articlenavlist': articlenavlist, 'comments': comments, 'article': article, 'nav': article.type.lower()}, c)
 
-def search(request,searchterm=None,page=1):
-    c=RequestContext(request);
-    if searchterm == None:
+
+def search(request, searchterm=None, page=1):
+    c = RequestContext(request)
+    if searchterm is None:
         if request.method == 'GET':
-            return redirect("/",Permanent=True)
+            return redirect("/", Permanent=True)
         if request.method == 'POST':
-            return redirect("/search/"+request.POST.get('a','')+"/")
+            return redirect("/search/" + request.POST.get('a','') + "/")
     else:
         results_list =  Article.objects.extra(select={'headline':"ts_headline(body,plainto_tsquery('english',%s))",'rank':"ts_rank(idxfti,plainto_tsquery('english',%s))"},where=["idxfti @@ plainto_tsquery('english',%s)"],params=[searchterm],select_params=[searchterm,searchterm]).order_by('-rank')
         paginator = Paginator(results_list,10)

@@ -41,7 +41,7 @@
             <li><a href="javascript:$('ul#{{archive.month|date:"Y"}}').slideToggle(100);">{{archive.month|date:"Y"}}</a></li>
             <ul id="{{archive.month|date:"Y"}}" class="hide">
         {% endif %}
-        <li><a href="/news/archive/{{archive.month|date:"Y"}}/{{archive.month|date:"m"}}/" title="{{archive.month|date:"F"}} {{archive.month|date:"Y"}} ({{archive.title__count}} entries)">{{archive.month|date:"F"}}</a> ({{archive.title__count}} entries)</li>
+        <li><a href="/news/archive/{{archive.month|date:"Y"}}/{{archive.month|date:"m"}}/" title="{{archive.month|date:"F"}} {{archive.month|date:"Y"}} ({{archive.title__count}})">{{archive.month|date:"F"}}</a> ({{archive.title__count}})</li>
         {%if forloop.last %}
             </ul>
         {% endif %}

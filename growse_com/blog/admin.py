@@ -1,6 +1,5 @@
 from growse_com.blog.models import Article
 from growse_com.blog.models import Comment
-from growse_com.blog.models import Footerline
 from django.contrib import admin
 
 
@@ -21,4 +20,3 @@ class ArticleAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Article, ArticleAdmin)
-admin.site.register(Footerline)

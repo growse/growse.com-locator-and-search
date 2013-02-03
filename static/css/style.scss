@@ -83,6 +83,9 @@ body {
                 width: 10em;
             }
         }
+        input#searchbox{
+            border-width: 0 1px 1px 1px;
+        }
         #previous {
             text-align: left;
             ul#previousyears {

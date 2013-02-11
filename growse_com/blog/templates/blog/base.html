@@ -53,7 +53,7 @@
             <nav>
             <ul>
                 {% for navitem in articlenavlist%}
-                <li><a href="/news/comments/{{navitem.shorttitle}}/" title="{{navitem.title}}" {%if article.id == navitem.id%}class="here"{%endif%}>{{navitem.title}}</a></li>
+                <li><a href="/news/comments/{{navitem.shorttitle}}/" title="{{navitem.title}}" {%if article.id == navitem.id%}class="here"{%endif%}>{{navitem.title}}<p class="datestamp">{{navitem.datestamp|date:"d M Y"}}</p></a></li>
                 {%endfor%}
                 <script type="text/javascript">
                     $(function() {

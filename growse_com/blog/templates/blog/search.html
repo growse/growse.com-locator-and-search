@@ -11,7 +11,7 @@
 <p>You looked for <strong>{{searchterm}}</strong>. I found {{results.paginator.count}} things that might have something to do with this.</p>
 </header>
 <nav>
-    {% if results.paginator.count != 0 %}
+    {% if results.paginator.num_pages > 1 %}
         <p>
         {% if results.has_previous %}
         <a href="/search/{{searchterm}}/1/" title="First Page">First</a> :: <a href="/search/{{searchterm}}/{{results.previous_page_number}}/" title="Page {{results.previous_page_number}}">Prev</a>

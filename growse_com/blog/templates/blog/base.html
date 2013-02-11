@@ -12,7 +12,7 @@
         <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400|Quando|Droid+Sans+Mono' rel='stylesheet' type='text/css'>
         {% compressed_css 'www' %}
         <script type="text/javascript">;(function (a) {_q = function () { return a; };$ = function (f) {typeof f === "function" && a.push(arguments);return $;};jQuery = $.ready = $;} ([]));</script>
-        {% if april_first%}
+        {% if april_first %}
         <style>#container {-moz-transform: scaleX(-1);-o-transform: scaleX(-1);-webkit-transform: scaleX(-1);transform: scaleX(-1)filter: FlipH;-ms-filter: "FlipH";}</style>
         {%endif%}
     </head> 
@@ -33,22 +33,24 @@
                 <div id="previous">
                     <h2>Previous things</h2>
                     <ul id="previousyears">
-    {% for archive in archives %}
-        {% if archive.newyear %}
-            {% if not forloop.first %}
-                </ul>
-            {% endif %}
-            <li><a href="javascript:$('ul#{{archive.month|date:"Y"}}').slideToggle(100);">{{archive.month|date:"Y"}}</a></li>
-            <ul id="{{archive.month|date:"Y"}}" class="hide">
-        {% endif %}
-        <li><a href="/news/archive/{{archive.month|date:"Y"}}/{{archive.month|date:"m"}}/" title="{{archive.month|date:"F"}} {{archive.month|date:"Y"}} ({{archive.title__count}})">{{archive.month|date:"F"}}</a> ({{archive.title__count}})</li>
-        {%if forloop.last %}
-            </ul>
-        {% endif %}
-        {% endfor %}
-    </ul>
-            </div>
-            {% endif%}
+                        {% for archive in archives %}
+                            {% if archive.newyear %}
+                                {% if not forloop.first %}
+                                    </ul>
+                                {% endif %}
+                                <li><a href="javascript:$('ul#{{archive.month|date:"Y"}}').slideToggle(100);">{{archive.month|date:"Y"}}</a></li>
+                                <ul id="{{archive.month|date:"Y"}}" class="hide">
+                            {% endif %}
+                            <li><a href="/news/archive/{{archive.month|date:"Y"}}/{{archive.month|date:"m"}}/" title="{{archive.month|date:"F"}} {{archive.month|date:"Y"}} ({{archive.title__count}})">{{archive.month|date:"F"}}</a> ({{archive.title__count}})</li>
+                            {%if forloop.last %}
+                                </ul>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif%}
+                <div id="location">
+                </div>
             </header>
             <nav>
             <ul>

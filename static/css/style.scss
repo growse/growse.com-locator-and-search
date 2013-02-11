@@ -117,10 +117,10 @@ body {
                 ul {
                     display: none;
                     list-style-type:none;
-                    margin: 0 0 0 0.2em;
+                    margin: 0 0 0 0.4em;
                     padding: 0;
                     li {
-                        margin:0;
+                        margin: 0;
                     }
                 }
             }
@@ -190,6 +190,8 @@ body {
             }
             .code {
                 font-family: 'Droid Sans Mono', monospace;
+                font-size: 12px;
+                line-height: normal;
                 border: 1px solid #556;
                 white-space: pre;
                 overflow: auto;

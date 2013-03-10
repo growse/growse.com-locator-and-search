@@ -14,7 +14,7 @@ $default-prefixes: webkit moz ms o;
 
 body {
     font-size: 13px;
-    font-family: Quando, Georgia, serif;
+    font-family: 'Open Sans', Trebuchet, Sans;
     color: #aaa;
     padding: 0;
     margin: 0;
@@ -59,6 +59,9 @@ body {
                 }
             }
         }
+        &:hover {
+            overflow-y: scroll;
+        }
     }
     header {
         width: 200px;
@@ -76,7 +79,7 @@ body {
         }
         h2 {
             text-align: center;
-            font-family: 'Open Sans', Trebuchet, Sans;
+            font-family: Quando, Georgia, serif;
             font-size: 1.2em;
         }
         fieldset {
@@ -139,7 +142,7 @@ body {
                 background: none;
                 h1 {
                     text-align: left;
-                    font-family: 'Open Sans', Trebuchet, Sans;
+                    font-family: Quando, Georgia, serif;
                     border: 0;
                     margin: 0;
                     font-size: 2.5em;

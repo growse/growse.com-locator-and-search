@@ -322,6 +322,8 @@ ul#linkstable {
 }
 
 .commentform input.submitbtn {
+    cursor: hand;
+    cursor: pointer;
     background: #333;
     width: 70px;
 }

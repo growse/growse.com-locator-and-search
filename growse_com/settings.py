@@ -52,6 +52,7 @@ MEDIA_ROOT = ''
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
+PIPELINE = not DEBUG
 if DEBUG:
     STATIC_ROOT = 'static-root'
 else:
@@ -90,8 +91,6 @@ PIPELINE_COMPILERS = (
 )
 PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None
-#PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'
-#PIPELINE_YUI_BINARY = '/bin/yui-compressor'
 PIPELINE_DISABLE_WRAPPER = True
 
 

@@ -68,7 +68,8 @@ PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
 PIPELINE_CSS = {
     'www': {
         'source_filenames': (
-            'css/*.scss',
+            'css/jquery.jscrollpane.css',
+            'css/*.scss'
         ),
         'output_filename': 'css/www.css',
         'extra_context': {

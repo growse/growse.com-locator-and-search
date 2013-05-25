@@ -59,7 +59,7 @@ else:
     STATIC_ROOT = '/var/www/growse.com/res/django-static/www/'
 STATICFILES_DIRS = ('static/',)
 if DEBUG:
-    STATIC_URL = '/static-css/'
+    STATIC_URL = '/static/'
 else:
     STATIC_URL = '//growseres1-growsecom.netdna-ssl.com/django-static/www/'
 if not DEBUG:

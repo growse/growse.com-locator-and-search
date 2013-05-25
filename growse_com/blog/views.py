@@ -7,12 +7,6 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from growse_com.blog.models import Article
 from growse_com.blog.models import Comment
 
-
-def photos(request):
-    c = RequestContext(request)
-    return render_to_response('blog/photos.html', {'pagetitle': 'Photos', 'nav': 'photos'}, c)
-
-
 def article(request, article_shorttitle=''):
     c = RequestContext(request)
     if article_shorttitle == '':

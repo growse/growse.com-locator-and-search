@@ -9,6 +9,8 @@
     <meta name="description"
           content="Various thoughts, happenings, projects and other things going on in the world of Andrew Rowson"/>
     <title>{% block title %}{% endblock %}growse.com</title>
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//ssl.google-analytics.com">
     <link rel="shortcut icon" type="image/ico" href="//{{ cdn_url }}/img/www/orangeblack/favicon.ico"/>
     <link rel="alternate" title="RSS Feed" href="//www.growse.com/news/rss/" type="application/rss+xml"/>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400|Quando|Droid+Sans+Mono' rel='stylesheet'
@@ -82,7 +84,7 @@
         <ul>
             {% for navitem in articlenavlist %}
                 <li><a href="/news/comments/{{ navitem.shorttitle }}/" title="{{ navitem.title }}"
-                       {% if article.id == navitem.id %}class="here"{% endif %}>{{ navitem.title|truncatechars:50 }}</a>
+                       {% if article.id == navitem.id %}class="here"{% endif %}><span>{{ navitem.title }}</span></a>
                 </li>
             {% endfor %}
             <script type="text/javascript">

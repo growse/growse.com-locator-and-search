@@ -66,7 +66,7 @@
                             </li>
                             <ul id="{{ archive.month|date:"Y" }}" class="hide">
                         {% endif %}
-                    <li><a href="/news/archive/{{ archive.month|date:"Y" }}/{{ archive.month|date:"m" }}/"
+                    <li><a href="/{{ archive.month|date:"Y" }}/{{ archive.month|date:"m" }}/"
                            title="{{ archive.month|date:"F" }} {{ archive.month|date:"Y" }} ({{ archive.title__count }})">{{ archive.month|date:"F" }}</a>
                         ({{ archive.title__count }})
                     </li>
@@ -84,7 +84,7 @@
         <ul>
             {% for navitem in articlenavlist %}
                 <li><a href="/news/comments/{{ navitem.shorttitle }}/" title="{{ navitem.title }}"
-                       {% if article.id == navitem.id %}class="here"{% endif %}><span>{{ navitem.title }}</span></a>
+                       {% if article.id == navitem.id %}class="here"{% endif %}><span>{{ navitem.title|truncatechars:50 }}</span></a>
                 </li>
             {% endfor %}
             <script type="text/javascript">

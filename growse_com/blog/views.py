@@ -2,7 +2,7 @@ from django.core.mail import send_mail
 from django.template import RequestContext
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.db.models import Count
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 import datetime
 from growse_com.blog.models import Article
@@ -12,16 +12,24 @@ from growse_com.blog.models import Comment
 def article_shorttitle(request, article_shorttitle=''):
     article = get_object_or_404(Article, shorttitle=article_shorttitle)
     articledate = article.datestamp.date()
-    return redirect('/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
-        articledate.day).zfill(2) + '/' + article.shorttitle + '/')
+    return HttpResponsePermanentRedirect(
+        '/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
+            articledate.day).zfill(2) + '/' + article.shorttitle + '/')
 
 
-def article_bydate(request, year, month='01', day='01'):
-    requesteddate = datetime.datetime(int(year), int(month), int(day))
-    article = get_object_or_404(Article, datestamp=requesteddate)
-    articledate = article.datestamp.date()
-    return redirect('/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
-        articledate.day).zfill(2) + '/' + article.shorttitle + '/')
+def article_bydate(request, year, month='', day=''):
+    article = None
+    if day and month and year:
+        article = Article.objects.filter(datestamp__year=year, datestamp__month=month, datestamp__day=day).order_by('datestamp')[0]
+    elif month and year:
+        article = Article.objects.filter(datestamp__year=year, datestamp__month=month).order_by('datestamp')[0]
+    elif year:
+        article = Article.objects.filter(datestamp__year=year).order_by('datestamp')[0]
+
+    if article:
+        articledate = article.datestamp.date()
+        return redirect('/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
+            articledate.day).zfill(2) + '/' + article.shorttitle + '/')
 
 
 def article(request, article_shorttitle=''):

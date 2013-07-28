@@ -2,9 +2,8 @@ from django.core.mail import send_mail
 from django.template import RequestContext
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.db.models import Count
-from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
+from django.http import HttpResponsePermanentRedirect
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-import datetime
 from growse_com.blog.models import Article
 from growse_com.blog.models import Comment
 
@@ -63,7 +62,7 @@ def article(request, article_shorttitle=''):
             if archive["month"].year != prevyear:
                 archive["newyear"] = True
                 prevyear = archive["month"].year
-        return render_to_response('blog/article.html',
+        return render_to_response('article.html',
                                   {'archives': archives, 'articlenavlist': articlenavlist, 'comments': comments,
                                    'article': article, 'nav': article.type.lower()}, c)
 
@@ -85,6 +84,6 @@ def search(request, searchterm=None, page=1):
             results = paginator.page(page)
         except(EmptyPage, InvalidPage):
             results = paginator.page(paginator.num_pages)
-        return render_to_response('blog/search.html', {'results': results, 'searchterm': searchterm}, c)
+        return render_to_response('search.html', {'results': results, 'searchterm': searchterm}, c)
 
 

@@ -80,7 +80,7 @@ def search(request, searchterm=None, page=1):
         if request.method == 'POST':
             return redirect("/search/" + request.POST.get('a', '') + "/")
     else:
-        results_list = Article.objects.extra(select={'headline': "ts_headline(body,plainto_tsquery('english',%s))",
+        results_list = Article.objects.extra(select={'headline': "ts_headline(body,plainto_tsquery('english',%s),'MaxFragments=1, MinWords=5, MaxWords=25')",
                                                      'rank': "ts_rank(idxfti,plainto_tsquery('english',%s))"},
                                              where=["idxfti @@ plainto_tsquery('english',%s)"], params=[searchterm],
                                              select_params=[searchterm, searchterm]).order_by('-rank')

@@ -20,11 +20,21 @@ def article_shorttitle(request, article_shorttitle=''):
 def article_bydate(request, year, month='', day=''):
     article = None
     if day and month and year:
-        article = Article.objects.filter(datestamp__year=year, datestamp__month=month, datestamp__day=day).order_by('datestamp')[0]
+        try:
+            article = Article.objects.filter(datestamp__year=year, datestamp__month=month, datestamp__day=day).order_by(
+                'datestamp')[0]
+        except IndexError:
+            raise Http404
     elif month and year:
-        article = Article.objects.filter(datestamp__year=year, datestamp__month=month).order_by('datestamp')[0]
+        try:
+            article = Article.objects.filter(datestamp__year=year, datestamp__month=month).order_by('datestamp')[0]
+        except IndexError:
+            raise Http404
     elif year:
-        article = Article.objects.filter(datestamp__year=year).order_by('datestamp')[0]
+        try:
+            article = Article.objects.filter(datestamp__year=year).order_by('datestamp')[0]
+        except IndexError:
+            raise Http404
 
     if article:
         articledate = article.datestamp.date()

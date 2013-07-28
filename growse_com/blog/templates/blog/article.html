@@ -1,44 +1,89 @@
 {% extends "blog/base.html" %}
 
 {% block title %}
-{{article.title}} ::
+    {{ article.title }} ::
 {% endblock %}
 
 {% block content %}
-<article itemscope itemtype="http://schema.org/blogposting">
-    <header>
-    <time itemprop="datePublished" datetime="{{article.datestamp|date:"c"}}"><p>{{article.datestamp|date:"N"}} <span class="day">{{article.datestamp|date:"d"}}</span><span class="year">{{article.datestamp|date:"Y"}}</span></p></time>
-        <h1 itemprop="name headline">{{article.title}}</h1>
-        <meta itemprop="author" content="Andrew Rowson" />
-    </header>
-    <section itemprop="articleBody">
-        {{article.body|safe}}
-    </section>
-</article>
-{% if comments.count != 0 %}
-    <h2>Comments</h2>
-{% endif %}
-{% for comment in comments %}
-    <div class="comment_title">
-        {% if comment.website and  comment.website|length >= 1 %}
-        <a href="{{comment.formattedwebsite}}" title="{{comment.name}}">{{comment.name}}</a>
-        {% else %}
-        {{comment.name}}
-        {% endif %}
-        - {{comment.datestamp}}
-    </div>
-    <div style="white-space: pre-line;" class="comment_body"><p>{{comment.comment}}</p></div>
-{% endfor %}
+    <article itemscope itemtype="http://schema.org/blogposting">
+        <header>
+            <time itemprop="datePublished" datetime="{{ article.datestamp|date:"c" }}">
+                <p>{{ article.datestamp|date:"N" }} <span class="day">{{ article.datestamp|date:"d" }}</span><span
+                        class="year">{{ article.datestamp|date:"Y" }}</span></p></time>
+            <h1 itemprop="name headline">{{ article.title }}</h1>
+            <meta itemprop="author" content="Andrew Rowson"/>
+        </header>
+        <section itemprop="articleBody">
+            {{ article.body|safe }}
+        </section>
+    </article>
+    {% if comments.count != 0 %}
+        <h2>Comments</h2>
+    {% endif %}
+    {% for comment in comments %}
+        <div class="comment_title">
+            {% if comment.website and  comment.website|length >= 1 %}
+                <a href="{{ comment.formattedwebsite }}" title="{{ comment.name }}">{{ comment.name }}</a>
+            {% else %}
+                {{ comment.name }}
+            {% endif %}
+            - {{ comment.datestamp }}
+        </div>
+        <div style="white-space: pre-line;" class="comment_body"><p>{{ comment.comment }}</p></div>
+    {% endfor %}
     <h2>Add a new comment</h2>
     <form class="commentform" method="post">
         <fieldset>
-            {%csrf_token%}
-            <p class="hohoho">Do not fill this out:<input type="text" name="email" value="" /></p>
-            <p><label for="name">Name:</label> <input type="text" id="name" name="name" value="" class="text" required /></p>
-            <p><label for="website">Website:</label> <input type="url" id="website" name="website" value="" class="text" /></p>
-            <p><label for="comment">Comment:</label> <textarea rows="8" cols="40" id="comment" name="comment" required></textarea></p>
-            <p><label></label><input class="submitbtn" type="submit" accesskey="s" value="Submit" /></p>
+            {% csrf_token %}
+            <p class="hohoho">Do not fill this out:<input type="text" name="email" value=""/></p>
+
+            <p><label for="name">Name:</label> <input type="text" id="name" name="name" value="" class="text" required/>
+            </p>
+
+            <p><label for="website">Website:</label> <input type="url" id="website" name="website" value=""
+                                                            class="text"/></p>
+
+            <p><label for="comment">Comment:</label> <textarea rows="8" cols="40" id="comment" name="comment"
+                                                               required></textarea></p>
+
+            <p><label></label><input class="submitbtn" type="submit" accesskey="s" value="Submit"/></p>
         </fieldset>
     </form>
 
+{% endblock %}
+
+{% block rightnav %}
+    <div id="search">
+        <form action="/search/" method="post">
+            <fieldset>
+                {% csrf_token %}
+                <input placeholder="Search for things" id="searchbox" type="text" name="a" class="searchtext"/>
+            </fieldset>
+        </form>
+    </div>
+    {% if archives %}
+        <div id="previous">
+            <h2>Previous things</h2>
+            <ul id="previousyears">
+                {% for archive in archives %}
+                    {% if archive.newyear %}
+                        {% if not forloop.first %}
+                            </ul>
+                        {% endif %}
+                        <li>
+                            <a href="javascript:$('ul#{{ archive.month|date:"Y" }}').slideToggle(100);">{{ archive.month|date:"Y" }}</a>
+                        </li>
+                        <ul id="{{ archive.month|date:"Y" }}" class="hide">
+                    {% endif %}
+                <li><a href="/{{ archive.month|date:"Y" }}/{{ archive.month|date:"m" }}/"
+                       title="{{ archive.month|date:"F" }} {{ archive.month|date:"Y" }} ({{ archive.title__count }})">{{ archive.month|date:"F" }}</a>
+                    ({{ archive.title__count }})
+                </li>
+                {% if forloop.last %}
+                    </ul>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
 {% endblock %}

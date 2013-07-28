@@ -41,9 +41,7 @@
 <div id="container">
     <header>
         <h1 id="titletext"><a href="/" title="Home">growse.com</a></h1>
-
         <h2 id="about">I write things here.</h2>
-
         <div id="search">
             <form action="/search/" method="post">
                 <fieldset>
@@ -83,7 +81,7 @@
     <nav>
         <ul>
             {% for navitem in articlenavlist %}
-                <li><a href="/news/comments/{{ navitem.shorttitle }}/" title="{{ navitem.title }}"
+                <li><a href="/{{ navitem.datestamp|date:"Y/m/d" }}/{{ navitem.shorttitle }}/" title="{{ navitem.title }}"
                        {% if article.id == navitem.id %}class="here"{% endif %}><span>{{ navitem.title }}</span></a>
                 </li>
             {% endfor %}

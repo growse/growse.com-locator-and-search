@@ -19,7 +19,8 @@ def article_shorttitle(request, article_shorttitle=''):
 def article_bydate(request, year, month='', day=''):
     article = None
     if day and month and year:
-        article = Article.objects.filter(datestamp__year=year, datestamp__month=month, datestamp__day=day).order_by('datestamp')[0]
+        Article.objects.filter(datestamp__year=year, datestamp__month=month, datestamp__day=day).order_by('datestamp')[
+            0]
     elif month and year:
         article = Article.objects.filter(datestamp__year=year, datestamp__month=month).order_by('datestamp')[0]
     elif year:
@@ -42,16 +43,20 @@ def article(request, article_shorttitle=''):
         website = request.POST.get('website')
         comment = request.POST.get('comment')
         spamfilter = request.POST.get('email')
+        articledate = article.datestamp.date()
         if spamfilter is None or len(spamfilter) == 0:
             Comment.objects.create(name=name, website=website, comment=comment, article=article,
                                    ip=request.META['REMOTE_ADDR'])
             try:
                 send_mail('New Comment on growse.com',
-                          'Someone posted a comment on growse.com. Over at http://www.growse.com/news/comments/' + article.shorttitle + '/',
+                          'Someone posted a comment on growse.com. Over at http://www.growse.com/' + str(
+                              articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
+                              articledate.day).zfill(2) + '/' + article.shorttitle + '/',
                           'hubfour@growse.com', ['comments@growse.com'], fail_silently=False)
             except:
                 pass
-        return redirect("/news/comments/" + article_shorttitle + "/")
+        return redirect('/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
+            articledate.day).zfill(2) + '/' + article.shorttitle + '/')
     else:
         articlenavlist = Article.objects.all().order_by('-datestamp')
         comments = Comment.objects.filter(article__id=article.id).order_by("datestamp")

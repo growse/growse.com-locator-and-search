@@ -41,20 +41,21 @@
 <div id="container">
     <header>
         <h1 id="titletext"><a href="/" title="Home">growse.com</a></h1>
+
         <h2 id="about">I write things here.</h2>
         {% block rightnav %}{% endblock %}
         <div id="location">
         </div>
     </header>
     <nav>
-        <ul>
-            {% for navitem in articlenavlist %}
-                <li><a href="/{{ navitem.datestamp|date:"Y/m/d" }}/{{ navitem.shorttitle }}/" title="{{ navitem.title }}"
-                       {% if article.id == navitem.id %}class="here"{% endif %}><span>{{ navitem.title|truncatechars:50 }}</span></a>
-                </li>
-            {% endfor %}
+        <ul id="articlenav">
+            <li data-id="{{ navitem.id }}"><a href="/{{ navitem.datestamp|date:"Y/m/d" }}/{{ navitem.shorttitle }}/"
+                   title="{{ navitem.title }}"
+                   {% if article.id == navitem.id %}class="here"{% endif %}><span>{{ navitem.title }}</span></a>
+            </li>
             <script type="text/javascript">
                 $(function () {
+                    growse.loadNav();
                     var percentagedown = ($('.here').position().top / $(window).height()) * 100;
                     if (percentagedown > 50) {
                         $('nav').scrollTop($('.here').position().top - ($(window).height() / 2) + ($('nav ul li:first').height() / 2));

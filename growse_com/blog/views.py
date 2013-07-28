@@ -2,10 +2,11 @@ from django.core.mail import send_mail
 from django.template import RequestContext
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.db.models import Count
-from django.http import HttpResponsePermanentRedirect
+from django.http import HttpResponsePermanentRedirect, HttpResponse
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from growse_com.blog.models import Article
 from growse_com.blog.models import Comment
+import simplejson as json
 
 
 def article_shorttitle(request, article_shorttitle=''):
@@ -41,6 +42,21 @@ def article_bydate(request, year, month='', day=''):
             articledate.day).zfill(2) + '/' + article.shorttitle + '/')
 
 
+def navlist(request):
+    articles = Article.objects.all().order_by('-datestamp');
+    response_data = []
+    for article in articles:
+        response_data.append({
+            'title': article.title,
+            'id':article.id,
+            'shorttitle':article.shorttitle,
+            'year': str(article.datestamp.year).zfill(4) if article.datestamp else None,
+            'month': str(article.datestamp.month).zfill(2) if article.datestamp else None,
+            'day': str(article.datestamp.day).zfill(2) if article.datestamp else None
+        })
+    return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+
 def article(request, article_shorttitle=''):
     c = RequestContext(request)
     if article_shorttitle == '':
@@ -67,7 +83,6 @@ def article(request, article_shorttitle=''):
         return redirect('/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
             articledate.day).zfill(2) + '/' + article.shorttitle + '/')
     else:
-        articlenavlist = Article.objects.all().order_by('-datestamp')
         comments = Comment.objects.filter(article__id=article.id).order_by("datestamp")
         archives = Article.objects.filter(type='NEWS').extra(select={'month': "DATE_TRUNC('month',datestamp)"}).values(
             'month').annotate(Count('title')).order_by('-month')
@@ -77,7 +92,7 @@ def article(request, article_shorttitle=''):
                 archive["newyear"] = True
                 prevyear = archive["month"].year
         return render_to_response('article.html',
-                                  {'archives': archives, 'articlenavlist': articlenavlist, 'comments': comments,
+                                  {'archives': archives, 'navitem': article, 'comments': comments,
                                    'article': article, 'nav': article.type.lower()}, c)
 
 
@@ -89,8 +104,9 @@ def search(request, searchterm=None, page=1):
         if request.method == 'POST':
             return redirect("/search/" + request.POST.get('a', '') + "/")
     else:
-        results_list = Article.objects.extra(select={'headline': "ts_headline(body,plainto_tsquery('english',%s),'MaxFragments=1, MinWords=5, MaxWords=25')",
-                                                     'rank': "ts_rank(idxfti,plainto_tsquery('english',%s))"},
+        results_list = Article.objects.extra(select={
+            'headline': "ts_headline(body,plainto_tsquery('english',%s),'MaxFragments=1, MinWords=5, MaxWords=25')",
+            'rank': "ts_rank(idxfti,plainto_tsquery('english',%s))"},
                                              where=["idxfti @@ plainto_tsquery('english',%s)"], params=[searchterm],
                                              select_params=[searchterm, searchterm]).order_by('-rank')
         paginator = Paginator(results_list, 10)

@@ -12,10 +12,11 @@ sitemaps = {
 }
 
 urlpatterns = patterns('',
-                       (r'^robots\.txt$', TemplateView.as_view(template_name='robots.txt')),  # direct_to_template, {'template': 'robots.txt', 'mimetype': 'text/plain'}),
+                       (r'^robots\.txt$', TemplateView.as_view(template_name='robots.txt')),
                        (r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps}),
                        (r'^cp/', include(admin.site.urls)),
                        (r'^news/rss/$', RssFeed()),
+                       (r'^navlist/$', 'growse_com.blog.views.navlist'),
                        (r'^news/comments/(?P<article_shorttitle>.+)/$', 'growse_com.blog.views.article_shorttitle'),
                        (r'^news/comments/(?P<article_shorttitle>.+)/$', 'growse_com.blog.views.article_shorttitle'),
                        (r'^(\d{4})/$', 'growse_com.blog.views.article_bydate'),
@@ -26,6 +27,6 @@ urlpatterns = patterns('',
                        (r'^search/(?P<searchterm>.+)/$', 'growse_com.blog.views.search'),
                        (r'^search/$', 'growse_com.blog.views.search'),
                        (r'^$', 'growse_com.blog.views.article'),
-                       )
+)
 
 urlpatterns += staticfiles_urlpatterns()

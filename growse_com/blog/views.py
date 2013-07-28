@@ -2,9 +2,8 @@ from django.core.mail import send_mail
 from django.template import RequestContext
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.db.models import Count
-from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
+from django.http import HttpResponsePermanentRedirect
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-import datetime
 from growse_com.blog.models import Article
 from growse_com.blog.models import Comment
 
@@ -53,16 +52,20 @@ def article(request, article_shorttitle=''):
         website = request.POST.get('website')
         comment = request.POST.get('comment')
         spamfilter = request.POST.get('email')
+        articledate = article.datestamp.date()
         if spamfilter is None or len(spamfilter) == 0:
             Comment.objects.create(name=name, website=website, comment=comment, article=article,
                                    ip=request.META['REMOTE_ADDR'])
             try:
                 send_mail('New Comment on growse.com',
-                          'Someone posted a comment on growse.com. Over at http://www.growse.com/news/comments/' + article.shorttitle + '/',
+                          'Someone posted a comment on growse.com. Over at http://www.growse.com/' + str(
+                              articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
+                              articledate.day).zfill(2) + '/' + article.shorttitle + '/',
                           'hubfour@growse.com', ['comments@growse.com'], fail_silently=False)
             except:
                 pass
-        return redirect("/news/comments/" + article_shorttitle + "/")
+        return redirect('/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
+            articledate.day).zfill(2) + '/' + article.shorttitle + '/')
     else:
         articlenavlist = Article.objects.all().order_by('-datestamp')
         comments = Comment.objects.filter(article__id=article.id).order_by("datestamp")
@@ -73,7 +76,7 @@ def article(request, article_shorttitle=''):
             if archive["month"].year != prevyear:
                 archive["newyear"] = True
                 prevyear = archive["month"].year
-        return render_to_response('blog/article.html',
+        return render_to_response('article.html',
                                   {'archives': archives, 'articlenavlist': articlenavlist, 'comments': comments,
                                    'article': article, 'nav': article.type.lower()}, c)
 
@@ -86,7 +89,7 @@ def search(request, searchterm=None, page=1):
         if request.method == 'POST':
             return redirect("/search/" + request.POST.get('a', '') + "/")
     else:
-        results_list = Article.objects.extra(select={'headline': "ts_headline(body,plainto_tsquery('english',%s))",
+        results_list = Article.objects.extra(select={'headline': "ts_headline(body,plainto_tsquery('english',%s),'MaxFragments=1, MinWords=5, MaxWords=25')",
                                                      'rank': "ts_rank(idxfti,plainto_tsquery('english',%s))"},
                                              where=["idxfti @@ plainto_tsquery('english',%s)"], params=[searchterm],
                                              select_params=[searchterm, searchterm]).order_by('-rank')
@@ -95,6 +98,6 @@ def search(request, searchterm=None, page=1):
             results = paginator.page(page)
         except(EmptyPage, InvalidPage):
             results = paginator.page(paginator.num_pages)
-        return render_to_response('blog/search.html', {'results': results, 'searchterm': searchterm}, c)
+        return render_to_response('search.html', {'results': results, 'searchterm': searchterm}, c)
 
 

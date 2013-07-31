@@ -46,7 +46,7 @@ def navlist(request, direction, datestamp):
     if direction == 'before':
         articles = Article.objects.filter(datestamp__lt=datestamp).order_by('-datestamp')
     elif direction == 'since':
-        articles = Article.objects.filter(datestamp__gt=datestamp).order_by('-datestamp')
+        articles = Article.objects.filter(datestamp__gt=datestamp).order_by('datestamp')
     response_data = []
     for article in articles:
         response_data.append({
@@ -91,7 +91,7 @@ def article(request, article_shorttitle=''):
             " union"
             " (select id,title,datestamp,shorttitle from articles where datestamp<(select datestamp from articles where id=%(id)s) order by datestamp desc limit 10)"
             " union"
-            " (select id,title,datestamp,shorttitle from articles where datestamp>(select datestamp from articles where id=%(id)s) order by datestamp asc limit 10) order by datestamp asc;",
+            " (select id,title,datestamp,shorttitle from articles where datestamp>(select datestamp from articles where id=%(id)s) order by datestamp asc limit 10) order by datestamp desc;",
             {'id': article.id}
         )
 

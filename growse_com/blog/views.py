@@ -2,7 +2,7 @@ from django.core.mail import send_mail
 from django.template import RequestContext
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.db.models import Count
-from django.http import HttpResponsePermanentRedirect, HttpResponse
+from django.http import HttpResponsePermanentRedirect, HttpResponse, Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from growse_com.blog.models import Article
 from growse_com.blog.models import Comment
@@ -42,14 +42,17 @@ def article_bydate(request, year, month='', day=''):
             articledate.day).zfill(2) + '/' + article.shorttitle + '/')
 
 
-def navlist(request):
-    articles = Article.objects.all().order_by('-datestamp');
+def navlist(request, direction, datestamp):
+    if direction == 'before':
+        articles = Article.objects.filter(datestamp__lt=datestamp).order_by('-datestamp')
+    elif direction == 'since':
+        articles = Article.objects.filter(datestamp__gt=datestamp).order_by('-datestamp')
     response_data = []
     for article in articles:
         response_data.append({
             'title': article.title,
-            'id':article.id,
-            'shorttitle':article.shorttitle,
+            'id': article.id,
+            'shorttitle': article.shorttitle,
             'year': str(article.datestamp.year).zfill(4) if article.datestamp else None,
             'month': str(article.datestamp.month).zfill(2) if article.datestamp else None,
             'day': str(article.datestamp.day).zfill(2) if article.datestamp else None
@@ -83,6 +86,15 @@ def article(request, article_shorttitle=''):
         return redirect('/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
             articledate.day).zfill(2) + '/' + article.shorttitle + '/')
     else:
+        navitems = Article.objects.raw(
+            "(select id,title,datestamp,shorttitle from articles where id=%(id)s)"
+            " union"
+            " (select id,title,datestamp,shorttitle from articles where datestamp<(select datestamp from articles where id=%(id)s) order by datestamp desc limit 10)"
+            " union"
+            " (select id,title,datestamp,shorttitle from articles where datestamp>(select datestamp from articles where id=%(id)s) order by datestamp asc limit 10) order by datestamp asc;",
+            {'id': article.id}
+        )
+
         comments = Comment.objects.filter(article__id=article.id).order_by("datestamp")
         archives = Article.objects.filter(type='NEWS').extra(select={'month': "DATE_TRUNC('month',datestamp)"}).values(
             'month').annotate(Count('title')).order_by('-month')
@@ -92,8 +104,8 @@ def article(request, article_shorttitle=''):
                 archive["newyear"] = True
                 prevyear = archive["month"].year
         return render_to_response('article.html',
-                                  {'archives': archives, 'navitem': article, 'comments': comments,
-                                   'article': article, 'nav': article.type.lower()}, c)
+                                  {'archives': archives, 'navitems': navitems, 'comments': comments,
+                                   'article': article}, c)
 
 
 def search(request, searchterm=None, page=1):

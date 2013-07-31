@@ -97,6 +97,7 @@ body {
       font-family: $seriffont;
       font-size: 1.0rem;
       font-weight: 300;
+      line-height: 1.0rem;
     }
     fieldset {
       border: 0;
@@ -163,7 +164,7 @@ body {
           font-family: $sansfont;
           border: 0px solid blue;
           margin: 0 0 1rem 0;
-          font-size: 2.0rem;
+          font-size: 2.5rem;
           color: #f90;
           font-weight: 100;
         }
@@ -199,7 +200,7 @@ body {
             span.year {
               border-radius: 0 0 5px 5px;
               font-size: 10px;
-              line-height: 15 PX;
+              line-height: 15px;
               background: $background-hl-color;
               color: #aaa;
               padding: 3px 0;
@@ -338,12 +339,6 @@ body {
     text-align: right;
   }
 
-  ul#linkstable {
-    list-style-type: none;
-    li! {
-    }
-  }
-
   .comment_title {
     margin: 5px 0;
   }
@@ -395,3 +390,4 @@ body {
     height: 1px;
     overflow: hidden;
   }
+}

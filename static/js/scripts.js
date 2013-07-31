@@ -1,22 +1,23 @@
 var growse = function () {
     return {
+        loadingNav: false,
         loadNav: function () {
-            $.getJSON("/navlist/", function (data) {
-                var hereid = $("#articlenav > li").data('id');
-                var before = true;
-                $.each(data, function (i, v) {
-                    if (v.id == hereid) {
-                        before = false;
-                        return;
-                    }
-                    var markup = "<li><a href=\"/" + v.year + "/" + v.month + "/" + v.day + "/" + v.shorttitle + "/\" title=\"" + v.title + "\"<span>" + v.title + "</span></a></li>";
-                    if (before) {
+            if (!growse.loadingNav) {
+                growse.loadingNav = true;
+                $.getJSON("/navlist/since/" + $("#articlenav > li:first").data('datestamp'), function (data) {
+                    $.each(data, function (i, v) {
+                        var markup = "<li><a href=\"/" + v.year + "/" + v.month + "/" + v.day + "/" + v.shorttitle + "/\" title=\"" + v.title + "\"<span>" + v.title + "</span></a></li>";
                         $("#articlenav").prepend(markup);
-                    } else {
-                        $("#articlenav").append(markup);
-                    }
+                    });
                 });
-            });
+                $.getJSON("/navlist/before/" + $("#articlenav > li:last").data('datestamp'), function (data) {
+                    $.each(data, function (i, v) {
+                        var markup = "<li><a href=\"/" + v.year + "/" + v.month + "/" + v.day + "/" + v.shorttitle + "/\" title=\"" + v.title + "\"<span>" + v.title + "</span></a></li>";
+                        $("#articlenav").append(markup);
+                    });
+
+                });
+            }
         },
         getLocation: function () {
             $.getJSON("//res.growse.com/nocache/latitude.js", function (data) {

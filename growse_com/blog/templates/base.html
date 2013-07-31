@@ -49,19 +49,23 @@
     </header>
     <nav>
         <ul id="articlenav">
-            <li data-id="{{ navitem.id }}"><a href="/{{ navitem.datestamp|date:"Y/m/d" }}/{{ navitem.shorttitle }}/"
-                   title="{{ navitem.title }}"
-                   {% if article.id == navitem.id %}class="here"{% endif %}><span>{{ navitem.title }}</span></a>
-            </li>
+            {% for navitem in navitems %}
+                <li data-datestamp="{{ navitem.datestamp|date:"Y-m-d h:m" }}" data-id="{{ navitem.id }}"><a
+                        href="/{{ navitem.datestamp|date:"Y/m/d" }}/{{ navitem.shorttitle }}/"
+                        title="{{ navitem.title }}"
+                        {% if article.id == navitem.id %}class="here"{% endif %}><span>{{ navitem.title }}</span></a>
+                </li>
+            {% endfor %}
             <script type="text/javascript">
                 $(function () {
-                    growse.loadNav();
+
                     var percentagedown = ($('.here').position().top / $(window).height()) * 100;
                     if (percentagedown > 50) {
                         $('nav').scrollTop($('.here').position().top - ($(window).height() / 2) + ($('nav ul li:first').height() / 2));
                     }
                     $('nav').
                             bind('mousewheel DOMMouseScroll', function (e) {
+                                growse.loadNav();
                                 var delta = e.wheelDelta || e.originalEvent.wheelDelta || -e.detail;
                                 console.log(delta);
                                 console.log(e);

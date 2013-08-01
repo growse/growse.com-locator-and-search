@@ -44,15 +44,18 @@ def article_bydate(request, year, month='', day=''):
 
 def navlist(request, direction, datestamp):
     if direction == 'before':
-        articles = Article.objects.filter(datestamp__lt=datestamp).order_by('-datestamp')
+        articles = Article.objects.extra(where=['date_trunc(\'second\',datestamp)<%s'], params=[datestamp]).order_by(
+            '-datestamp')
     elif direction == 'since':
-        articles = Article.objects.filter(datestamp__gt=datestamp).order_by('datestamp')
+        articles = Article.objects.extra(where=['date_trunc(\'second\',datestamp)>%s'], params=[datestamp]).order_by(
+            'datestamp')
     response_data = []
     for article in articles:
         response_data.append({
             'title': article.title,
             'id': article.id,
             'shorttitle': article.shorttitle,
+            'datestamp': article.datestamp.isoformat(),
             'year': str(article.datestamp.year).zfill(4) if article.datestamp else None,
             'month': str(article.datestamp.month).zfill(2) if article.datestamp else None,
             'day': str(article.datestamp.day).zfill(2) if article.datestamp else None
@@ -89,12 +92,11 @@ def article(request, article_shorttitle=''):
         navitems = Article.objects.raw(
             "(select id,title,datestamp,shorttitle from articles where id=%(id)s)"
             " union"
-            " (select id,title,datestamp,shorttitle from articles where datestamp<(select datestamp from articles where id=%(id)s) order by datestamp desc limit 10)"
+            " (select id,title,datestamp,shorttitle from articles where datestamp<(select datestamp from articles where id=%(id)s) order by datestamp desc limit 20)"
             " union"
-            " (select id,title,datestamp,shorttitle from articles where datestamp>(select datestamp from articles where id=%(id)s) order by datestamp asc limit 10) order by datestamp desc;",
+            " (select id,title,datestamp,shorttitle from articles where datestamp>(select datestamp from articles where id=%(id)s) order by datestamp asc limit 20) order by datestamp desc;",
             {'id': article.id}
         )
-
         comments = Comment.objects.filter(article__id=article.id).order_by("datestamp")
         archives = Article.objects.filter(type='NEWS').extra(select={'month': "DATE_TRUNC('month',datestamp)"}).values(
             'month').annotate(Count('title')).order_by('-month')

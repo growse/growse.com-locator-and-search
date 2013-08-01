@@ -1,3 +1,4 @@
+{% load tz %}
 {% load static from staticfiles %}
 {% load compressed %}
 <!DOCTYPE html>
@@ -43,7 +44,6 @@
 <div id="container">
     <header>
         <h1 id="titletext"><a href="/" title="Home">growse.com</a></h1>
-
         <h2 id="about">I write things here.</h2>
         {% block rightnav %}{% endblock %}
         <div id="location">
@@ -52,8 +52,8 @@
     <nav>
         <ul id="articlenav">
             {% for navitem in navitems %}
-                <li data-datestamp="{{ navitem.datestamp|date:"Y-m-d h:m" }}" data-id="{{ navitem.id }}"><a
-                        href="/{{ navitem.datestamp|date:"Y/m/d" }}/{{ navitem.shorttitle }}/"
+                <li data-datestamp="{{ navitem.datestamp|utc|date:"Y-m-d H:i:s" }}" data-id="{{ navitem.id }}"><a
+                        href="/{{ navitem.datestamp|utc|date:"Y/m/d" }}/{{ navitem.shorttitle }}/"
                         title="{{ navitem.title }}"
                         {% if article.id == navitem.id %}class="here"{% endif %}><span>{{ navitem.title }}</span></a>
                 </li>

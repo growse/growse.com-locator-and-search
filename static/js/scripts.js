@@ -1,6 +1,6 @@
 WebFontConfig = {
      google: {
-      families: ['Droid Sans', 'Open Sans','Quando']
+      families: ['Droid Sans', 'Open Sans:300,400','Quando']
     }
 };
 

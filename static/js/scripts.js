@@ -1,17 +1,17 @@
-WebFontConfig = {
-    google: {
-        families: ['Droid Sans', 'Open Sans:300,400','Quando']
-    }
-};
+//WebFontConfig = {
+//    google: {
+//        families: ['Droid Sans', 'Open Sans:300,400','Quando']
+//    }
+//};
 
 $(function () {
-    var wf = document.createElement('script');
-    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-    '://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js';
-wf.type = 'text/javascript';
-wf.async = 'true';
-var s = document.getElementsByTagName('script')[0];
-s.parentNode.insertBefore(wf, s);
+//    var wf = document.createElement('script');
+//    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+//    '://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js';
+//wf.type = 'text/javascript';
+//wf.async = 'true';
+//var s = document.getElementsByTagName('script')[0];
+//s.parentNode.insertBefore(wf, s);
 
 var percentagedown = ($('.here').position().top / $(window).height()) * 100;
 if (percentagedown > 50) {
@@ -19,7 +19,7 @@ if (percentagedown > 50) {
 }
 $('nav').bind('mousewheel DOMMouseScroll', function (e) {
     var delta = e.wheelDelta || e.originalEvent.wheelDelta || -e.detail || -e.originalEvent.detail;
-    this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+    this.scrollTop += ( delta < 0 ? 1 : -1 ) * 40;
     e.preventDefault();
 });
 });

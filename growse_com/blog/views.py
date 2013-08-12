@@ -66,7 +66,7 @@ def navlist(request, direction, datestamp):
 def article(request, article_shorttitle=''):
     c = RequestContext(request)
     if article_shorttitle == '':
-        article = Article.objects.latest('datestamp')
+        article = Article.objects.filter(datestamp__isnull=False).latest('datestamp')
     else:
         article = get_object_or_404(Article, shorttitle=article_shorttitle)
     if request.method == 'POST':
@@ -89,14 +89,15 @@ def article(request, article_shorttitle=''):
         return redirect('/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
             articledate.day).zfill(2) + '/' + article.shorttitle + '/')
     else:
-        navitems = Article.objects.raw(
-            "(select id,title,datestamp,shorttitle from articles where id=%(id)s)"
-            " union"
-            " (select id,title,datestamp,shorttitle from articles where datestamp<(select datestamp from articles where id=%(id)s) order by datestamp desc limit 20)"
-            " union"
-            " (select id,title,datestamp,shorttitle from articles where datestamp>(select datestamp from articles where id=%(id)s) order by datestamp asc limit 20) order by datestamp desc;",
-            {'id': article.id}
-        )
+#        navitems = Article.objects.raw(
+#            "(select id,title,datestamp,shorttitle from articles where id=%(id)s)"
+#            " union"
+#            " (select id,title,datestamp,shorttitle from articles where datestamp<(select datestamp from articles where id=%(id)s) order by datestamp desc limit 20)"
+#            " union"
+#            " (select id,title,datestamp,shorttitle from articles where datestamp>(select datestamp from articles where id=%(id)s) order by datestamp asc limit 20) order by datestamp desc;",
+#            {'id': article.id}
+#        )
+        navitems = Article.objects.filter(datestamp__isnull=False).order_by("-datestamp")
         comments = Comment.objects.filter(article__id=article.id).order_by("datestamp")
         archives = Article.objects.filter(type='NEWS').extra(select={'month': "DATE_TRUNC('month',datestamp)"}).values(
             'month').annotate(Count('title')).order_by('-month')
@@ -129,5 +130,4 @@ def search(request, searchterm=None, page=1):
         except(EmptyPage, InvalidPage):
             results = paginator.page(paginator.num_pages)
         return render_to_response('search.html', {'results': results, 'searchterm': searchterm}, c)
-
 

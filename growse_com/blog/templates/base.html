@@ -4,8 +4,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!--<link href='http://fonts.googleapis.com/css?family=Open+Sans:100,300,400|Quando|Droid+Sans+Mono' rel='stylesheet'
-          type='text/css'>-->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:100,300,400|Quando|Droid+Sans+Mono' rel='stylesheet'
+          type='text/css'>
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8"/>
     <meta name="google-site-verification" content="Sr-L2EMmHr-hc4npzb8p1f7zi9ew1Iev84ly519r1p4"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,22 +59,6 @@
                 </li>
             {% endfor %}
             <script type="text/javascript">
-                $(function () {
-
-                    var percentagedown = ($('.here').position().top / $(window).height()) * 100;
-                    if (percentagedown > 50) {
-                        $('nav').scrollTop($('.here').position().top - ($(window).height() / 2) + ($('nav ul li:first').height() / 2));
-                    }
-                    $('nav').
-                            bind('mousewheel DOMMouseScroll', function (e) {
-                                growse.loadNav();
-                                var delta = e.wheelDelta || e.originalEvent.wheelDelta || -e.detail;
-                                console.log(delta);
-                                console.log(e);
-                                this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
-                                e.preventDefault();
-                            });
-                });
             </script>
         </ul>
     </nav>

@@ -89,17 +89,17 @@ def article(request, article_shorttitle=''):
         return redirect('/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
             articledate.day).zfill(2) + '/' + article.shorttitle + '/')
     else:
-#        navitems = Article.objects.raw(
-#            "(select id,title,datestamp,shorttitle from articles where id=%(id)s)"
-#            " union"
-#            " (select id,title,datestamp,shorttitle from articles where datestamp<(select datestamp from articles where id=%(id)s) order by datestamp desc limit 20)"
-#            " union"
-#            " (select id,title,datestamp,shorttitle from articles where datestamp>(select datestamp from articles where id=%(id)s) order by datestamp asc limit 20) order by datestamp desc;",
-#            {'id': article.id}
-#        )
+    #        navitems = Article.objects.raw(
+    #            "(select id,title,datestamp,shorttitle from articles where id=%(id)s)"
+    #            " union"
+    #            " (select id,title,datestamp,shorttitle from articles where datestamp<(select datestamp from articles where id=%(id)s) order by datestamp desc limit 20)"
+    #            " union"
+    #            " (select id,title,datestamp,shorttitle from articles where datestamp>(select datestamp from articles where id=%(id)s) order by datestamp asc limit 20) order by datestamp desc;",
+    #            {'id': article.id}
+    #        )
         navitems = Article.objects.filter(datestamp__isnull=False).order_by("-datestamp")
         comments = Comment.objects.filter(article__id=article.id).order_by("datestamp")
-        archives = Article.objects.filter(type='NEWS').extra(select={'month': "DATE_TRUNC('month',datestamp)"}).values(
+        archives = Article.objects.filter(datestamp__isnull=False).extra(select={'month': "DATE_TRUNC('month',datestamp)"}).values(
             'month').annotate(Count('title')).order_by('-month')
         prevyear = None
         for archive in archives:

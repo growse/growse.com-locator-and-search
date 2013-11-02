@@ -23,7 +23,6 @@ class Article(models.Model):
     body = models.TextField()
     idxfti = models.TextField()  # This field type is a guess.
     published = models.BooleanField()
-    type = models.CharField(max_length=10)
 
     def save(self, *args, **kwargs):
         self.body = markdown.markdown(self.markdown)

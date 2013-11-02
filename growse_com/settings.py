@@ -9,7 +9,7 @@ TEMPLATE_DEBUG = DEBUG
 ADMINS = (
     ('Andrew Rowson', 'andrew@growse.com'),
 )
-CDN_URL = ('growseres1-growsecom.netdna-ssl.com')
+CDN_URL = 'growseres1-growsecom.netdna-ssl.com'
 
 MANAGERS = ADMINS
 
@@ -55,47 +55,50 @@ MEDIA_ROOT = ''
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-PIPELINE = not DEBUG
+PIPELINE = True
 if DEBUG:
     STATIC_ROOT = 'static-root'
 else:
     STATIC_ROOT = '/var/www/growse.com/res/django-static/www/'
-    STATICFILES_DIRS = ('static/',)
-    if DEBUG:
-        STATIC_URL = '/static/'
-    else:
-        STATIC_URL = '//growseres1-growsecom.netdna-ssl.com/django-static/www/'
-        if not DEBUG:
-            STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
-            PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
-            PIPELINE_CSS = {
-                'www': {
-                    'source_filenames': (
-                        'css/style.scss',
-                        'css/wlefi.scss'
-                    ),
-                    'output_filename': 'css/www.css',
-                    'extra_context': {
-                        'media': 'screen,projection',
-                    },
-                },
-            }
-            PIPELINE_JS = {
-                'www': {
-                    'source_filenames': (
-                        'js/jquery-*.min.js',
-                        'js/jquery.*.js',
-                        'js/scripts.js',
-                    ),
-                    'output_filename': 'js/www.js',
-                }
-            }
-            PIPELINE_COMPILERS = (
-                'pipeline_compass.compiler.CompassCompiler',
-            )
-            PIPELINE_CSS_COMPRESSOR = None
-            PIPELINE_JS_COMPRESSOR = None
-            PIPELINE_DISABLE_WRAPPER = True
+
+STATICFILES_DIRS = ('static/',)
+
+if DEBUG:
+    STATIC_URL = '/static/'
+else:
+    STATIC_URL = '//growseres1-growsecom.netdna-ssl.com/django-static/www/'
+
+
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
+PIPELINE_CSS = {
+    'www': {
+        'source_filenames': (
+            'css/style.scss',
+            'css/wlefi.scss'
+        ),
+        'output_filename': 'css/www.css',
+        'extra_context': {
+            'media': 'screen,projection',
+        },
+    },
+}
+PIPELINE_JS = {
+    'www': {
+        'source_filenames': (
+            'js/jquery-*.min.js',
+            'js/jquery.*.js',
+            'js/scripts.js',
+        ),
+        'output_filename': 'js/www.js',
+    }
+}
+PIPELINE_COMPILERS = (
+    'pipeline_compass.compiler.CompassCompiler',
+)
+PIPELINE_CSS_COMPRESSOR = None
+PIPELINE_JS_COMPRESSOR = None
+PIPELINE_DISABLE_WRAPPER = True
 
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a

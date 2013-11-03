@@ -1,5 +1,6 @@
 # Django settings for growse_com project.
 import sys
+
 if not 'runserver' in sys.argv:
     DEBUG = False
 else:
@@ -15,13 +16,16 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'growse_com',                      # Or path to database file if using sqlite3.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'growse_com', # Or path to database file if using sqlite3.
         'USER': 'growse_com',
         'PASSWORD': 'abominable',
         'HOST': 'localhost'
     }
 }
+
+ALLOWED_HOSTS = ['www.growse.com']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -67,7 +71,6 @@ if DEBUG:
     STATIC_URL = '/static/'
 else:
     STATIC_URL = '//growseres1-growsecom.netdna-ssl.com/django-static/www/'
-
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
@@ -115,7 +118,6 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 )
 
-
 TEMPLATE_CONTEXT_PROCESSORS = (
     'growse_com.blog.context_processors.debug_mode',
     'growse_com.blog.context_processors.site_version',
@@ -134,7 +136,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
 )
 
-
 if DEBUG:
     SECURE_SSL_REDIRECT = False
     SECURE_FRAME_DENY = True
@@ -149,10 +150,10 @@ else:
 ROOT_URLCONF = 'growse_com.urls'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    #! Don't forget to use absolute paths, not relative paths.
-    #"/home/growse/django/templates",
+# Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+# Always use forward slashes, even on Windows.
+#! Don't forget to use absolute paths, not relative paths.
+#"/home/growse/django/templates",
 )
 
 INSTALLED_APPS = (

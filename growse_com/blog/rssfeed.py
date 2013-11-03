@@ -1,5 +1,6 @@
 from django.contrib.syndication.views import Feed
 from growse_com.blog.models import Article
+import markdown
 
 
 class RssFeed(Feed):
@@ -14,7 +15,7 @@ class RssFeed(Feed):
         return item.title
 
     def item_description(self, item):
-        return item.body
+        return markdown.markdown(item.markdown)
 
     def item_link(self, item):
         return 'http://www.growse.com/news/comments/' + item.shorttitle + '/'

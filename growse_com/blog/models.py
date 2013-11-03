@@ -8,6 +8,7 @@
 # into your database.
 
 from django.db import models
+from django.utils.html import strip_tags
 import datetime
 import re
 import markdown
@@ -15,28 +16,20 @@ import markdown
 
 class Article(models.Model):
     id = models.AutoField(primary_key=True)
-    datestamp = models.DateTimeField(null=True, blank=True)
+    datestamp = models.DateTimeField(null=True, auto_now_add=True)
     title = models.CharField(max_length=255)
     shorttitle = models.CharField(unique=True, max_length=255)
     description = models.TextField(null=True)
     markdown = models.TextField()
-    body = models.TextField()
     idxfti = models.TextField()  # This field type is a guess.
     published = models.BooleanField()
+    searchtext = models.TextField()
 
     def save(self, *args, **kwargs):
-        self.body = markdown.markdown(self.markdown)
         self.shorttitle = self.title
         self.shorttitle = re.sub("[^a-zA-Z0-9]+", "-", self.shorttitle.lower()).lstrip('-').rstrip('-')
-        if not self.id:
-            self.datestamp = datetime.datetime.now()
+        self.searchtext = strip_tags(markdown.markdown(self.markdown))
         super(Article, self).save(*args, **kwargs)
-
-    def get_absolute_url(self):
-        if self.type == 'NEWS':
-            return "/news/comments/" + self.shorttitle + "/"
-        else:
-            return "/" + self.type.lower() + "/" + self.shorttitle + "/"
 
     class Meta:
         db_table = u'articles'

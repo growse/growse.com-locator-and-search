@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load markup %}
 {% block title %}
     {{ article.title }} ::
 {% endblock %}
@@ -14,7 +15,7 @@
             <meta itemprop="author" content="Andrew Rowson"/>
         </header>
         <section itemprop="articleBody">
-            {{ article.body|safe }}
+            {{ article.markdown|markdown:"safe" }}
         </section>
     </article>
     {% if comments.count != 0 %}
@@ -53,14 +54,6 @@
 {% endblock %}
 
 {% block rightnav %}
-    <div id="search">
-        <form action="/search/" method="post">
-            <fieldset>
-                {% csrf_token %}
-                <input placeholder="Search for things" id="searchbox" type="text" name="a" class="searchtext"/>
-            </fieldset>
-        </form>
-    </div>
     {% if archives %}
         <div id="previous">
             <h2>Previous things</h2>
@@ -70,7 +63,7 @@
                         {% if not forloop.first %}
                             </ul>
                         {% endif %}
-                        <li>
+                        <li class="year">
                             <a href="javascript:$('ul#{{ archive.month|date:"Y" }}').slideToggle(100);">{{ archive.month|date:"Y" }}</a>
                         </li>
                         <ul id="{{ archive.month|date:"Y" }}" class="hide">

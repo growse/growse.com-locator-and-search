@@ -166,6 +166,8 @@ INSTALLED_APPS = (
     'growse_com.blog',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
+    'django.contrib.markup',
+    'django_extensions',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'djangosecure',

@@ -1,45 +1,50 @@
+import re
 from django.core.mail import send_mail
 from django.template import RequestContext
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import get_object_or_404, redirect, render_to_response, render
 from django.db.models import Count
+from django import template
 from django.http import HttpResponsePermanentRedirect, HttpResponse, Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.utils.safestring import mark_safe
 from growse_com.blog.models import Article
 from growse_com.blog.models import Comment
 import simplejson as json
 
 
 def article_shorttitle(request, article_shorttitle=''):
-    article = get_object_or_404(Article, shorttitle=article_shorttitle)
-    articledate = article.datestamp.date()
+    thisarticle = get_object_or_404(Article, shorttitle=article_shorttitle)
+    articledate = thisarticle.datestamp.date()
     return HttpResponsePermanentRedirect(
         '/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
-            articledate.day).zfill(2) + '/' + article.shorttitle + '/')
+            articledate.day).zfill(2) + '/' + thisarticle.shorttitle + '/')
 
 
 def article_bydate(request, year, month='', day=''):
-    article = None
+    thisarticle = None
     if day and month and year:
         try:
-            article = Article.objects.filter(datestamp__year=year, datestamp__month=month, datestamp__day=day).order_by(
-                'datestamp')[0]
+            thisarticle = Article.objects.filter(
+                datestamp__year=year,
+                datestamp__month=month,
+                datestamp__day=day).order_by('datestamp')[0]
         except IndexError:
             raise Http404
     elif month and year:
         try:
-            article = Article.objects.filter(datestamp__year=year, datestamp__month=month).order_by('datestamp')[0]
+            thisarticle = Article.objects.filter(datestamp__year=year, datestamp__month=month).order_by('datestamp')[0]
         except IndexError:
             raise Http404
     elif year:
         try:
-            article = Article.objects.filter(datestamp__year=year).order_by('datestamp')[0]
+            thisarticle = Article.objects.filter(datestamp__year=year).order_by('datestamp')[0]
         except IndexError:
             raise Http404
 
-    if article:
-        articledate = article.datestamp.date()
+    if thisarticle:
+        articledate = thisarticle.datestamp.date()
         return redirect('/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
-            articledate.day).zfill(2) + '/' + article.shorttitle + '/')
+            articledate.day).zfill(2) + '/' + thisarticle.shorttitle + '/')
 
 
 def navlist(request, direction, datestamp):
@@ -83,36 +88,28 @@ def article(request, article_shorttitle=''):
                           'Someone posted a comment on growse.com. Over at http://www.growse.com/' + str(
                               articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
                               articledate.day).zfill(2) + '/' + article.shorttitle + '/',
-                          'hubfour@growse.com', ['comments@growse.com'], fail_silently=False)
+                          'blog@growse.com', ['comments@growse.com'], fail_silently=False)
             except:
                 pass
         return redirect('/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
             articledate.day).zfill(2) + '/' + article.shorttitle + '/')
     else:
-    #        navitems = Article.objects.raw(
-    #            "(select id,title,datestamp,shorttitle from articles where id=%(id)s)"
-    #            " union"
-    #            " (select id,title,datestamp,shorttitle from articles where datestamp<(select datestamp from articles where id=%(id)s) order by datestamp desc limit 20)"
-    #            " union"
-    #            " (select id,title,datestamp,shorttitle from articles where datestamp>(select datestamp from articles where id=%(id)s) order by datestamp asc limit 20) order by datestamp desc;",
-    #            {'id': article.id}
-    #        )
         navitems = Article.objects.filter(datestamp__isnull=False).order_by("-datestamp")
         comments = Comment.objects.filter(article__id=article.id).order_by("datestamp")
-        archives = Article.objects.filter(datestamp__isnull=False).extra(select={'month': "DATE_TRUNC('month',datestamp)"}).values(
+        archives = Article.objects.filter(datestamp__isnull=False).extra(
+            select={'month': "DATE_TRUNC('month',datestamp)"}).values(
             'month').annotate(Count('title')).order_by('-month')
         prevyear = None
         for archive in archives:
             if archive["month"].year != prevyear:
                 archive["newyear"] = True
                 prevyear = archive["month"].year
-        return render_to_response('article.html',
-                                  {'archives': archives, 'navitems': navitems, 'comments': comments,
-                                   'article': article}, c)
+        return render(request, 'article.html',
+                      {'archives': archives, 'navitems': navitems, 'comments': comments,
+                       'article': article})
 
 
 def search(request, searchterm=None, page=1):
-    c = RequestContext(request)
     if searchterm is None:
         if request.method == 'GET':
             return redirect("/", Permanent=True)
@@ -120,7 +117,6 @@ def search(request, searchterm=None, page=1):
             return redirect("/search/" + request.POST.get('a', '') + "/")
     else:
         results_list = Article.objects.extra(select={
-            'headline': "ts_headline(body,plainto_tsquery('english',%s),'MaxFragments=1, MinWords=5, MaxWords=25')",
             'rank': "ts_rank(idxfti,plainto_tsquery('english',%s))"},
                                              where=["idxfti @@ plainto_tsquery('english',%s)"], params=[searchterm],
                                              select_params=[searchterm, searchterm]).order_by('-rank')
@@ -129,5 +125,37 @@ def search(request, searchterm=None, page=1):
             results = paginator.page(page)
         except(EmptyPage, InvalidPage):
             results = paginator.page(paginator.num_pages)
-        return render_to_response('search.html', {'results': results, 'searchterm': searchterm}, c)
+        for result in results:
+            result.snippet = smart_truncate(result.searchtext, searchterm)
+        return render(request, 'search.html', {'results': results, 'searchterm': searchterm})
 
+
+def smart_truncate(content, searchterm, surrounding_words=15, suffix='...'):
+    words = content.split(' ')
+    searchterm = remove_punctuation_to_lower(searchterm)
+    trimmed_words = map(remove_punctuation_to_lower, words)
+    if remove_punctuation_to_lower(searchterm) in trimmed_words:
+        index = trimmed_words.index(searchterm.lower())
+        startindex = index - surrounding_words
+        endindex = index + surrounding_words
+        if startindex < 0:
+            startindex = 0
+            endindex = 2 * surrounding_words
+        if endindex >= len(words):
+            endindex = len(words) - 1
+            startindex = endindex - (2 * surrounding_words)
+            if startindex < 0:
+                startindex = 0
+        result = ' '.join(words[startindex:endindex])
+        if startindex > 0:
+            result = suffix + ' ' + result
+        if endindex < len(words) - 1:
+            result = result + ' ' + suffix
+        return result
+    else:
+        return ' '.join(words[0:2 * surrounding_words])
+
+
+def remove_punctuation_to_lower(text):
+    pattern = re.compile('([^\s\w]|_)+')
+    return pattern.sub('', text).lower()

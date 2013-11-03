@@ -12,4 +12,4 @@ def deploy():
         with prefix('source bin/activate'):
             run('git pull')
             run('pip install --upgrade -r requirements.txt')
-            sudo('restart uwsgi')
+            sudo('touch /etc/uwsgi/apps-enabled/growse.com.ini')

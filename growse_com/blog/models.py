@@ -31,6 +31,13 @@ class Article(models.Model):
         self.searchtext = strip_tags(markdown.markdown(self.markdown))
         super(Article, self).save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        if self.datestamp is not None:
+            return '/' + str(self.datestamp.year) + '/' + str(self.datestamp.month) + '/' + str(
+                self.datestamp.day) + '/' + self.shorttitle
+        else:
+            return ''
+
     class Meta:
         db_table = u'articles'
 

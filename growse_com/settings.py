@@ -160,6 +160,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sitemaps',
     'growse_com.blog',
+    'suit',
     'django.contrib.admin',
     'django.contrib.markup',
     'django_extensions',

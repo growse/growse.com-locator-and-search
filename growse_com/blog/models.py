@@ -34,7 +34,7 @@ class Article(models.Model):
     def get_absolute_url(self):
         if self.datestamp is not None:
             return '/' + str(self.datestamp.year) + '/' + str(self.datestamp.month) + '/' + str(
-                self.datestamp.day) + '/' + self.shorttitle
+                self.datestamp.day) + '/' + self.shorttitle + '/'
         else:
             return ''
 

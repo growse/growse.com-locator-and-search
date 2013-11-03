@@ -101,8 +101,8 @@ PIPELINE_JS = {
 PIPELINE_COMPILERS = (
     'pipeline_compass.compiler.CompassCompiler',
 )
-PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = None
+PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'
+PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'
 PIPELINE_DISABLE_WRAPPER = True
 
 
@@ -130,7 +130,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
-    'htmlmin.middleware.HtmlMinifyMiddleware',
+    'pipeline.middleware.MinifyHTMLMiddleware',
     'django.middleware.common.CommonMiddleware',
     'djangosecure.middleware.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

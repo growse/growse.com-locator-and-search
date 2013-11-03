@@ -30,7 +30,7 @@
             {% endif %}
             - {{ comment.datestamp }}
         </div>
-        <div style="white-space: pre-line;" class="comment_body"><p>{{ comment.comment }}</p></div>
+        <div style="white-space: pre-line;" class="comment_body"><p>{{ comment.comment|urlizetrunc:100 }}</p></div>
     {% endfor %}
     <h2>Add a new comment</h2>
     <form class="commentform" method="post">

@@ -228,8 +228,7 @@ body {
         width: auto;
         height: auto;
       }
-      .codehilite {
-
+      div.codehilite {
         font-family: $monospacefont;
         font-size: 1.0rem;
         line-height: 1.4;
@@ -237,7 +236,6 @@ body {
         white-space: pre;
         overflow: auto;
         padding: 5px;
-        color: #ddd;
         background: #223;
       }
       section {

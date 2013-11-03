@@ -75,7 +75,7 @@ PIPELINE_CSS = {
     'www': {
         'source_filenames': (
             'css/style.scss',
-            'css/wlefi.scss'
+            'css/solarizeddark.scss'
         ),
         'output_filename': 'css/www.css',
         'extra_context': {
@@ -164,12 +164,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sitemaps',
     'growse_com.blog',
-    # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     'django.contrib.markup',
     'django_extensions',
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
     'djangosecure',
     'pipeline',
     'south'

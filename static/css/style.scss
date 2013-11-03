@@ -16,6 +16,7 @@ $background-color: #222;
 
 $sansfont: 'Open Sans', Trebuchet, Sans;
 $seriffont: Quando, Georgia, serif;
+$monospacefont: 'Droid Sans Mono', monospace;
 
 $headlinefont: $sansfont;
 $bodyfont: $seriffont;
@@ -227,9 +228,10 @@ body {
         width: auto;
         height: auto;
       }
-      .code {
-        font-family: 'Droid Sans Mono', monospace;
-        font-size: 0.8rem;
+      .codehilite {
+
+        font-family: $monospacefont;
+        font-size: 1.0rem;
         line-height: 1.4;
         border: 1px solid #556;
         white-space: pre;

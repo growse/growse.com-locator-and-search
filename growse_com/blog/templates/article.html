@@ -15,7 +15,7 @@
             <meta itemprop="author" content="Andrew Rowson"/>
         </header>
         <section itemprop="articleBody">
-            {{ article.markdown|markdown:"safe" }}
+            {{ article.markdown|markdown:"safe,codehilite" }}
         </section>
     </article>
     {% if comments.count != 0 %}

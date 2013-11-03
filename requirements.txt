@@ -1,5 +1,6 @@
 Django==1.5.5
 Markdown==2.3.1
+Pygments==1.6
 South==0.8.2
 argparse==1.2.1
 django-extensions==1.2.5
@@ -10,6 +11,7 @@ django-secure==1.0
 futures==2.1.4
 psycopg2==2.5.1
 pyScss==1.2.0.post3
+pygments-style-solarized==0.1.1
 simplejson==3.3.1
 six==1.4.1
 wsgiref==0.1.2

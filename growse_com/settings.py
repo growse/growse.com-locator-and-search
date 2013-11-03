@@ -5,6 +5,7 @@ if not 'runserver' in sys.argv:
     DEBUG = False
 else:
     DEBUG = True
+
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -65,7 +66,8 @@ if DEBUG:
 else:
     STATIC_ROOT = '/var/www/growse.com/res/django-static/www/'
 
-STATICFILES_DIRS = ('static/',)
+STATICFILES_DIRS = ('static/',
+                    'lib/python2.7/site-packages/suit/static/')
 
 if DEBUG:
     STATIC_URL = '/static/'

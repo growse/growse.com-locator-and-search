@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load markup %}
+{% load tz %}
 {% block title %}
     {{ article.title }} ::
 {% endblock %}
@@ -8,10 +9,13 @@
 {% block content %}
     <article itemscope itemtype="http://schema.org/blogposting">
         <header>
-            <time itemprop="datePublished" datetime="{{ article.datestamp|date:"c" }}">
-                <p>{{ article.datestamp|date:"N" }} <span class="day">{{ article.datestamp|date:"d" }}</span><span
-                        class="year">{{ article.datestamp|date:"Y" }}</span></p></time>
+            <time class="fancy" itemprop="datePublished" datetime="{{ article.datestamp|utc|date:"Y-m-d"}}{{article.datestamp|utc|date:"H:i:s" }}Z">
+                <p>{{ article.datestamp|utc|date:"N" }} <span class="day">{{ article.datestamp|utc|date:"d" }}</span><span
+                        class="year">{{ article.datestamp|utc|date:"Y" }}</span></p></time>
             <h1 itemprop="name headline">{{ article.title }}</h1>
+            <time class="plain" itemprop="datePublished" datetime="{{ article.datestamp|utc|date:"Y-m-d"}}{{article.datestamp|utc|date:"H:i:s" }}Z">
+                {{ article.datestamp|utc|date:"N d, Y" }}
+            </time>
             <meta itemprop="author" content="Andrew Rowson"/>
         </header>
         <section itemprop="articleBody">

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load markup %}
+{% load filters %}
 {% load tz %}
 {% block title %}
     {{ article.title }} ::
@@ -19,7 +19,7 @@
             <meta itemprop="author" content="Andrew Rowson"/>
         </header>
         <section itemprop="articleBody">
-            {{ article.markdown|markdown:"safe,codehilite" }}
+            {{ article.markdown|my_markdown}}
         </section>
     </article>
     {% if comments.count != 0 %}

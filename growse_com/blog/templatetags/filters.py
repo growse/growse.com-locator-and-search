@@ -1,3 +1,7 @@
+import markdown
+
+from django.template.defaultfilters import stringfilter
+from django.utils.encoding import force_unicode
 from django import template
 from django.utils.safestring import mark_safe
 import re
@@ -9,3 +13,14 @@ register = template.Library()
 def highlight(text, word):
     pattern = re.compile(r"(?P<filter>%s)" % word, re.IGNORECASE)
     return mark_safe(re.sub(pattern, r"<span class='highlight'>\g<filter></span>", text))
+
+
+
+@register.filter(is_safe=True)
+@stringfilter
+def my_markdown(value):
+    extensions = ["codehilite", ]
+    return mark_safe(markdown.markdown(force_unicode(value),
+                                       extensions,
+                                       safe_mode=True,
+                                       enable_attributes=False))

@@ -164,7 +164,6 @@ INSTALLED_APPS = (
     'growse_com.blog',
     'suit',
     'django.contrib.admin',
-    'django.contrib.markup',
     'django_extensions',
     'djangosecure',
     'pipeline',

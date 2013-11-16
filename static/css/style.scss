@@ -288,6 +288,12 @@ body {
         padding: 5px;
         background: #223;
       }
+      code {
+        border: 1px solid #556;
+        padding: 2px;
+        font-family: $monospacefont;
+        background: #223;
+      }
       section {
         line-height: 1.6em;
       }

@@ -22,7 +22,7 @@ class Article(models.Model):
     description = models.TextField(null=True)
     markdown = models.TextField()
     idxfti = models.TextField()  # This field type is a guess.
-    published = models.BooleanField()
+    published = models.BooleanField(default=True)
     searchtext = models.TextField()
 
     def save(self, *args, **kwargs):

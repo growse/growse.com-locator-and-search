@@ -130,6 +130,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.common.CommonMiddleware',
     'djangosecure.middleware.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -161,24 +162,25 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.sitemaps',
+    'debug_toolbar',
     'growse_com.blog',
     'suit',
     'django.contrib.admin',
     'django_extensions',
     'djangosecure',
     'pipeline',
-    'south'
+    'south',
+
 )
 
-#CACHES = {
-#		'default': {
-#			'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-#			'LOCATION': '/var/tmp/django_cache',
-#		}
-#	}
-#
-#CACHE_MIDDLEWARE_KEY_PREFIX='growse_com'
-#CACHE_MIDDLEWARE_SECONDS=300
+INTERNAL_IPS = ('127.0.0.1',)
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': 'unix:/tmp/memcache.socket',
+    }
+}
 
 FORCE_SCRIPT_NAME = ''
 

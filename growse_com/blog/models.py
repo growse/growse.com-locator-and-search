@@ -12,6 +12,7 @@ from django.utils.html import strip_tags
 import datetime
 import re
 import markdown
+from django.core.cache import cache
 
 
 class Article(models.Model):
@@ -29,6 +30,7 @@ class Article(models.Model):
         self.shorttitle = self.title
         self.shorttitle = re.sub("[^a-zA-Z0-9]+", "-", self.shorttitle.lower()).lstrip('-').rstrip('-')
         self.searchtext = strip_tags(markdown.markdown(self.markdown))
+        cache.delete('navitems')
         super(Article, self).save(*args, **kwargs)
 
     def get_absolute_url(self):

@@ -1,12 +1,13 @@
+from django.core.cache import cache
+import zlib
 import re
+import cPickle
 from django.core.mail import send_mail
 from django.template import RequestContext
-from django.shortcuts import get_object_or_404, redirect, render_to_response, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count
-from django import template
 from django.http import HttpResponsePermanentRedirect, HttpResponse, Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.utils.safestring import mark_safe
 from growse_com.blog.models import Article
 from growse_com.blog.models import Comment
 import simplejson as json
@@ -94,7 +95,14 @@ def article(request, article_shorttitle=''):
         return redirect('/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
             articledate.day).zfill(2) + '/' + article.shorttitle + '/')
     else:
-        navitems = Article.objects.filter(datestamp__isnull=False).order_by("-datestamp")
+        pickled_navitems = cache.get('navitems')
+        if pickled_navitems is None:
+            navitems = Article.objects.filter(datestamp__isnull=False).order_by("-datestamp").all()
+            pickled = zlib.compress(cPickle.dumps(navitems, cPickle.HIGHEST_PROTOCOL), 9)
+            cache.set('navitems', pickled)
+        else:
+            navitems = cPickle.loads(zlib.decompress(pickled_navitems))
+
         comments = Comment.objects.filter(article__id=article.id).order_by("datestamp")
         archives = Article.objects.filter(datestamp__isnull=False).extra(
             select={'month': "DATE_TRUNC('month',datestamp)"}).values(

@@ -1,4 +1,5 @@
 from django.core.cache import cache
+from django.views.decorators.cache import cache_page
 import zlib
 import re
 import cPickle
@@ -99,19 +100,27 @@ def article(request, article_shorttitle=''):
         if pickled_navitems is None:
             navitems = Article.objects.filter(datestamp__isnull=False).order_by("-datestamp").all()
             pickled = zlib.compress(cPickle.dumps(navitems, cPickle.HIGHEST_PROTOCOL), 9)
-            cache.set('navitems', pickled)
+            cache.set('navitems', pickled, None)
         else:
             navitems = cPickle.loads(zlib.decompress(pickled_navitems))
 
         comments = Comment.objects.filter(article__id=article.id).order_by("datestamp")
-        archives = Article.objects.filter(datestamp__isnull=False).extra(
-            select={'month': "DATE_TRUNC('month',datestamp)"}).values(
-            'month').annotate(Count('title')).order_by('-month')
-        prevyear = None
-        for archive in archives:
-            if archive["month"].year != prevyear:
-                archive["newyear"] = True
-                prevyear = archive["month"].year
+
+        pickled_archives = cache.get('archives')
+        if pickled_archives is None:
+            archives = Article.objects.filter(datestamp__isnull=False).extra(
+                select={'month': "DATE_TRUNC('month',datestamp)"}).values(
+                'month').annotate(Count('title')).order_by('-month')
+
+            prevyear = None
+            for archive in archives:
+                if archive["month"].year != prevyear:
+                    archive["newyear"] = True
+                    prevyear = archive["month"].year
+            pickled = zlib.compress(cPickle.dumps(archives, cPickle.HIGHEST_PROTOCOL), 9)
+            cache.set('archives', pickled, None)
+        else:
+            archives = cPickle.loads(zlib.decompress(pickled_archives))
         return render(request, 'article.html',
                       {'archives': archives, 'navitems': navitems, 'comments': comments,
                        'article': article})

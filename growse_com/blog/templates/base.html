@@ -60,8 +60,8 @@
         <div id="location">
         </div>
     </header>
-    <nav>
-        <ul id="articlenav">
+    <nav class="nano">
+        <ul id="articlenav" class="content">
             {% for navitem in navitems %}
                 <li data-datestamp="{{ navitem.datestamp|utc|date:"Y-m-d H:i:s" }}" data-id="{{ navitem.id }}"><a
                         href="/{{ navitem.datestamp|utc|date:"Y/m/d" }}/{{ navitem.shorttitle }}/"

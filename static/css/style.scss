@@ -463,3 +463,13 @@ body {
     overflow: hidden;
   }
 }
+
+.nano > .pane {
+  background: #333;
+  -webkit-border-radius: 0;
+  border-radius: 0;
+}
+
+.nano > .slider {
+  background: #fff;
+}

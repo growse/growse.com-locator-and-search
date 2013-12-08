@@ -79,6 +79,7 @@ PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
 PIPELINE_CSS = {
     'www': {
         'source_filenames': (
+            'css/nanoscroller.css',
             'css/style.scss',
             'css/solarizeddark.scss'
         ),

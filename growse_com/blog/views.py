@@ -85,14 +85,12 @@ def article(request, article_shorttitle=''):
         if spamfilter is None or len(spamfilter) == 0:
             Comment.objects.create(name=name, website=website, comment=comment, article=article,
                                    ip=request.META['REMOTE_ADDR'])
-            try:
-                send_mail('New Comment on growse.com',
-                          'Someone posted a comment on growse.com. Over at http://www.growse.com/' + str(
-                              articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
-                              articledate.day).zfill(2) + '/' + article.shorttitle + '/',
-                          'blog@growse.com', ['comments@growse.com'], fail_silently=False)
-            except:
-                pass
+            send_mail('New Comment on growse.com',
+                      'Someone posted a comment on growse.com. Over at http://www.growse.com/' + str(
+                          articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
+                          articledate.day).zfill(2) + '/' + article.shorttitle + '/',
+                      'blog@growse.com', ['comments@growse.com'], fail_silently=False)
+            
         return redirect('/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
             articledate.day).zfill(2) + '/' + article.shorttitle + '/')
     else:

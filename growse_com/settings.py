@@ -176,6 +176,11 @@ INSTALLED_APPS = (
 
 INTERNAL_IPS = ('127.0.0.1',)
 
+EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
+MAILGUN_ACCESS_KEY = 'key-5nvxiijjtshdf7p8ra3vdhgkishcq587'
+MAILGUN_SERVER_NAME = 'growse.com'
+DEFAULT_FROM_EMAIL = 'blog@growse.com'
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',

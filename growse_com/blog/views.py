@@ -1,6 +1,7 @@
 from django.core.cache import cache
 from django.views.decorators.cache import cache_page
 import zlib
+from django.views.decorators.csrf import csrf_exempt
 import re
 import cPickle
 from django.core.mail import send_mail
@@ -9,7 +10,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count
 from django.http import HttpResponsePermanentRedirect, HttpResponse, Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from growse_com.blog.models import Article
+from growse_com.blog.models import Article, Location
 from growse_com.blog.models import Comment
 import simplejson as json
 
@@ -71,7 +72,6 @@ def navlist(request, direction, datestamp):
 
 
 def article(request, article_shorttitle=''):
-    c = RequestContext(request)
     if article_shorttitle == '':
         article = Article.objects.filter(datestamp__isnull=False).latest('datestamp')
     else:
@@ -90,7 +90,7 @@ def article(request, article_shorttitle=''):
                           articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
                           articledate.day).zfill(2) + '/' + article.shorttitle + '/',
                       'blog@growse.com', ['comments@growse.com'], fail_silently=False)
-            
+
         return redirect('/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
             articledate.day).zfill(2) + '/' + article.shorttitle + '/')
     else:
@@ -174,3 +174,24 @@ def smart_truncate(content, searchterm, surrounding_words=15, suffix='...'):
 def remove_punctuation_to_lower(text):
     pattern = re.compile('([^\s\w]|_)+')
     return pattern.sub('', text).lower()
+
+
+@csrf_exempt
+def locator(request):
+    if request.method != 'POST':
+        raise Http404
+
+    if 'lat' not in request.POST \
+        or 'long' not in request.POST \
+        or 'acc' not in request.POST \
+        or 'time' not in request.POST:
+        raise Http404
+
+    location = Location()
+    location.latitude = request.POST.get('lat')
+    location.longitude = request.POST.get('long')
+    location.accuracy = request.POST.get('acc')
+    location.devicetimestamp = request.POST.get('time')
+    location.save()
+
+    return HttpResponse('')

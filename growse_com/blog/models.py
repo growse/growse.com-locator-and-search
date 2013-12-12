@@ -72,3 +72,14 @@ class Comment(models.Model):
             return 'http://' + self.website
         else:
             return self.website
+
+
+class Location(models.Model):
+    timestamp = models.DateTimeField(auto_now_add=True)
+    devicetimestamp = models.DateTimeField()
+    latitude = models.DecimalField(decimal_places=6, max_digits=9)
+    longitude = models.DecimalField(decimal_places=6, max_digits=9)
+    accuracy = models.DecimalField(decimal_places=6, max_digits=9)
+
+    class Meta:
+        db_table = u'locations'

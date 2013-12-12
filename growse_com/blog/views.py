@@ -1,11 +1,12 @@
-from django.core.cache import cache
-from django.views.decorators.cache import cache_page
+import datetime
 import zlib
+import cPickle
+from decimal import Decimal
+
+from django.core.cache import cache
 from django.views.decorators.csrf import csrf_exempt
 import re
-import cPickle
 from django.core.mail import send_mail
-from django.template import RequestContext
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count
 from django.http import HttpResponsePermanentRedirect, HttpResponse, Http404
@@ -181,17 +182,16 @@ def locator(request):
     if request.method != 'POST':
         raise Http404
 
-    if 'lat' not in request.POST \
-        or 'long' not in request.POST \
-        or 'acc' not in request.POST \
-        or 'time' not in request.POST:
+    if 'lat' not in request.POST or 'long' not in request.POST or 'acc' not in request.POST or 'time' not in request.POST:
         raise Http404
 
     location = Location()
     location.latitude = request.POST.get('lat')
     location.longitude = request.POST.get('long')
     location.accuracy = request.POST.get('acc')
-    location.devicetimestamp = request.POST.get('time')
+
+    location.devicetimestamp = datetime.datetime.fromtimestamp(Decimal(request.POST.get('time')) / 1000)
+
     location.save()
 
     return HttpResponse('')

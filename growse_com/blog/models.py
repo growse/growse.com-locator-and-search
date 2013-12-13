@@ -90,7 +90,7 @@ class Location(models.Model):
             url = settings.GEOCODE_API_URL.format(self.latitude, self.longitude)
             try:
                 r = requests.get(url)
-                if r.status_codepush is 200:
+                if r.status_code is 200:
                     self.geocoding = r.text
             except requests.RequestException as e:
                 send_mail('Geocode exception on growse.com',

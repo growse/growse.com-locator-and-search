@@ -190,6 +190,8 @@ CACHES = {
 
 FORCE_SCRIPT_NAME = ''
 
+GEOCODE_API_URL = 'http://api.geonames.org/findNearbyPlaceNameJSON?formatted=false&lat={}&lng={}&username=growse'
+
 try:
     from local_settings import *
 except ImportError:

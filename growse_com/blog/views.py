@@ -189,7 +189,6 @@ def locator(request):
     location.latitude = request.POST.get('lat')
     location.longitude = request.POST.get('long')
     location.accuracy = request.POST.get('acc')
-
     location.devicetimestamp = datetime.datetime.fromtimestamp(Decimal(request.POST.get('time')) / 1000)
 
     location.save()

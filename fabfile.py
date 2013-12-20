@@ -1,6 +1,6 @@
 from fabric.api import sudo, cd, run, env, local, prefix
 
-env.hosts = ['109.123.84.240']
+env.hosts = ['www.growse.com']
 env.user = 'growse'
 
 

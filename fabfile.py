@@ -1,7 +1,6 @@
 from fabric.api import sudo, cd, run, env, local, prefix
 
 env.hosts = ['www.growse.com']
-env.user = 'growse'
 
 
 def deploy():

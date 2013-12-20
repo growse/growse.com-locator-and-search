@@ -14,4 +14,4 @@ def deploy():
             run('pip install --upgrade -r requirements.txt')
             run('./manage.py migrate blog')
             run('./manage.py collectstatic --noinput')
-            sudo('touch /etc/uwsgi/apps-enabled/growse.com.ini')
+            sudo('/etc/init.d/uwsgi restart')

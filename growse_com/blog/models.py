@@ -7,7 +7,7 @@
 # Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'
 # into your database.
 from django.core.mail import send_mail
-
+import json
 from django.db import models
 from django.utils.html import strip_tags
 import datetime
@@ -97,6 +97,14 @@ class Location(models.Model):
                           'Exception raised while trying to geocode location: {}'.format(e), 'blog@growse.com',
                           'andrew@growse.com')
         super(Location, self).save(*args, **kwargs)
+
+    @staticmethod
+    def get_latest():
+        last = Location.objects.all().order_by('-timestamp')[:1].get()
+        jsonposition = json.loads(last.geocoding)
+        locobj = {'name': jsonposition['geonames'][0]['name'], 'latitude': jsonposition['geonames'][0]['lat'],
+                  'longitude': jsonposition['geonames'][0]['lng']}
+        return locobj
 
     class Meta:
         db_table = u'locations'

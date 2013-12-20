@@ -57,7 +57,11 @@
         </div>
 
         {% block rightnav %}{% endblock %}
+
         <div id="location">
+            <p>Last seen floating around near <a
+                    href="http://maps.google.com/?q={{ lastlocation.latitude }},{{ lastlocation.longitude }}">{{ lastlocation.name }}</a>
+            </p>
         </div>
     </header>
     <nav class="nano">

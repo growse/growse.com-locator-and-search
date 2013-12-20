@@ -120,9 +120,10 @@ def article(request, article_shorttitle=''):
             cache.set('archives', pickled, None)
         else:
             archives = cPickle.loads(zlib.decompress(pickled_archives))
+        lastlocation = Location.get_latest()
         return render(request, 'article.html',
                       {'archives': archives, 'navitems': navitems, 'comments': comments,
-                       'article': article})
+                       'article': article, 'lastlocation': lastlocation})
 
 
 def search(request, searchterm=None, page=1):

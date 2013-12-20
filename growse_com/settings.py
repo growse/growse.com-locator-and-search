@@ -64,7 +64,7 @@ PIPELINE = True
 if DEBUG:
     STATIC_ROOT = 'static-root'
 else:
-    STATIC_ROOT = '/var/www/growse.com/res/django-static/www/'
+    STATIC_ROOT = '/var/www/res.growse.com/django-static/www/'
 
 STATICFILES_DIRS = ('static/',
                     'lib/python2.7/site-packages/suit/static/')

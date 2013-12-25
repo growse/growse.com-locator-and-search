@@ -82,7 +82,7 @@ class Location(models.Model):
     devicetimestamp = models.DateTimeField()
     latitude = models.DecimalField(decimal_places=6, max_digits=9)
     longitude = models.DecimalField(decimal_places=6, max_digits=9)
-    accuracy = models.DecimalField(decimal_places=6, max_digits=9)
+    accuracy = models.DecimalField(decimal_places=6, max_digits=12)
     geocoding = models.TextField(null=True)
 
     def save(self, *args, **kwargs):

@@ -100,10 +100,11 @@ class Location(models.Model):
 
     @staticmethod
     def get_latest():
-        last = Location.objects.all().order_by('-timestamp')[:1].get()
+        last = Location.objects.filter(geocoding__contains='geonames').order_by('-timestamp')[:1].get()
         jsonposition = json.loads(last.geocoding)
-        locobj = {'name': jsonposition['geonames'][0]['name'], 'latitude': jsonposition['geonames'][0]['lat'],
-                  'longitude': jsonposition['geonames'][0]['lng']}
+        if 'geonames' in jsonposition:
+            locobj = {'name': jsonposition['geonames'][0]['name'], 'latitude': jsonposition['geonames'][0]['lat'],
+                      'longitude': jsonposition['geonames'][0]['lng']}
         return locobj
 
     class Meta:

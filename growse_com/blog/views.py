@@ -78,12 +78,12 @@ def article(request, article_shorttitle=''):
     else:
         article = get_object_or_404(Article, shorttitle=article_shorttitle)
     if request.method == 'POST':
-        name = request.POST.get('name')
+        name = request.POST.get('name').strip()
         website = request.POST.get('website')
-        comment = request.POST.get('comment')
+        comment = request.POST.get('comment').strip()
         spamfilter = request.POST.get('email')
         articledate = article.datestamp.date()
-        if spamfilter is None or len(spamfilter) == 0:
+        if (spamfilter is None or len(spamfilter) == 0) and len(comment) > 0 and len(name) > 0:
             Comment.objects.create(name=name, website=website, comment=comment, article=article,
                                    ip=request.META['REMOTE_ADDR'])
             send_mail('New Comment on growse.com',

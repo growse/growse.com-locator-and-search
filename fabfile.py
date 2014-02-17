@@ -1,6 +1,6 @@
 from fabric.api import sudo, cd, run, env, local, prefix
 
-env.hosts = ['h4']
+env.hosts = ['www.growse.com']
 env.use_ssh_config = True
 
 

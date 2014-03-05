@@ -178,6 +178,13 @@ def remove_punctuation_to_lower(text):
     return pattern.sub('', text).lower()
 
 
+def where(request):
+    distancespeeds = Location.objects.raw(
+        "select id,distance, timed, 2.23693629* (distance / extract (epoch from timed)) as speed from (select id, devicetimestamp, latitude, longitude, devicetimestamp-lag(devicetimestamp) over (order by id asc) as timed, ST_Distance_Sphere(ST_SetSRID(ST_MakePoint(longitude, latitude),4326),ST_SetSRID(ST_MakePoint(lag(longitude) over (order by id asc), lag(latitude) over (order by id asc)),4326)) as distance from locations order by id asc) as boo;")
+
+    return render(request, 'where.html', {'locations': distancespeeds})
+
+
 @csrf_exempt
 def locator(request):
     if request.method != 'POST':

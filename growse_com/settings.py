@@ -18,11 +18,10 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'growse_com',  # Or path to database file if using sqlite3.
-        'USER': 'growse_com',
-        'PASSWORD': 'abominable',
-        'HOST': 'localhost'
+        'NAME': 'www_growse_com',
+        'USER': 'www_growse_com',
+        'PASSWORD': 'password',
+        'HOST': ''
     }
 }
 
@@ -113,7 +112,7 @@ PIPELINE_DISABLE_WRAPPER = True
 #ADMIN_MEDIA_PREFIX = '/media/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = ''
+SECRET_KEY = 'INSECURE_DEFAULT'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (

@@ -29,6 +29,7 @@ urlpatterns = patterns('',
                        (r'^search/(?P<searchterm>.+)/$', 'growse_com.blog.views.search'),
                        (r'^search/$', 'growse_com.blog.views.search'),
                        (r'^locator/$', 'growse_com.blog.views.locator'),
+                       (r'^where/$', 'growse_com.blog.views.where'),
                        (r'^$', 'growse_com.blog.views.article'),
 )
 

@@ -121,10 +121,9 @@ def article(request, article_shorttitle=''):
             cache.set('archives', pickled, None)
         else:
             archives = cPickle.loads(zlib.decompress(pickled_archives))
-        lastlocation = Location.get_latest()
         return render(request, 'article.html',
                       {'archives': archives, 'navitems': navitems, 'comments': comments,
-                       'article': article, 'lastlocation': lastlocation})
+                       'article': article, 'lastlocation': Location.get_latest()})
 
 
 def search(request, searchterm=None, page=1):
@@ -145,7 +144,8 @@ def search(request, searchterm=None, page=1):
             results = paginator.page(paginator.num_pages)
         for result in results:
             result.snippet = smart_truncate(result.searchtext, searchterm)
-        return render(request, 'search.html', {'results': results, 'searchterm': searchterm})
+        return render(request, 'search.html',
+                      {'results': results, 'searchterm': searchterm, 'lastlocation': Location.get_latest()})
 
 
 def smart_truncate(content, searchterm, surrounding_words=15, suffix='...'):
@@ -202,7 +202,8 @@ def where(request):
     return render(request, 'where.html', {
         'accuracies': json.dumps(list(accuracies)),
         'avgspeed': avgspeedrow,
-        'speeds': list(speeds)
+        'speeds': list(speeds),
+        'lastlocation': Location.get_latest()
     })
 
 
@@ -218,7 +219,7 @@ def locator(request):
     location.latitude = request.POST.get('lat')
     location.longitude = request.POST.get('long')
     location.accuracy = request.POST.get('acc')
-    location.devicetimestamp = datetime.datetime.fromtimestamp(Decimal(request.POST.get('time')) / 1000)
+    location.devicetimestamp = datetime.datetime.utcfromtimestamp(Decimal(request.POST.get('time')) / 1000)
 
     location.save()
 

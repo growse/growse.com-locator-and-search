@@ -4,11 +4,12 @@ import cPickle
 from decimal import Decimal
 
 from django.core.cache import cache
+from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
 import re
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect, render
-from django.db.models import Count
+from django.db.models import Count, Avg
 from django.http import HttpResponsePermanentRedirect, HttpResponse, Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from growse_com.blog.models import Article, Location
@@ -179,10 +180,30 @@ def remove_punctuation_to_lower(text):
 
 
 def where(request):
-    distancespeeds = Location.objects.raw(
-        "select id,distance, timed, 2.23693629* (distance / extract (epoch from timed)) as speed from (select id, devicetimestamp, latitude, longitude, devicetimestamp-lag(devicetimestamp) over (order by id asc) as timed, ST_Distance_Sphere(ST_SetSRID(ST_MakePoint(longitude, latitude),4326),ST_SetSRID(ST_MakePoint(lag(longitude) over (order by id asc), lag(latitude) over (order by id asc)),4326)) as distance from locations order by id asc) as boo;")
+    start = datetime.datetime.strptime('20140101', '%Y%m%d')
+    end = datetime.datetime.strptime('20150101', '%Y%m%d')
+    accuracies = Location.objects.extra(
+        select={'date': "extract (epoch from date_trunc('hour',devicetimestamp))"}).filter(
+        devicetimestamp__gte=start) \
+        .values_list('date') \
+        .annotate(avg=Avg('accuracy')).order_by('date')
+    cursor = connection.cursor()
+    cursor.execute(
+        "select extract (epoch from date_trunc('hour',devicetimestamp)) as date, avg(2.23693629*(distance/(timedelta/1000000))) from locations where devicetimestamp>'2014-01-01' group by extract (epoch from date_trunc('hour',devicetimestamp)) order by date asc")
+    speedresults = cursor.fetchall()
+    speeds = []
+    for result in speedresults:
+        speeds.append([result[0], float(result[1])])
 
-    return render(request, 'where.html', {'locations': distancespeeds})
+    cursor = connection.cursor()
+    cursor.execute(
+        'select 2.23693629*avg(distance/(timedelta/1000000)) from locations where extract(year from devicetimestamp) = 2013;')
+    avgspeedrow = cursor.fetchone()[0]
+    return render(request, 'where.html', {
+        'accuracies': json.dumps(list(accuracies)),
+        'avgspeed': avgspeedrow,
+        'speeds': list(speeds)
+    })
 
 
 @csrf_exempt

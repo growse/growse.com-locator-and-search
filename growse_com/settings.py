@@ -96,6 +96,10 @@ PIPELINE_JS = {
             'js/scripts.js',
         ),
         'output_filename': 'js/www.js',
+    },
+    'd3': {
+        'source_filenames': ('js/d3.js',),
+        'output_filename': 'js/d3-min.js',
     }
 }
 PIPELINE_COMPILERS = (

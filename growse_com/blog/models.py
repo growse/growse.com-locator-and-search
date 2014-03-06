@@ -6,6 +6,9 @@
 #
 # Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'
 # into your database.
+import math
+from decimal import Decimal
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 import json
 from django.db import models
@@ -16,6 +19,7 @@ import re
 import markdown
 from django.core.cache import cache
 import requests
+from durationfield.db.models.fields.duration import DurationField
 
 
 class Article(models.Model):
@@ -83,9 +87,58 @@ class Location(models.Model):
     latitude = models.DecimalField(decimal_places=6, max_digits=9)
     longitude = models.DecimalField(decimal_places=6, max_digits=9)
     accuracy = models.DecimalField(decimal_places=6, max_digits=12)
+    timedelta = DurationField(null=True)
+    distance = models.DecimalField(decimal_places=3, max_digits=12, null=True)
     geocoding = models.TextField(null=True)
 
+    def speed_in_ms(self):
+        return self.distance / self.timedelta
+
+    @staticmethod
+    def distance_on_unit_sphere(lat1, long1, lat2, long2):
+
+        # Convert latitude and longitude to
+        # spherical coordinates in radians.
+        degrees_to_radians = math.pi / 180.0
+
+        # phi = 90 - latitude
+        phi1 = (90.0 - lat1) * degrees_to_radians
+        phi2 = (90.0 - lat2) * degrees_to_radians
+
+        # theta = longitude
+        theta1 = long1 * degrees_to_radians
+        theta2 = long2 * degrees_to_radians
+
+        # Compute spherical distance from spherical coordinates.
+
+        # For two locations in spherical coordinates
+        # (1, theta, phi) and (1, theta, phi)
+        # cosine( arc length ) =
+        #    sin phi sin phi' cos(theta-theta') + cos phi cos phi'
+        # distance = rho * arc length
+
+        cos = (math.sin(phi1) * math.sin(phi2) * math.cos(theta1 - theta2) +
+               math.cos(phi1) * math.cos(phi2))
+        arc = math.acos(cos)
+
+        # Remember to multiply arc by the radius of the earth
+        # in your favorite set of units to get length.
+        return arc
+
     def save(self, *args, **kwargs):
+        try:
+            prev = Location.objects.filter(devicetimestamp__lt=self.devicetimestamp).order_by('-devicetimestamp')[
+                   :1].get()
+            if self.latitude == prev.latitude and self.longitude == prev.longitude:
+                self.distance = 0
+            else:
+                self.distance = 6378100 * Location.distance_on_unit_sphere(float(self.latitude), float(self.longitude),
+                                                                           float(prev.latitude),
+                                                                           float(prev.longitude))
+            self.timedelta = self.devicetimestamp - prev.devicetimestamp
+        except ObjectDoesNotExist:
+            pass
+        # Geocode the things
         if not self.geocoding:
             url = settings.GEOCODE_API_URL.format(self.latitude, self.longitude)
             try:

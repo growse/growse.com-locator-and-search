@@ -1,24 +1,27 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-</head>
-<body>
-<table>
-    <tr>
-        <th>Lat</th>
-        <th>Long</th>
-        <th>Timestamp</th>
-    </tr>
+{% extends "base.html" %}
+{% load compressed %}
+{% block content %}
+    <article>
+        <header>
+            <h1>Dribble</h1>
+        </header>
+        <p>This year, I've averaged a huge <strong>{{ avgspeed|floatformat:2 }}mph</strong>.</p>
 
-    {% for location in locations %}
+        <h2>Speed</h2>
 
-        <tr>
-            <td>{{ location.latitude }}</td>
-            <td>{{ location.longitude }}</td>
-            <td>{{ location.devicetimestamp }}</td>
-        </tr>
-    {% endfor %}
-</table>
-</body>
-</html>
+        <div id="speedgraph"></div>
+        <h2>Locator accuracy</h2>
+
+        <div id="accuracygraph"></div>
+    </article>
+    <script type="text/javascript">
+        var accuracydata =
+        {{ accuracies|safe }}
+        var speeddata = {{ speeds|safe }}
+                $(function () {
+                    growse.drawLineChart('#accuracygraph', accuracydata, 800, 200, '', 'm');
+                    growse.drawLineChart('#speedgraph', speeddata, 800, 200, '', 'mph');
+                });
+    </script>
+    {% compressed_js 'd3' %}
+{% endblock %}

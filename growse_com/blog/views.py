@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from django.core.cache import cache
 from django.db import connection
+from django.utils.timezone import utc
 from django.views.decorators.csrf import csrf_exempt
 import re
 from django.core.mail import send_mail
@@ -219,7 +220,7 @@ def locator(request):
     location.latitude = request.POST.get('lat')
     location.longitude = request.POST.get('long')
     location.accuracy = request.POST.get('acc')
-    location.devicetimestamp = datetime.datetime.utcfromtimestamp(Decimal(request.POST.get('time')) / 1000)
+    location.devicetimestamp = datetime.datetime.fromtimestamp(Decimal(request.POST.get('time')) / 1000, tz=utc)
 
     location.save()
 

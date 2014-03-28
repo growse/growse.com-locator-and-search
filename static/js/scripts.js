@@ -97,18 +97,18 @@ var growse = {
             .append('rect')
             .attr('class', 'chartbar')
             .attr('fill', '#57d')
-            .attr("width", function (d) {
-                return 0.8 * x.rangeBand();//0.999 * ((width - (2 * xpadding)) / data.length) + "px";
+            .attr("width", function () {
+                return 0.8 * x.rangeBand();
             })
             .attr("height", function (d) {
-                console.log(y(d.val) + ' ' + d.val);
-                return y(d.val) + "px";
+                console.log(d.val);
+                return (height - (2*ypadding) - y(d.val)) + "px";
             })
             .attr('x',function (d) {
                 return (0.1 * x.rangeBand() + x(d.date)) + "px";
 
             }).attr('y', function (d) {
-                return height - (ypadding) - y(d.val) - ypadding;
+                return y(d.val)
             });
 
         svg.append("g")

@@ -166,6 +166,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.sitemaps',
+    'django.contrib.humanize',
     'debug_toolbar',
     'growse_com.blog',
     'suit',

@@ -1,11 +1,13 @@
 {% extends "base.html" %}
+{% load humanize %}
 {% load compressed %}
 {% block content %}
     <article>
         <header>
             <h1>Dribble</h1>
         </header>
-        <p>This year, I've averaged a huge <strong>{{ avgspeed|floatformat:2 }}mph</strong>.</p>
+        <p>This year, I've averaged a huge <strong>{{ avgspeed|floatformat:2 }}mph</strong> after covering
+            <strong>{{ totaldistance|floatformat:2|intcomma }} miles</strong>.</p>
 
         <h2>Speed</h2>
 
@@ -13,15 +15,19 @@
         <h2>Locator accuracy</h2>
 
         <div id="accuracygraph"></div>
+        <div id="accuracyhourgraph"></div>
     </article>
     <script type="text/javascript">
-        var accuracydata =
-        {{ accuracies|safe }}
-        var speeddata = {{ speeds|safe }}
-                $(function () {
-                    growse.drawLineChart('#accuracygraph', accuracydata, 800, 200, '', 'm');
-                    growse.drawLineChart('#speedgraph', speeddata, 800, 200, '', 'mph');
-                });
+        var accuracy_data =
+                {{ accuracies|safe }};
+        var speed_data =
+                {{ speeds|safe }};
+        var accuracy_hours_data = {{ accuracy_hours|safe }};
+        $(function () {
+            growse.drawLineChart('#accuracygraph', accuracy_data, 800, 200, '', 'm');
+            growse.drawLineChart('#speedgraph', speed_data, 800, 200, '', 'mph');
+            growse.drawColumnChart('#accuracyhourgraph', accuracy_hours_data, 800, 200, 'hour', 'm');
+        });
     </script>
     {% compressed_js 'd3' %}
 {% endblock %}

@@ -198,12 +198,26 @@ def where(request):
 
     cursor = connection.cursor()
     cursor.execute(
-        'select 2.23693629*avg(distance/(timedelta/1000000)) from locations where extract(year from devicetimestamp) = 2013;')
+        'select 2.23693629*avg(distance/(timedelta/1000000)) from locations where extract(year from devicetimestamp) = 2014;')
     avgspeedrow = cursor.fetchone()[0]
+    cursor.execute(
+        'select 0.000621371192*sum(distance) from locations where extract(year from devicetimestamp) = 2014;')
+    totaldistancerow = cursor.fetchone()[0]
+
+    cursor = connection.cursor()
+    cursor.execute(
+        "select extract (hour from devicetimestamp) as hour,avg(accuracy) from locations where extract(year from devicetimestamp) = 2014 group by extract(hour from devicetimestamp) order by hour asc;")
+    accuracy_hour_results = cursor.fetchall()
+    accuracy_hours = []
+    for result in accuracy_hour_results:
+        accuracy_hours.append([result[0], float(result[1])])
+
     return render(request, 'where.html', {
         'accuracies': json.dumps(list(accuracies)),
         'avgspeed': avgspeedrow,
+        'totaldistance': totaldistancerow,
         'speeds': list(speeds),
+        'accuracy_hours': list(accuracy_hours),
         'lastlocation': Location.get_latest()
     })
 

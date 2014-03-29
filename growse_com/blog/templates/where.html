@@ -12,6 +12,7 @@
         <h2>Speed</h2>
 
         <div id="speedgraph"></div>
+        <div id="speedhourgraph"></div>
         <h2>Locator accuracy</h2>
 
         <div id="accuracygraph"></div>
@@ -23,10 +24,12 @@
         var speed_data =
                 {{ speeds|safe }};
         var accuracy_hours_data = {{ accuracy_hours|safe }};
+        var speed_hours_data = {{ speed_hours|safe }};
         $(function () {
             growse.drawLineChart('#accuracygraph', accuracy_data, 800, 200, '', 'm');
             growse.drawLineChart('#speedgraph', speed_data, 800, 200, '', 'mph');
             growse.drawColumnChart('#accuracyhourgraph', accuracy_hours_data, 800, 200, 'hour', 'm');
+            growse.drawColumnChart('#speedhourgraph', speed_hours_data, 800, 200, 'hour', 'mph');
         });
     </script>
     {% compressed_js 'd3' %}

@@ -135,12 +135,14 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'growse_com.blog.middleware.SmartUpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'djangosecure.middleware.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 if not DEBUG:
@@ -180,17 +182,10 @@ INSTALLED_APPS = (
 
 INTERNAL_IPS = ('127.0.0.1',)
 
-EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
-MAILGUN_ACCESS_KEY = 'key-5nvxiijjtshdf7p8ra3vdhgkishcq587'
-MAILGUN_SERVER_NAME = 'growse.com'
-DEFAULT_FROM_EMAIL = 'blog@growse.com'
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = '/tmp/growse.com-mail'
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': 'unix:/tmp/memcache.socket',
-    }
-}
+DEFAULT_FROM_EMAIL = 'blog@growse.com'
 
 FORCE_SCRIPT_NAME = ''
 

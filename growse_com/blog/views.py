@@ -5,8 +5,10 @@ from decimal import Decimal
 
 from django.core.cache import cache
 from django.db import connection
+from django.utils.cache import get_cache_key
 from django.utils.timezone import utc
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import last_modified
 import re
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect, render
@@ -73,7 +75,7 @@ def navlist(request, direction, datestamp):
         })
     return HttpResponse(json.dumps(response_data), content_type='application/json')
 
-
+@csrf_exempt
 def article(request, article_shorttitle=''):
     if article_shorttitle == '':
         article = Article.objects.filter(datestamp__isnull=False).latest('datestamp')
@@ -93,6 +95,8 @@ def article(request, article_shorttitle=''):
                           articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
                           articledate.day).zfill(2) + '/' + article.shorttitle + '/',
                       'blog@growse.com', ['comments@growse.com'], fail_silently=False)
+            cachekey = get_cache_key(request)
+            cache.delete(cachekey)
 
         return redirect('/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
             articledate.day).zfill(2) + '/' + article.shorttitle + '/')

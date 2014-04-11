@@ -39,7 +39,6 @@
     <h2>Add a new comment</h2>
     <form class="commentform" method="post">
         <fieldset>
-            {% csrf_token %}
             <p class="hohoho">Do not fill this out:<input type="text" name="email" value=""/></p>
 
             <p><label for="name">Name:</label> <input type="text" id="name" name="name" value="" class="text" required/>

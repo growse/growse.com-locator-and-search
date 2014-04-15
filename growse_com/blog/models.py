@@ -15,6 +15,7 @@ from django.db import models
 from django.utils.html import strip_tags
 import datetime
 from growse_com import settings
+import jsonfield
 import re
 import markdown
 from django.core.cache import cache
@@ -89,7 +90,7 @@ class Location(models.Model):
     accuracy = models.DecimalField(decimal_places=6, max_digits=12)
     timedelta = DurationField(null=True)
     distance = models.DecimalField(decimal_places=3, max_digits=12, null=True)
-    geocoding = models.TextField(null=True)
+    geocoding = jsonfield.JSONField()
 
     def speed_in_ms(self):
         return self.distance / self.timedelta
@@ -158,11 +159,11 @@ class Location(models.Model):
 
     @staticmethod
     def get_latest():
-        last = Location.objects.filter(geocoding__contains='geonames').order_by('-timestamp')[:1].get()
-        jsonposition = json.loads(last.geocoding)
-        if 'geonames' in jsonposition:
-            locobj = {'name': jsonposition['geonames'][0]['name'], 'latitude': jsonposition['geonames'][0]['lat'],
-                      'longitude': jsonposition['geonames'][0]['lng']}
+        last = Location.objects.all().order_by('-timestamp')[:1].get()
+        print last.geocoding
+        if 'geonames' in last.geocoding:
+            locobj = {'name': last.geocoding['geonames'][0]['name'], 'latitude': last.geocoding['geonames'][0]['lat'],
+                      'longitude': last.geocoding['geonames'][0]['lng']}
         return locobj
 
     class Meta:

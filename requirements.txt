@@ -16,7 +16,7 @@ django-secure==1.0
 django-suit==0.2.7
 ecdsa==0.11
 futures==2.1.6
-paramiko==1.13.0
+paramiko==1.12.0
 psycopg2==2.5.2
 pyScss==1.2.0.post3
 pycrypto==2.6.1

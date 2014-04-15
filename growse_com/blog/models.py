@@ -119,6 +119,7 @@ class Location(models.Model):
 
         cos = (math.sin(phi1) * math.sin(phi2) * math.cos(theta1 - theta2) +
                math.cos(phi1) * math.cos(phi2))
+        cos = max(min(cos, 1.0), -1.0)
         arc = math.acos(cos)
 
         # Remember to multiply arc by the radius of the earth

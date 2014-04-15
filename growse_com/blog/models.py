@@ -159,8 +159,7 @@ class Location(models.Model):
 
     @staticmethod
     def get_latest():
-        last = Location.objects.all().order_by('-timestamp')[:1].get()
-        print last.geocoding
+        last = Location.objects.all().order_by('-timestamp')[:1].get()        
         if 'geonames' in last.geocoding:
             locobj = {'name': last.geocoding['geonames'][0]['name'], 'latitude': last.geocoding['geonames'][0]['lat'],
                       'longitude': last.geocoding['geonames'][0]['lng']}

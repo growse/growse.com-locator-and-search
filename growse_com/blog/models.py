@@ -7,13 +7,12 @@
 # Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'
 # into your database.
 import math
-from decimal import Decimal
+import datetime
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
-import json
 from django.db import models
 from django.utils.html import strip_tags
-import datetime
 from growse_com import settings
 import jsonfield
 import re
@@ -65,6 +64,7 @@ class Comment(models.Model):
     ip = models.IPAddressField(null=True)
 
     def save(self, *args, **kwargs):
+
         if not self.id:
             self.datestamp = datetime.datetime.now()
         super(Comment, self).save(*args, **kwargs)
@@ -159,7 +159,7 @@ class Location(models.Model):
 
     @staticmethod
     def get_latest():
-        last = Location.objects.all().order_by('-timestamp')[:1].get()        
+        last = Location.objects.all().order_by('-timestamp')[:1].get()
         if 'geonames' in last.geocoding:
             locobj = {'name': last.geocoding['geonames'][0]['name'], 'latitude': last.geocoding['geonames'][0]['lat'],
                       'longitude': last.geocoding['geonames'][0]['lng']}

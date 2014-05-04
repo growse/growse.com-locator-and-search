@@ -193,7 +193,7 @@ def where(request):
         .annotate(avg=Avg('accuracy')).order_by('date')
     cursor = connection.cursor()
     cursor.execute(
-        "select extract (epoch from date_trunc('hour',devicetimestamp)) as date, avg(2.23693629*(distance/(timedelta/1000000))) from locations where devicetimestamp>'2014-01-01' group by extract (epoch from date_trunc('hour',devicetimestamp)) order by date asc")
+        "select extract (epoch from date_trunc('hour',devicetimestamp)) as date, avg(2.23693629*(distance/(timedelta/1000000::float))) from locations where devicetimestamp>'2014-01-01' group by extract (epoch from date_trunc('hour',devicetimestamp)) order by date asc")
     speedresults = cursor.fetchall()
     speeds = []
     for result in speedresults:
@@ -201,7 +201,7 @@ def where(request):
 
     cursor = connection.cursor()
     cursor.execute(
-        'select 2.23693629*avg(distance/(timedelta/1000000)) from locations where extract(year from devicetimestamp) = 2014;')
+        'select 2.23693629*avg(distance/(timedelta/1000000::float)) from locations where extract(year from devicetimestamp) = 2014;')
     avgspeedrow = cursor.fetchone()[0]
     cursor.execute(
         'select 0.000621371192*sum(distance) from locations where extract(year from devicetimestamp) = 2014;')
@@ -217,7 +217,7 @@ def where(request):
 
     #Get speed / hour histogram
     cursor.execute(
-        "select extract (hour from devicetimestamp) as hour, 2.23693629*avg(distance/(timedelta/1000000)) from locations where extract(year from devicetimestamp) = 2014 group by extract(hour from devicetimestamp) order by hour asc;")
+        "select extract (hour from devicetimestamp) as hour, 2.23693629*avg(distance/(timedelta/1000000::float)) from locations where extract(year from devicetimestamp) = 2014 group by extract(hour from devicetimestamp) order by hour asc;")
     speed_hour_results = cursor.fetchall()
     speed_hours = []
     for result in speed_hour_results:

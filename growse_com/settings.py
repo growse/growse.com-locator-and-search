@@ -188,7 +188,7 @@ DEFAULT_FROM_EMAIL = 'blog@growse.com'
 
 FORCE_SCRIPT_NAME = ''
 
-GEOCODE_API_URL = 'http://api.geonames.org/findNearbyPlaceNameJSON?formatted=false&lat={}&lng={}&username=growse'
+GEOCODE_API_URL = 'http://api.geonames.org/findNearbyPlaceNameJSON?formatted=false&lat={}&lng={}&cities=cities15000&username=growse'
 
 try:
     from local_settings import *

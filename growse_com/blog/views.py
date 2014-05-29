@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from django.core.cache import cache
 from django.db import connection
+from django.db.models.base import get_absolute_url
 from django.utils.cache import get_cache_key
 from django.utils.timezone import utc
 import re
@@ -250,3 +251,9 @@ def locator(request):
     location.save()
 
     return HttpResponse('')
+
+
+def wxrFeed(request):
+    output = '<?xml version="1.0" encoding="utf-8"?><channel><title>growse.com</title><link>https://www.growse.com</link>\n'
+    articles = Article.objects.all()
+    return render(request, 'wxr.xml', {'articles':articles}, content_type="text/plain")

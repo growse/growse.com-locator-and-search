@@ -5,7 +5,6 @@ from decimal import Decimal
 
 from django.core.cache import cache
 from django.db import connection
-from django.db.models.base import get_absolute_url
 from django.utils.cache import get_cache_key
 from django.utils.timezone import utc
 import re
@@ -80,55 +79,35 @@ def article(request, article_shorttitle=''):
         article = Article.objects.filter(datestamp__isnull=False).latest('datestamp')
     else:
         article = get_object_or_404(Article, shorttitle=article_shorttitle)
-    if request.method == 'POST':
-        name = request.POST.get('name').strip()
-        website = request.POST.get('website')
-        comment = request.POST.get('comment').strip()
-        spamfilter = request.POST.get('email')
-        articledate = article.datestamp.date()
-        if (spamfilter is None or len(spamfilter) == 0) and len(comment) > 0 and len(name) > 0:
-            Comment.objects.create(name=name, website=website, comment=comment, article=article,
-                                   ip=request.META['REMOTE_ADDR'])
-            send_mail('New Comment on growse.com',
-                      'Someone posted a comment on growse.com. Over at http://www.growse.com/' + str(
-                          articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
-                          articledate.day).zfill(2) + '/' + article.shorttitle + '/',
-                      'blog@growse.com', ['comments@growse.com'], fail_silently=False)
-            cachekey = get_cache_key(request)
-            print "Cachekey " + cachekey
-            cache.delete(cachekey)
 
-        return redirect('/' + str(articledate.year) + '/' + str(articledate.month).zfill(2) + '/' + str(
-            articledate.day).zfill(2) + '/' + article.shorttitle + '/')
+    pickled_navitems = cache.get('navitems')
+    if pickled_navitems is None:
+        navitems = Article.objects.filter(datestamp__isnull=False).order_by("-datestamp").all()
+        pickled = zlib.compress(cPickle.dumps(navitems, cPickle.HIGHEST_PROTOCOL), 9)
+        cache.set('navitems', pickled, None)
     else:
-        pickled_navitems = cache.get('navitems')
-        if pickled_navitems is None:
-            navitems = Article.objects.filter(datestamp__isnull=False).order_by("-datestamp").all()
-            pickled = zlib.compress(cPickle.dumps(navitems, cPickle.HIGHEST_PROTOCOL), 9)
-            cache.set('navitems', pickled, None)
-        else:
-            navitems = cPickle.loads(zlib.decompress(pickled_navitems))
+        navitems = cPickle.loads(zlib.decompress(pickled_navitems))
 
-        comments = Comment.objects.filter(article__id=article.id).order_by("datestamp")
+    comments = Comment.objects.filter(article__id=article.id).order_by("datestamp")
 
-        pickled_archives = cache.get('archives')
-        if pickled_archives is None:
-            archives = Article.objects.filter(datestamp__isnull=False).extra(
-                select={'month': "DATE_TRUNC('month',datestamp)"}).values(
-                'month').annotate(Count('title')).order_by('-month')
+    pickled_archives = cache.get('archives')
+    if pickled_archives is None:
+        archives = Article.objects.filter(datestamp__isnull=False).extra(
+            select={'month': "DATE_TRUNC('month',datestamp)"}).values(
+            'month').annotate(Count('title')).order_by('-month')
 
-            prevyear = None
-            for archive in archives:
-                if archive["month"].year != prevyear:
-                    archive["newyear"] = True
-                    prevyear = archive["month"].year
-            pickled = zlib.compress(cPickle.dumps(archives, cPickle.HIGHEST_PROTOCOL), 9)
-            cache.set('archives', pickled, None)
-        else:
-            archives = cPickle.loads(zlib.decompress(pickled_archives))
-        return render(request, 'article.html',
-                      {'archives': archives, 'navitems': navitems, 'comments': comments,
-                       'article': article, 'lastlocation': Location.get_latest()})
+        prevyear = None
+        for archive in archives:
+            if archive["month"].year != prevyear:
+                archive["newyear"] = True
+                prevyear = archive["month"].year
+        pickled = zlib.compress(cPickle.dumps(archives, cPickle.HIGHEST_PROTOCOL), 9)
+        cache.set('archives', pickled, None)
+    else:
+        archives = cPickle.loads(zlib.decompress(pickled_archives))
+    return render(request, 'article.html',
+                  {'archives': archives, 'navitems': navitems, 'comments': comments,
+                   'article': article, 'lastlocation': Location.get_latest()})
 
 
 def search(request, searchterm=None, page=1):

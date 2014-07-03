@@ -18,14 +18,14 @@ $primary-highlight-color: #f90;
 $secondary-highlight-color: #57d;
 
 $sansfont: 'Open Sans', Trebuchet, Sans;
-$seriffont: 'Libre Baskerville', Georgia, serif;
+$seriffont: 'Andada', Georgia, serif;
 $monospacefont: 'Inconsolata', monospace;
 
 $headlinefont: $sansfont;
 $bodyfont: $seriffont;
 $navlinkfont: $sansfont;
 $subheadlinefont: $seriffont;
-$archivenavfont: $seriffont;
+$archivenavfont: $sansfont;
 $formfont: $sansfont;
 $pagetitlefont: $sansfont;
 $datefont: $sansfont;
@@ -176,6 +176,7 @@ body {
       }
     }
     #location {
+      font-family: $sansfont;
       font-size: 0.5rem;
     }
   }

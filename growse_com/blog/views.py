@@ -75,13 +75,13 @@ def navlist(request, direction, datestamp):
 
 def article(request, article_shorttitle=''):
     if article_shorttitle == '':
-        article = Article.objects.filter(datestamp__isnull=False, published__eq=True).latest('datestamp')
+        article = Article.objects.filter(datestamp__isnull=False, published=True).latest('datestamp')
     else:
         article = get_object_or_404(Article, shorttitle=article_shorttitle)
 
     pickled_navitems = cache.get('navitems')
     if pickled_navitems is None:
-        navitems = Article.objects.filter(datestamp__isnull=False, published__eq=True).order_by("-datestamp").all()
+        navitems = Article.objects.filter(datestamp__isnull=False, published=True).order_by("-datestamp").all()
         pickled = zlib.compress(cPickle.dumps(navitems, cPickle.HIGHEST_PROTOCOL), 9)
         cache.set('navitems', pickled, None)
     else:
@@ -89,7 +89,7 @@ def article(request, article_shorttitle=''):
 
     pickled_archives = cache.get('archives')
     if pickled_archives is None:
-        archives = Article.objects.filter(datestamp__isnull=False, published__eq=True).extra(
+        archives = Article.objects.filter(datestamp__isnull=False, published=True).extra(
             select={'month': "DATE_TRUNC('month',datestamp)"}).values(
             'month').annotate(Count('title')).order_by('-month')
 

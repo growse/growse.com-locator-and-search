@@ -2,3 +2,4 @@
 static/css/*.css
 build
 local_settings.py
+.idea

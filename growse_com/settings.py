@@ -194,7 +194,7 @@ FORCE_SCRIPT_NAME = ''
 GEOCODE_API_URL = 'http://api.geonames.org/findNearbyPlaceNameJSON?formatted=false&lat={}&lng={}&cities=cities15000&username=growse'
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
-
+WSGI_APPLICATION = "growse_com.wsgi.application"
 try:
     from local_settings import *
 except ImportError:

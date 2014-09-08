@@ -2,19 +2,18 @@ import datetime
 import zlib
 import cPickle
 from decimal import Decimal
+import re
 
 from django.core.cache import cache
 from django.db import connection
-from django.utils.cache import get_cache_key
 from django.utils.timezone import utc
-import re
-from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count, Avg
 from django.http import HttpResponsePermanentRedirect, HttpResponse, Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from growse_com.blog.models import Article, Location
 import simplejson as json
+
+from growse_com.blog.models import Article, Location
 
 
 def article_shorttitle(request, article_shorttitle=''):
@@ -222,6 +221,12 @@ def locator(request):
     location.latitude = request.POST.get('lat')
     location.longitude = request.POST.get('long')
     location.accuracy = request.POST.get('acc')
+    if 'wifissid' in request.POST:
+        location.wifissid = request.POST.get('wifissid')
+    if 'gsmtype' in request.POST:
+        if request.POST.get('gsmtype').lower() != 'unknown':
+            location.gsmtype = request.POST.get('gsmtype')
+
     location.devicetimestamp = datetime.datetime.fromtimestamp(Decimal(request.POST.get('time')) / 1000, tz=utc)
 
     location.save()

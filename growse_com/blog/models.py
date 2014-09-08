@@ -1,6 +1,6 @@
 # This is an auto-generated Django model module.
 # You'll have to do the following manually to clean this up:
-#     * Rearrange models' order
+# * Rearrange models' order
 #     * Make sure each model has one field with primary_key=True
 # Feel free to rename the models, but don't rename db_table values or field names.
 #
@@ -8,18 +8,19 @@
 # into your database.
 import math
 import datetime
+import re
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.db import models
 from django.utils.html import strip_tags
-from growse_com import settings
 import jsonfield
-import re
 import markdown
 from django.core.cache import cache
 import requests
 from durationfield.db.models.fields.duration import DurationField
+
+from growse_com import settings
 
 
 class Article(models.Model):
@@ -90,6 +91,8 @@ class Location(models.Model):
     accuracy = models.DecimalField(decimal_places=6, max_digits=12)
     timedelta = DurationField(null=True)
     distance = models.DecimalField(decimal_places=3, max_digits=12, null=True)
+    wifissid = models.CharField(max_length=32, null=True)
+    gsmtype = models.CharField(max_length=32, null=True)
     geocoding = jsonfield.JSONField()
 
     def speed_in_ms(self):
@@ -154,7 +157,7 @@ class Location(models.Model):
             except requests.RequestException as e:
                 send_mail('Geocode exception on growse.com',
                           'Exception raised while trying to geocode location: {}'.format(e), 'blog@growse.com',
-                          'andrew@growse.com')
+                          ['andrew@growse.com'])
         super(Location, self).save(*args, **kwargs)
 
     @staticmethod

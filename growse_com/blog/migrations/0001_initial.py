@@ -1,73 +1,68 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+import durationfield.db.models.fields.duration
+import __builtin__
+import jsonfield.fields
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Article'
-        db.create_table(u'articles', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('datestamp', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('shorttitle', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255)),
-            ('description', self.gf('django.db.models.fields.TextField')(null=True)),
-            ('markdown', self.gf('django.db.models.fields.TextField')()),
-            ('body', self.gf('django.db.models.fields.TextField')()),
-            ('idxfti', self.gf('django.db.models.fields.TextField')()),
-            ('published', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('type', self.gf('django.db.models.fields.CharField')(max_length=10)),
-        ))
-        db.send_create_signal(u'blog', ['Article'])
+    dependencies = [
+    ]
 
-        # Adding model 'Comment'
-        db.create_table(u'comments', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('article', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['blog.Article'])),
-            ('datestamp', self.gf('django.db.models.fields.DateTimeField')()),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('website', self.gf('django.db.models.fields.CharField')(max_length=255, null=True)),
-            ('comment', self.gf('django.db.models.fields.TextField')()),
-            ('ip', self.gf('django.db.models.fields.IPAddressField')(max_length=15, null=True)),
-        ))
-        db.send_create_signal(u'blog', ['Comment'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'Article'
-        db.delete_table(u'articles')
-
-        # Deleting model 'Comment'
-        db.delete_table(u'comments')
-
-
-    models = {
-        u'blog.article': {
-            'Meta': {'object_name': 'Article', 'db_table': "u'articles'"},
-            'body': ('django.db.models.fields.TextField', [], {}),
-            'datestamp': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'description': ('django.db.models.fields.TextField', [], {'null': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'idxfti': ('django.db.models.fields.TextField', [], {}),
-            'markdown': ('django.db.models.fields.TextField', [], {}),
-            'published': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'shorttitle': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'type': ('django.db.models.fields.CharField', [], {'max_length': '10'})
-        },
-        u'blog.comment': {
-            'Meta': {'object_name': 'Comment', 'db_table': "u'comments'"},
-            'article': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['blog.Article']"}),
-            'comment': ('django.db.models.fields.TextField', [], {}),
-            'datestamp': ('django.db.models.fields.DateTimeField', [], {}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'ip': ('django.db.models.fields.IPAddressField', [], {'max_length': '15', 'null': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'website': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True'})
-        }
-    }
-
-    complete_apps = ['blog']
+    operations = [
+        migrations.CreateModel(
+            name='Article',
+            fields=[
+                ('id', models.AutoField(serialize=False, primary_key=True)),
+                ('datestamp', models.DateTimeField(auto_now_add=True, null=True)),
+                ('title', models.CharField(max_length=255)),
+                ('shorttitle', models.CharField(unique=True, max_length=255)),
+                ('description', models.TextField(null=True)),
+                ('markdown', models.TextField()),
+                ('idxfti', models.TextField()),
+                ('published', models.BooleanField(default=True)),
+                ('searchtext', models.TextField()),
+            ],
+            options={
+                'db_table': 'articles',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Comment',
+            fields=[
+                ('id', models.AutoField(serialize=False, primary_key=True)),
+                ('datestamp', models.DateTimeField()),
+                ('name', models.CharField(max_length=255)),
+                ('website', models.CharField(max_length=255, null=True)),
+                ('comment', models.TextField()),
+                ('ip', models.IPAddressField(null=True)),
+                ('article', models.ForeignKey(to='blog.Article')),
+            ],
+            options={
+                'db_table': 'comments',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Location',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('timestamp', models.DateTimeField(auto_now_add=True)),
+                ('devicetimestamp', models.DateTimeField()),
+                ('latitude', models.DecimalField(max_digits=9, decimal_places=6)),
+                ('longitude', models.DecimalField(max_digits=9, decimal_places=6)),
+                ('accuracy', models.DecimalField(max_digits=12, decimal_places=6)),
+                ('timedelta', durationfield.db.models.fields.duration.DurationField(null=True)),
+                ('distance', models.DecimalField(null=True, max_digits=12, decimal_places=3)),
+                ('geocoding', jsonfield.fields.JSONField(default=__builtin__.dict)),
+            ],
+            options={
+                'db_table': 'locations',
+            },
+            bases=(models.Model,),
+        ),
+    ]

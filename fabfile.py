@@ -14,4 +14,4 @@ def deploy():
             run('pip install --upgrade -r requirements.txt')
             run('./manage.py migrate')
             run('./manage.py collectstatic --noinput')
-            sudo('/etc/init.d/uwsgi restart')
+            sudo('supervisorctl restart www.growse.com-uwsgi')

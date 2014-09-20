@@ -9,7 +9,7 @@
         <p>This year, I've averaged a huge <strong>{{ avgspeed|floatformat:2 }}mph</strong> after covering
             <strong>{{ totaldistance|floatformat:2|intcomma }} miles</strong>.</p>
 
-        <p>Last device ping: {{ timestamp|naturaltime}}.</p>
+        <p>Last device ping: {{ lastlocation.timestamp|naturaltime}}.</p>
 
         <h2>Speed</h2>
 

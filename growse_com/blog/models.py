@@ -1,7 +1,7 @@
 # This is an auto-generated Django model module.
 # You'll have to do the following manually to clean this up:
 # * Rearrange models' order
-#     * Make sure each model has one field with primary_key=True
+# * Make sure each model has one field with primary_key=True
 # Feel free to rename the models, but don't rename db_table values or field names.
 #
 # Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'
@@ -19,7 +19,6 @@ import markdown
 from django.core.cache import cache
 import requests
 from durationfield.db.models.fields.duration import DurationField
-
 from growse_com import settings
 
 
@@ -118,7 +117,7 @@ class Location(models.Model):
         # For two locations in spherical coordinates
         # (1, theta, phi) and (1, theta, phi)
         # cosine( arc length ) =
-        #    sin phi sin phi' cos(theta-theta') + cos phi cos phi'
+        # sin phi sin phi' cos(theta-theta') + cos phi cos phi'
         # distance = rho * arc length
 
         cos = (math.sin(phi1) * math.sin(phi2) * math.cos(theta1 - theta2) +

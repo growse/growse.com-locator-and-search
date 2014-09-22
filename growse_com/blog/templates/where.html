@@ -33,7 +33,7 @@
         var accuracy_hours_data = {{ accuracy_hours|safe }};
         var speed_hours_data = {{ speed_hours|safe }};
         $(function () {
-            var mapfile = "{% static 'js/world-50m.js' %}";
+            var mapfile = "{% static 'js/world-50m.json' %}";
             growse.drawLineChart('#accuracygraph', accuracy_data, 800, 200, '', 'm');
             growse.drawLineChart('#speedgraph', speed_data, 800, 200, '', 'mph');
             growse.drawColumnChart('#accuracyhourgraph', accuracy_hours_data, 800, 200, 'hour', 'm');

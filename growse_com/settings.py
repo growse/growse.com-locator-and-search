@@ -103,6 +103,12 @@ PIPELINE_JS = {
             'js/topojson.v1.min.js',
         ),
         'output_filename': 'js/d3-min.js',
+    },
+    'world-50m': {
+        'source_filenames': (
+            'js/world-50m.js'
+        ),
+        'output_filename': 'js/world-50m.min.js',
     }
 }
 PIPELINE_COMPILERS = (

@@ -67,7 +67,7 @@ var growse = {
         }
 
     },
-    drawMap: function (elemId) {
+    drawMap: function (elemId, mapfile) {
         //Initial dimensions
         var width = 816,
             height = 480;
@@ -81,12 +81,12 @@ var growse = {
         var path = d3.geo.path()
             .projection(projection);
 
-        var svg = d3.select("#map").append("svg")
+        var svg = d3.select(elemId).append("svg")
             .attr("width", width)
             .attr("height", height);
 
 
-        d3.json("/static/js/world-50m.json", function (error, world) {
+        d3.json(mapfile, function (error, world) {
             svg.append("path")
                 .datum(topojson.feature(world, world.objects.land))
                 .attr("class", "land")

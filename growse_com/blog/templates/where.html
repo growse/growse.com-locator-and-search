@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load humanize %}
 {% load compressed %}
+{% load staticfiles %}
 {% block content %}
     <article>
         <header>
@@ -32,11 +33,12 @@
         var accuracy_hours_data = {{ accuracy_hours|safe }};
         var speed_hours_data = {{ speed_hours|safe }};
         $(function () {
+            var mapfile = "{% static 'js/world-50m.js' %}";
             growse.drawLineChart('#accuracygraph', accuracy_data, 800, 200, '', 'm');
             growse.drawLineChart('#speedgraph', speed_data, 800, 200, '', 'mph');
             growse.drawColumnChart('#accuracyhourgraph', accuracy_hours_data, 800, 200, 'hour', 'm');
             growse.drawColumnChart('#speedhourgraph', speed_hours_data, 800, 200, 'hour', 'mph');
-            growse.drawMap('#map');
+            growse.drawMap('#map',mapfile);
         });
     </script>
     {% compressed_js 'd3' %}

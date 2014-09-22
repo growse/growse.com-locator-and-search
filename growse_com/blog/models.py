@@ -164,7 +164,7 @@ class Location(models.Model):
         last = Location.objects.filter(geocoding__contains='geonames').order_by('-timestamp')[:1].get()
         if 'geonames' in last.geocoding:
             locobj = {'name': last.geocoding['geonames'][0]['name'], 'latitude': last.geocoding['geonames'][0]['lat'],
-                      'longitude': last.geocoding['geonames'][0]['lng']}
+                      'longitude': last.geocoding['geonames'][0]['lng'], 'timestamp': last.timestamp}
         return locobj
 
     class Meta:

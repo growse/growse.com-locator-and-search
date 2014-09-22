@@ -67,6 +67,81 @@ var growse = {
         }
 
     },
+    drawMap: function (elemId) {
+        //Initial dimensions
+        var width = 816,
+            height = 480;
+        //Set up the map projection
+        var projection = d3.geo.equirectangular()
+            .scale(140)
+            .translate([width / 2, height / 2])
+            .precision(.1);
+
+        //Turn the projection into a path
+        var path = d3.geo.path()
+            .projection(projection);
+
+        var svg = d3.select("#map").append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+
+        d3.json("/static/js/world-50m.json", function (error, world) {
+            svg.append("path")
+                .datum(topojson.feature(world, world.objects.land))
+                .attr("class", "land")
+                .attr("d", path)
+                .style("fill", "#57d");
+            d3.json("/where/linestring/", function (error, mypath) {
+                //Add the path
+                svg.append("g")
+                    .attr("class", "route")
+                    .selectAll("path")
+                    .data(mypath.features)
+                    .enter()
+                    .append("path")
+                    .attr("d", path)
+                    .style("fill-opacity", "0.0")
+                    .style("fill", "#000")
+                    .style("stroke", "#f90")
+                    .style("stroke-width", "1")
+
+                ;
+
+                var targetPath = d3.selectAll('.route')[0][0];
+                var pathNode = d3.select(targetPath).selectAll('path').node();
+                var pathLength = pathNode.getTotalLength();
+                console.log(pathLength);
+                /*
+
+                 //Add the circle
+                 var circle =
+                 svg.append("circle").attr({
+                 r: 3,
+                 fill: '#f33',
+                 transform: function () {
+                 var p = pathNode.getPointAtLength(0)
+                 return "translate(" + [p.x, p.y] + ")";
+                 }
+                 });
+
+                 circle.transition()
+                 .duration(duration)
+                 .ease("bounce")
+                 .attrTween("transform", function (d, i) {
+                 return function (t) {
+                 var p = pathNode.getPointAtLength(pathLength * t);
+                 return "translate(" + [p.x, p.y] + ")";
+                 }
+                 });
+                 */
+            });
+        });
+
+        d3.select(self.frameElement).style("height", height + "px");
+        d3.select(self.frameElement).style("width", width + "px");
+
+    },
     drawColumnChart: function (elemId, data, width, height, xAxisTitle, yAxisTitle) {
         var xpadding = 45;
         var ypadding = 15;
@@ -101,10 +176,9 @@ var growse = {
                 return 0.8 * x.rangeBand();
             })
             .attr("height", function (d) {
-                console.log(d.val);
-                return (height - (2*ypadding) - y(d.val)) + "px";
+                return (height - (2 * ypadding) - y(d.val)) + "px";
             })
-            .attr('x',function (d) {
+            .attr('x', function (d) {
                 return (0.1 * x.rangeBand() + x(d.date)) + "px";
 
             }).attr('y', function (d) {

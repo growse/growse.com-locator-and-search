@@ -98,7 +98,10 @@ PIPELINE_JS = {
         'output_filename': 'js/www.js',
     },
     'd3': {
-        'source_filenames': ('js/d3.js',),
+        'source_filenames': (
+            'js/d3.js',
+            'js/topojson.v1.min.js',
+        ),
         'output_filename': 'js/d3-min.js',
     }
 }

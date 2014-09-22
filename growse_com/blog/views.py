@@ -11,7 +11,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count, Avg
 from django.http import HttpResponsePermanentRedirect, HttpResponse, Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
+import geojson
 import simplejson as json
+from geojson import LineString, Feature, FeatureCollection
 
 from growse_com.blog.models import Article, Location
 
@@ -183,7 +185,7 @@ def where(request):
         'select 0.000621371192*sum(distance) from locations where extract(year from devicetimestamp) = 2014;')
     totaldistancerow = cursor.fetchone()[0]
 
-    #Get accuracy / hour histogram
+    # Get accuracy / hour histogram
     cursor.execute(
         "select extract (hour from devicetimestamp) as hour,avg(accuracy) from locations where extract(year from devicetimestamp) = 2014 group by extract(hour from devicetimestamp) order by hour asc;")
     accuracy_hour_results = cursor.fetchall()
@@ -191,7 +193,7 @@ def where(request):
     for result in accuracy_hour_results:
         accuracy_hours.append([result[0], float(result[1])])
 
-    #Get speed / hour histogram
+    # Get speed / hour histogram
     cursor.execute(
         "select extract (hour from devicetimestamp) as hour, 2.23693629*avg(distance/(timedelta/1000000::float)) from locations where extract(year from devicetimestamp) = 2014 group by extract(hour from devicetimestamp) order by hour asc;")
     speed_hour_results = cursor.fetchall()
@@ -208,6 +210,15 @@ def where(request):
         'speed_hours': list(speed_hours),
         'lastlocation': Location.get_latest()
     })
+
+
+def where_linestring(request):
+    start = datetime.datetime.strptime('20140101', '%Y%m%d')
+    end = datetime.datetime.strptime('20150101', '%Y%m%d')
+    points = Location.objects.filter(devicetimestamp__gte=start).order_by("timestamp")[0:]
+    linestring = LineString(map(lambda p: [p.longitude, p.latitude], list(points)))
+
+    return HttpResponse(geojson.dumps(FeatureCollection([Feature(geometry=linestring)])), content_type='application/json')
 
 
 def locator(request):
@@ -237,4 +248,4 @@ def locator(request):
 def wxrFeed(request):
     output = '<?xml version="1.0" encoding="utf-8"?><channel><title>growse.com</title><link>https://www.growse.com</link>\n'
     articles = Article.objects.all()
-    return render(request, 'wxr.xml', {'articles':articles}, content_type="text/plain")
+    return render(request, 'wxr.xml', {'articles': articles}, content_type="text/plain")

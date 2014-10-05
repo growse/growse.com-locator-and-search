@@ -111,7 +111,10 @@ var growse = {
                 var targetPath = d3.selectAll('.route')[0][0];
                 var pathNode = d3.select(targetPath).selectAll('path').node();
                 var pathLength = pathNode.getTotalLength();
-                console.log(pathLength);
+                d3.select('.route')
+                    .style('stroke-dasharray', pathLength)
+                    .style('stroke-dashoffset', 0)
+                    .style('-webkit-animation', "flarble 60s linear forwards");
                 /*
 
                  //Add the circle

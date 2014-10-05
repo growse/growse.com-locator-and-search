@@ -24,11 +24,14 @@ $monospacefont: 'Inconsolata', monospace;
 $headlinefont: $sansfont;
 $bodyfont: $seriffont;
 $navlinkfont: $sansfont;
+$articlesectionheadingfont: $sansfont;
 $subheadlinefont: $seriffont;
 $archivenavfont: $sansfont;
 $formfont: $sansfont;
 $pagetitlefont: $sansfont;
 $datefont: $sansfont;
+
+$lefthandwidth: 200px;
 
 html {
   font-size: 100%;
@@ -69,9 +72,9 @@ body {
       overflow: hidden;
       /*      -webkit-overflow-scrolling: touch;*/
       position: fixed;
-
       float: left;
-      width: 200px;
+      width: $lefthandwidth;
+      padding: 0;
       height: 100%;
       ul {
         list-style-type: none;
@@ -84,9 +87,9 @@ body {
             outline: solid 1;
             font-family: $navlinkfont;
             font-size: 0.8rem;
+            width: $lefthandwidth;
             display: table-cell;
             vertical-align: middle;
-            width: 200px;
             height: 3.0rem;
             text-overflow: ellipsis;
             padding: 0.2rem 1rem;
@@ -190,7 +193,7 @@ body {
       margin: 0 200px 0 0;
     }
     @media screen and (min-width: 1024px) {
-      margin: 0 200px;
+      margin: 0 200px 0 $lefthandwidth;
     }
     @media screen and (max-width: 767px) {
       padding: 0.5rem 1rem;
@@ -279,12 +282,6 @@ body {
         }
       }
 
-      nav {
-        float: none;
-        position: relative;
-        width: auto;
-        height: auto;
-      }
       div.codehilite {
         font-family: $monospacefont;
         font-size: 1.0rem;
@@ -304,10 +301,11 @@ body {
       section {
         line-height: 1.6em;
       }
+      h2 {
+        font-family: $articlesectionheadingfont;
+      }
     }
-    h2 {
-      font-family: 'Open Sans', Sans-serif;
-    }
+
     #searchresults {
       nav {
         #paginator {
@@ -354,21 +352,7 @@ body {
     margin: 0.5rem 0;
   }
 
-  .commentform fieldset {
-    border: 0;
-    padding: 0;
-    input {
-      margin: 0;
-      padding: 2px;
-      color: #aaa;
-      font-size: 11px;
-      border: 1px solid #666;
-      background: $background-color;
-      font-family: $formfont;
-    }
-  }
-
-  fieldset textarea, input, textarea {
+  input{
     margin: 0;
     padding: 2px;
     color: #aaa;
@@ -378,37 +362,8 @@ body {
     background: $background-color;
   }
 
-  .commentform fieldset {
-    input, textarea {
-      width: 80%;
-      padding: 5px;
-      font-size: 1rem;
-    }
-    input[type=submit] {
-      font-family: 'Open Sans', Sans;
-      font-size: 1.3em;
-      padding: 10px;
-      width: 10em;
-      border-radius: 3px;
-    }
-    label, input.textfield, textarea.textfield {
-      display: block;
-      float: left;
-      margin-bottom: 10px;
-    }
-    label {
-      text-align: right;
-      width: 6em;
-      padding-right: 20px;
-    }
-  }
-
   iframe {
     border: 0;
-  }
-
-  #randomlinks {
-    display: none;
   }
 
   footer {
@@ -418,24 +373,6 @@ body {
     text-align: right;
   }
 
-  .comment_title {
-    margin: 5px 0;
-  }
-
-  .comment_body {
-    background: #223;
-    border: 1px solid #556;
-    padding: 0 5px;
-    margin-bottom: 10px;
-    line-height: 1.6;
-  }
-
-  .commentform input.submitbtn {
-    cursor: hand;
-    cursor: pointer;
-    background: $background-hl-color;
-    width: 70px;
-  }
 
   .right {
     float: right;

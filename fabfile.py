@@ -11,6 +11,7 @@ def deploy():
     with cd('/home/growse/django-sites/www.growse.com'):
         with prefix('source bin/activate'):
             run('git pull')
+            run('rm -rf build')
             run('pip install --upgrade -r requirements.txt')
             run('./manage.py migrate')
             run('./manage.py collectstatic --noinput')

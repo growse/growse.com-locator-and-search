@@ -6,6 +6,7 @@
 #
 # Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'
 # into your database.
+import logging
 import math
 import datetime
 import re
@@ -13,12 +14,15 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.db import models
+from django.http import HttpRequest
+from django.utils.cache import get_cache_key
 from django.utils.html import strip_tags
 import jsonfield
 import markdown
 from django.core.cache import cache
 import requests
 from durationfield.db.models.fields.duration import DurationField
+
 from growse_com import settings
 
 
@@ -34,10 +38,19 @@ class Article(models.Model):
     searchtext = models.TextField()
 
     def save(self, *args, **kwargs):
+        logger = logging.getLogger(__name__)
+
         self.shorttitle = self.title
         self.shorttitle = re.sub("[^a-zA-Z0-9]+", "-", self.shorttitle.lower()).lstrip('-').rstrip('-')
         self.searchtext = strip_tags(markdown.markdown(self.markdown))
         cache.delete('navitems')
+        
+        request = HttpRequest()
+        request.path = "https://www.growse.com/" + self.get_absolute_url()
+        key = get_cache_key(request)
+        if cache.has_key(key):
+            cache.delete(key)
+
         super(Article, self).save(*args, **kwargs)
 
     def get_absolute_url(self):

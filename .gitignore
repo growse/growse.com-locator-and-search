@@ -3,3 +3,9 @@ static/css/*.css
 build
 local_settings.py
 .idea
+bin
+include
+local
+lib
+.Python
+.ropeproject

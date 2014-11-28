@@ -21,7 +21,8 @@ DATABASES = {
         'NAME': 'www_growse_com',
         'USER': 'www_growse_com',
         'PASSWORD': 'password',
-        'HOST': ''
+        'HOST': '',
+        'CONN_MAX_AGE': None
     }
 }
 

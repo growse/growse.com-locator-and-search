@@ -19,8 +19,10 @@ def highlight(text, word):
 @register.filter(is_safe=True)
 @stringfilter
 def my_markdown(value):
-    extensions = ["codehilite", ]
+
+    extensions = ["codehilite", "sane_lists"]
     return mark_safe(markdown.markdown(force_unicode(value),
                                        extensions,
-                                       safe_mode=True,
+                                       lazy_ol=False,
+                                       safe_mode=False,
                                        enable_attributes=False))

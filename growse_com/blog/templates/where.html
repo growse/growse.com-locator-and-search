@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load humanize %}
-{% load compressed %}
+{% load pipeline %}
 {% load staticfiles %}
 {% block content %}
     <article>
@@ -41,5 +41,5 @@
             growse.drawMap('#map',mapfile);
         });
     </script>
-    {% compressed_js 'd3' %}
+    {% javascript 'd3' %}
 {% endblock %}

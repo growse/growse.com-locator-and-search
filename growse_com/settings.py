@@ -1,7 +1,7 @@
 # Django settings for growse_com project.
 import sys
 
-if not 'runserver' in sys.argv:
+if 'runserver' not in sys.argv:
     DEBUG = False
 else:
     DEBUG = True
@@ -60,7 +60,6 @@ MEDIA_ROOT = ''
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-PIPELINE = True
 if DEBUG:
     STATIC_ROOT = 'static-root'
 else:
@@ -69,12 +68,19 @@ else:
 STATICFILES_DIRS = ('static/',
                     'lib/python2.7/site-packages/suit/static/')
 
+STATICFILES_FINDERS = (
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+        'pipeline.finders.PipelineFinder',
+)
+
 if DEBUG:
     STATIC_URL = '/static/'
 else:
     STATIC_URL = '//growseres1-growsecom.netdna-ssl.com/django-static/www/'
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+PIPELINE_ENABLED = not DEBUG
 PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
 PIPELINE_CSS = {
     'www': {

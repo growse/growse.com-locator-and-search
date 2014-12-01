@@ -44,7 +44,7 @@ class Article(models.Model):
         self.shorttitle = re.sub("[^a-zA-Z0-9]+", "-", self.shorttitle.lower()).lstrip('-').rstrip('-')
         self.searchtext = strip_tags(markdown.markdown(self.markdown))
         cache.delete('navitems')
-        
+
         request = HttpRequest()
         request.path = "https://www.growse.com/" + self.get_absolute_url()
         key = get_cache_key(request)

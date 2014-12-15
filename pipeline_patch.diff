@@ -1,8 +1,0 @@
-9c9
-<   load_paths = scss.LOAD_PATHS.split(',') # split it up so we can a path check.
----
->   load_paths = scss.config.LOAD_PATHS.split(',') # split it up so we can a path check.
-12c12
-<       scss.LOAD_PATHS = ','.join(load_paths)
----
->       scss.config.LOAD_PATHS = ','.join(load_paths)

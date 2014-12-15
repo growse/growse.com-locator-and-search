@@ -9,3 +9,10 @@ local
 lib
 .Python
 .ropeproject
+static/node_modules
+static/js/*.www.js
+static/css/*.www.css
+pkg
+src/github.com
+*.iml
+out

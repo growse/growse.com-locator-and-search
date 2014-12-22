@@ -10,7 +10,7 @@ import (
 )
 
 type Article struct {
-	Id        uint32
+	Id        int
 	Timestamp time.Time
 	Slug      string
 	Title     string

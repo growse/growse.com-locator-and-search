@@ -8,6 +8,7 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
+	"gopkg.in/fsnotify.v1"
 	"io/ioutil"
 	"log"
 	"os"
@@ -83,7 +84,6 @@ func ArticleHandler(c *gin.Context) {
 		c.String(404, "404 Not Found")
 		return
 	}
-
 	index, months, err := loadIndex()
 	if err != nil {
 		c.String(500, err.Error())
@@ -175,13 +175,14 @@ func main() {
 	log.Print(yay)
 	var err error
 	db, err = sql.Open("postgres", "user=andrew dbname=www_growse_com sslmode=disable")
+	defer db.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	router := gin.Default()
 	gin.SetMode(gin.ReleaseMode)
-	router.LoadHTMLTemplates(path.Join(templatePath, "*.tmpl"))
+	router.LoadHTMLGlob(path.Join(templatePath, "*.tmpl"))
 	router.Static("/static/", staticPath)
 	//Get latest updated stylesheet
 	stylesheets, _ := ioutil.ReadDir(path.Join(staticPath, "css"))
@@ -209,6 +210,35 @@ func main() {
 		log.Fatal("No javascript found in staticpath. Perhaps run Grunt first?")
 	}
 
+	//Detect changes to css / js and update those paths.
+	watcher, err := fsnotify.NewWatcher()
+	if err == nil {
+		defer watcher.Close()
+		watcher.Add(path.Join(staticPath, "css"))
+		watcher.Add(path.Join(staticPath, "js"))
+		go func() {
+			for {
+				select {
+				case event := <-watcher.Events:
+					if event.Op&fsnotify.Create == fsnotify.Create {
+						if strings.HasSuffix(event.Name, ".www.css") {
+							log.Printf("New CSS Detected: %s", path.Base(event.Name))
+							stylesheetfilename = path.Base(event.Name)
+						}
+						if strings.HasSuffix(event.Name, ".www.js") {
+							log.Printf("New JS Detected: %s", path.Base(event.Name))
+							javascriptfilename = path.Base(event.Name)
+						}
+					}
+				case err := <-watcher.Errors:
+					log.Println("error:", err)
+				}
+			}
+		}()
+	} else {
+		log.Printf("Initify watcher failed: %s Continuing.", err)
+	}
+
 	//Caching time
 	memcacheClient = memcache.New("/tmp/memcache.sock")
 
@@ -217,5 +247,4 @@ func main() {
 	router.GET("/2:year/:month/:day/:slug", ArticleHandler)
 	router.GET("/", LatestArticleHandler)
 	router.Run(":8080")
-	db.Close()
 }

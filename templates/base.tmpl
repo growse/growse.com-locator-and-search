@@ -63,7 +63,7 @@
                 <ul id="articlenav" class="nano-content">
                     {{ range .Index }}
                     <li data-datestamp="{{ .Timestamp}}" data-id="{{ .Id }}">
-                        <a href="{{.GetAbsoluteUrl}}" title="{{ .Title }}"><span>{{ .Title }}</span></a>
+                        <a href="{{.GetAbsoluteUrl}}" title="{{ .Title }}" {{if eq $.Article.Id .Id}}class="here"{{end}}><span>{{ .Title }}</span></a>
                     </li>
                     {{ end }}
                 </ul>

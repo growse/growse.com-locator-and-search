@@ -1,3 +1,5 @@
+hljs.initHighlightingOnLoad();
+
 $(function () {
     if ($('.here').length > 0) {
         var percentagedown = ($('.here').position().top / $(window).height()) * 100;
@@ -8,6 +10,7 @@ $(function () {
             $(".nano").nanoScroller();
         }
     }
+
 });
 
 var growse = {

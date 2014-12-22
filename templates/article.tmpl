@@ -4,7 +4,7 @@
         <time class="fancy" itemprop="datePublished"
         datetime="{{ .Article.Timestamp.Format "2006-01-02T15:04:05Z07:00" }}">
         <p>{{ .Article.Timestamp.Format "Jan"}} <span
-        class="day">{{ .Article.Timestamp.Day }}</span><span
+        class="day">{{ printf "%02d" .Article.Timestamp.Day }}</span><span
         class="year">{{ .Article.Timestamp.Year }}</span></p></time>
         <h1 itemprop="name headline">{{ .Article.Title }}</h1>
         <time class="plain" itemprop="datePublished"

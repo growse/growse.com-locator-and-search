@@ -10,20 +10,25 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-            scripts:{
+            scripts: {
                 files: ['<%= jshint.files %>'],
-                tasks: ['jshint', 'uglify', 'rev']
+                tasks: ['jshint', 'uglify', 'clean:js', 'rev']
             },
             stylesheets: {
                 files: ['css/style.scss', 'css/solarizeddark.scss', 'css/nanoscroller.css'],
-                tasks: ['sass', 'cssmin', 'rev']
+                tasks: ['sass', 'cssmin', 'clean:css', 'rev']
             }
         },
         uglify: {
             target: {
                 files: {
-                    'js/www.js': ['js/d3.js', 'js/jquery-2.0.3.min.js', 'jquery.nanoscroller.min.js', 'js/scripts.js', 'js/topojson.v1.min.js']
+                    'js/www.js': ['js/jquery-2.0.3.min.js', 'js/jquery.nanoscroller.min.js', 'js/d3.js', 'js/highlight.pack.js', 'js/scripts.js', 'js/topojson.v1.min.js']
                 }
+            },
+            options: {
+                mangle: true,
+                compress: true,
+                beautify: false
             }
         },
         rev: {
@@ -41,7 +46,6 @@ module.exports = function(grunt) {
             target: {
                 files: {
                     'css/style.css': 'css/style.scss',
-                    'css/solarizeddark.css': 'css/solarizeddark.scss'
                 }
             }
         },
@@ -51,6 +55,14 @@ module.exports = function(grunt) {
                     'css/www.css': ['css/style.css', 'css/solarizeddark.css', 'css/nanoscroller.css']
                 }
             }
+        },
+        clean: {
+            css: [
+                'css/*.www.css'
+            ],
+            js: [
+                'js/*.www.js'
+            ]
         }
     });
 
@@ -60,7 +72,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-rev');
     grunt.loadNpmTasks('grunt-sass');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
+    grunt.loadNpmTasks('grunt-contrib-clean');
 
-    grunt.registerTask('default', ['jshint', 'uglify', 'sass', 'cssmin', 'rev']);
+
+    grunt.registerTask('default', ['jshint', 'uglify', 'sass', 'cssmin', 'clean', 'rev']);
 
 };

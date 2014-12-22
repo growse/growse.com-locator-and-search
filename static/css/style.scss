@@ -282,15 +282,17 @@ body {
         }
       }
 
-      div.codehilite {
-        font-family: $monospacefont;
-        font-size: 1.0rem;
-        line-height: 1.4;
-        border: 1px solid #556;
-        white-space: pre;
-        overflow: auto;
-        padding: 5px;
-        background: #223;
+      pre {
+        code {
+          font-family: $monospacefont;
+          font-size: 1.0rem;
+          line-height: 1.4;
+          border: 1px solid #556;
+          white-space: pre;
+          overflow: auto;
+          padding: 5px;
+          background: #223;
+        }
       }
       code {
         border: 1px solid #556;

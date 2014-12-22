@@ -10,8 +10,14 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-            files: ['<%= jshint.files %>'],
-            tasks: ['jshint']
+            scripts:{
+                files: ['<%= jshint.files %>'],
+                tasks: ['jshint', 'uglify', 'rev']
+            },
+            stylesheets: {
+                files: ['css/style.scss', 'css/solarizeddark.scss', 'css/nanoscroller.css'],
+                tasks: ['sass', 'cssmin', 'rev']
+            }
         },
         uglify: {
             target: {
@@ -27,7 +33,7 @@ module.exports = function(grunt) {
             },
             assets: {
                 files: [{
-                    src: ['js/www.js','css/www.css']
+                    src: ['js/www.js', 'css/www.css']
                 }]
             }
         },

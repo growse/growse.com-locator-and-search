@@ -285,15 +285,18 @@ body {
       pre {
         code {
           font-family: $monospacefont;
-          font-size: 1.0rem;
-          line-height: 1.4;
+          font-size: 0.8rem;
+          line-height: 1.0;
           border: 1px solid #556;
           white-space: pre;
           overflow: auto;
           padding: 5px;
           background: #223;
+          display: block;
+          margin: 1em 0px;
         }
       }
+
       code {
         border: 1px solid #556;
         padding: 2px;

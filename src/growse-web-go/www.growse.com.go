@@ -27,6 +27,10 @@ var (
 	cpuProfile         string
 	stylesheetfilename string
 	javascriptfilename string
+	memcacheUrl        string
+	dbUser             string
+	dbName             string
+	dbPassword         string
 	memcacheClient     *memcache.Client
 )
 
@@ -187,7 +191,7 @@ func main() {
 	yay := pq.ListenerEventConnected
 	log.Print(yay)
 	var err error
-	db, err = sql.Open("postgres", "user=andrew dbname=www_growse_com sslmode=disable")
+	db, err = sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s sslmode=disable", dbUser, dbName))
 	defer db.Close()
 	if err != nil {
 		log.Fatal(err)
@@ -253,7 +257,7 @@ func main() {
 	}
 
 	//Caching time
-	memcacheClient = memcache.New("/tmp/memcache.sock")
+	memcacheClient = memcache.New(memcacheUrl)
 	memcacheClient.SetMaxIdleConnsPerAddr(10)
 
 	if cpuProfile != "" {
@@ -287,6 +291,10 @@ func init() {
 	flag.StringVar(&templatePath, "templatePath", "", "The path to the templates")
 	flag.StringVar(&staticPath, "staticPath", "", "The path to the static files")
 	flag.StringVar(&cpuProfile, "cpuprofile", "", "write cpu profile to file")
+	flag.StringVar(&memcacheUrl, "memcacheUrl", "tcp://localhost:11211", "Url to connect to memcache")
+	flag.StringVar(&dbUser, "dbUser", "www_growse_com", "Postgres username")
+	flag.StringVar(&dbPassword, "dbPassword", "", "Postgres database password")
+	flag.StringVar(&dbName, "dbName", "www_growse_com", "Postgres database name")
 
 	flag.Parse()
 

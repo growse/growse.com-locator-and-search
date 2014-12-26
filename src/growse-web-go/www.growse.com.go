@@ -298,7 +298,7 @@ func init() {
 	flag.StringVar(&dbUser, "dbUser", "www_growse_com", "Postgres username")
 	flag.StringVar(&dbPassword, "dbPassword", "", "Postgres database password")
 	flag.StringVar(&dbName, "dbName", "www_growse_com", "Postgres database name")
-	flag.StringVar(&dbName, "dbHost", "/var/run/postgres", "Postgres database host")
+	flag.StringVar(&dbHost, "dbHost", "/var/run/postgres", "Postgres database host")
 
 	flag.Parse()
 

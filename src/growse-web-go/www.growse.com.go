@@ -28,9 +28,10 @@ var (
 )
 
 type ArticleMonth struct {
-	Year  int
-	Month int
-	Count int
+	FirstOfTheYear bool
+	Year           int
+	Month          int
+	Count          int
 }
 
 func loadLatestArticle() (*Article, error) {
@@ -89,9 +90,9 @@ func ArticleHandler(c *gin.Context) {
 		c.String(500, err.Error())
 		return
 	}
-	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename}
+	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "CurrentYear": time.Now().Year(), "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename}
 
-	c.HTML(200, "article.tmpl", obj)
+	c.HTML(200, "article.html", obj)
 }
 
 func LatestArticleHandler(c *gin.Context) {
@@ -107,7 +108,7 @@ func LatestArticleHandler(c *gin.Context) {
 	}
 	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename}
 
-	c.HTML(200, "article.tmpl", obj)
+	c.HTML(200, "article.html", obj)
 }
 
 func loadIndex() (*[]Article, *[]ArticleMonth, error) {
@@ -133,41 +134,20 @@ func loadIndex() (*[]Article, *[]ArticleMonth, error) {
 		json.Unmarshal(indexFromCache.Value, &articles)
 	}
 
-	monthRows, err := db.Query("select date_part('year',datestamp) as year, date_part('month',datestamp) as month, count(*) as count  from articles group by date_part('year',datestamp), date_part('month',datestamp) order by year asc, month asc")
+	monthRows, err := db.Query("with t as (select date_part('year',datestamp at time zone 'UTC') as year, date_part('month',datestamp at time zone 'UTC') as month, count(*) as c from articles group by date_part('year',datestamp at time zone 'UTC'),date_part('month',datestamp at time zone 'UTC') order by year desc, month desc) select case when lag(year,1) over () = year then false else true end as first, year,month,c from t;")
+	defer monthRows.Close()
 	if err != nil {
 		return nil, nil, err
 	}
-	defer monthRows.Close()
 	var months []ArticleMonth
 	for monthRows.Next() {
 		var month ArticleMonth
-		monthRows.Scan(&month.Year, &month.Month, &month.Count)
+		monthRows.Scan(&month.FirstOfTheYear, &month.Year, &month.Month, &month.Count)
+
 		months = append(months, month)
 
 	}
 	return &articles, &months, nil
-}
-
-func init() {
-	flag.StringVar(&templatePath, "templatePath", "", "The path to the templates")
-	flag.StringVar(&staticPath, "staticPath", "", "The path to the static files")
-
-	flag.Parse()
-
-	if templatePath == "" {
-		log.Fatalf("No template directory supplied")
-	}
-	if staticPath == "" {
-		log.Fatalf("No static directory supplied")
-	}
-	if _, err := os.Stat(templatePath); os.IsNotExist(err) {
-		log.Fatalf("No such file or directory: %s", templatePath)
-
-	}
-	if _, err := os.Stat(staticPath); os.IsNotExist(err) {
-		log.Fatalf("No such file or directory: %s", staticPath)
-	}
-
 }
 
 func main() {
@@ -182,7 +162,7 @@ func main() {
 
 	router := gin.Default()
 	gin.SetMode(gin.ReleaseMode)
-	router.LoadHTMLGlob(path.Join(templatePath, "*.tmpl"))
+	router.LoadHTMLGlob(path.Join(templatePath, "*.html"))
 	router.Static("/static/", staticPath)
 	//Get latest updated stylesheet
 	stylesheets, _ := ioutil.ReadDir(path.Join(staticPath, "css"))
@@ -247,4 +227,25 @@ func main() {
 	router.GET("/2:year/:month/:day/:slug", ArticleHandler)
 	router.GET("/", LatestArticleHandler)
 	router.Run(":8080")
+}
+
+func init() {
+	flag.StringVar(&templatePath, "templatePath", "", "The path to the templates")
+	flag.StringVar(&staticPath, "staticPath", "", "The path to the static files")
+
+	flag.Parse()
+
+	if templatePath == "" {
+		log.Fatalf("No template directory supplied")
+	}
+	if staticPath == "" {
+		log.Fatalf("No static directory supplied")
+	}
+	if _, err := os.Stat(templatePath); os.IsNotExist(err) {
+		log.Fatalf("No such file or directory: %s", templatePath)
+
+	}
+	if _, err := os.Stat(staticPath); os.IsNotExist(err) {
+		log.Fatalf("No such file or directory: %s", staticPath)
+	}
 }

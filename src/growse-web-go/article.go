@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/russross/blackfriday"
+	"gopkgs.com/memcache.v1"
 	"html/template"
 	"time"
 )
@@ -64,7 +64,7 @@ func GetArticle(year int, month int, day int, slug string) (*Article, error) {
 }
 
 func (article *Article) GetAbsoluteUrl() string {
-	return fmt.Sprintf("/%d/%02d/%02d/%s", article.Timestamp.Year(), article.Timestamp.Month(), article.Timestamp.Day(), article.Slug)
+	return fmt.Sprintf("/%d/%02d/%02d/%s/", article.Timestamp.Year(), article.Timestamp.Month(), article.Timestamp.Day(), article.Slug)
 }
 
 func (article *Article) Rendered() template.HTML {

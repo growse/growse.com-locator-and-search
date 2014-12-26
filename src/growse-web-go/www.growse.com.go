@@ -5,14 +5,16 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 	"gopkg.in/fsnotify.v1"
+	"gopkgs.com/memcache.v1"
 	"io/ioutil"
 	"log"
 	"os"
+	"os/signal"
 	"path"
+	"runtime/pprof"
 	"strconv"
 	"strings"
 	"time"
@@ -22,6 +24,7 @@ var (
 	db                 *sql.DB
 	templatePath       string
 	staticPath         string
+	cpuProfile         string
 	stylesheetfilename string
 	javascriptfilename string
 	memcacheClient     *memcache.Client
@@ -59,7 +62,37 @@ func loadLatestArticle() (*Article, error) {
 	return &article, nil
 }
 
+func MonthHandler(c *gin.Context) {
+	log.Print("MonthHandler")
+	year, err := strconv.Atoi("2" + c.Params.ByName("year"))
+	if err != nil {
+		c.String(404, "404 Not Found")
+		return
+	}
+
+	month, err := strconv.Atoi(c.Params.ByName("month"))
+	if err != nil {
+		c.String(404, "404 Not Found")
+		return
+	}
+
+	resultSlug, err := memcacheClient.Get(fmt.Sprintf("growse.com-bymonth-%d-%d", year, month))
+	if err == nil {
+		c.Redirect(302, string(resultSlug.Value))
+	} else {
+		var article Article
+		err := db.QueryRow("select id,datestamp, shorttitle,title from articles where date_part('year',datestamp at time zone 'UTC')=$1 and date_part('month',datestamp at time zone 'UTC')=$2 order by datestamp desc limit 1", year, month).Scan(&article.Id, &article.Timestamp, &article.Slug, &article.Title)
+		if err != nil {
+			c.String(404, err.Error())
+		}
+		redirect := article.GetAbsoluteUrl()
+		memcacheClient.Set(&memcache.Item{Key: fmt.Sprintf("growse.com-bymonth-%d-%d", year, month), Value: []byte(redirect)})
+		c.Redirect(302, redirect)
+	}
+}
+
 func ArticleHandler(c *gin.Context) {
+	log.Print("ArticleHandler")
 	year, err := strconv.Atoi("2" + c.Params.ByName("year"))
 	if err != nil {
 		c.String(404, err.Error())
@@ -221,10 +254,31 @@ func main() {
 
 	//Caching time
 	memcacheClient = memcache.New("/tmp/memcache.sock")
+	memcacheClient.SetMaxIdleConnsPerAddr(10)
+
+	if cpuProfile != "" {
+		f, err := os.Create(cpuProfile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		for sig := range c {
+			log.Printf("captured %v, stopping profiler and exiting..", sig)
+			pprof.StopCPUProfile()
+			os.Exit(1)
+		}
+	}()
 
 	//Ugly hack to deal with the fact that httprouter can't cope with both /static/ and /:year existing
 	//All years will begin with 2. So this sort of helps. Kinda.
-	router.GET("/2:year/:month/:day/:slug", ArticleHandler)
+	router.GET("/2:year/:month/", MonthHandler)
+	router.GET("/2:year/:month/:day/:slug/", ArticleHandler)
 	router.GET("/", LatestArticleHandler)
 	router.Run(":8080")
 }
@@ -232,6 +286,7 @@ func main() {
 func init() {
 	flag.StringVar(&templatePath, "templatePath", "", "The path to the templates")
 	flag.StringVar(&staticPath, "staticPath", "", "The path to the static files")
+	flag.StringVar(&cpuProfile, "cpuprofile", "", "write cpu profile to file")
 
 	flag.Parse()
 

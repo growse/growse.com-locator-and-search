@@ -31,6 +31,7 @@ var (
 	dbUser             string
 	dbName             string
 	dbPassword         string
+	dbHost             string
 	memcacheClient     *memcache.Client
 )
 
@@ -191,7 +192,7 @@ func main() {
 	yay := pq.ListenerEventConnected
 	log.Print(yay)
 	var err error
-	db, err = sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s sslmode=disable", dbUser, dbName))
+	db, err = sql.Open("postgres", fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable", dbHost, dbUser, dbName))
 	defer db.Close()
 	if err != nil {
 		log.Fatal(err)
@@ -295,6 +296,7 @@ func init() {
 	flag.StringVar(&dbUser, "dbUser", "www_growse_com", "Postgres username")
 	flag.StringVar(&dbPassword, "dbPassword", "", "Postgres database password")
 	flag.StringVar(&dbName, "dbName", "www_growse_com", "Postgres database name")
+	flag.StringVar(&dbName, "dbHost", "/var/run/postgres", "Postgres database host")
 
 	flag.Parse()
 

@@ -192,7 +192,9 @@ func main() {
 	yay := pq.ListenerEventConnected
 	log.Print(yay)
 	var err error
-	db, err = sql.Open("postgres", fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, dbUser, dbName, dbPassword))
+	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, dbUser, dbName, dbPassword)
+	log.Print(connectionString)
+	db, err = sql.Open("postgres", connectionString)
 	defer db.Close()
 	if err != nil {
 		log.Fatal(err)

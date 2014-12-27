@@ -7,8 +7,10 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
+	"github.com/oxtoacart/bpool"
 	"gopkg.in/fsnotify.v1"
 	"gopkgs.com/memcache.v1"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"os"
@@ -25,7 +27,9 @@ var (
 	stylesheetfilename string
 	javascriptfilename string
 	configuration      Configuration
+	templates          *template.Template
 	memcacheClient     *memcache.Client
+	bufPool            *bpool.BufferPool
 )
 
 type Configuration struct {
@@ -148,9 +152,27 @@ func LatestArticleHandler(c *gin.Context) {
 		c.String(500, err.Error())
 		return
 	}
+
+	cachedItem, err := memcacheClient.Get(article.getCacheKey() + "-page")
+	if err == nil {
+		c.Data(200, "text/html", cachedItem.Value)
+		return
+	}
+
 	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename}
 
-	c.HTML(200, "article.html", obj)
+	buf := bufPool.Get()
+
+	err = templates.ExecuteTemplate(buf, "article.html", obj)
+	pageBytes := buf.Bytes()
+	memcacheClient.Set(&memcache.Item{Key: article.getCacheKey() + "-page", Value: pageBytes})
+
+	if err == nil {
+		c.Data(200, "text/html", pageBytes)
+	} else {
+		c.String(500, "Internal Error")
+	}
+
 }
 
 func loadIndex() (*[]Article, *[]ArticleMonth, error) {
@@ -193,11 +215,14 @@ func loadIndex() (*[]Article, *[]ArticleMonth, error) {
 }
 
 func main() {
+	bufPool = bpool.NewBufferPool(16)
+
+	//Get around auto removing of pq
 	yay := pq.ListenerEventConnected
 	log.Print(yay)
+
 	var err error
 	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", configuration.DbHost, configuration.DbUser, configuration.DbName, configuration.DbPassword)
-	log.Print(connectionString)
 	db, err = sql.Open("postgres", connectionString)
 	defer db.Close()
 	if err != nil {
@@ -206,7 +231,10 @@ func main() {
 
 	router := gin.Default()
 	gin.SetMode(gin.ReleaseMode)
-	router.LoadHTMLGlob(path.Join(configuration.TemplatePath, "*.html"))
+
+	//router.LoadHTMLGlob()
+	templateGlob := path.Join(configuration.TemplatePath, "*.html")
+	templates = template.Must(template.ParseGlob(templateGlob))
 	router.Static("/static/", configuration.StaticPath)
 	//Get latest updated stylesheet
 	stylesheets, _ := ioutil.ReadDir(path.Join(configuration.StaticPath, "css"))

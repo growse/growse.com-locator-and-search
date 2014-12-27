@@ -1,5 +1,7 @@
 *.pyc
 static/css/*.css
+*.prof
+*.json
 build
 local_settings.py
 .idea
@@ -14,5 +16,6 @@ static/js/*.www.js
 static/css/*.www.css
 pkg
 src/github.com
+src/gopkg*
 *.iml
 out

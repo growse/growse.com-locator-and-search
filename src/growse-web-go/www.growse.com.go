@@ -22,18 +22,22 @@ import (
 
 var (
 	db                 *sql.DB
-	templatePath       string
-	staticPath         string
-	cpuProfile         string
 	stylesheetfilename string
 	javascriptfilename string
-	memcacheUrl        string
-	dbUser             string
-	dbName             string
-	dbPassword         string
-	dbHost             string
+	configuration      Configuration
 	memcacheClient     *memcache.Client
 )
+
+type Configuration struct {
+	MemcacheUrl  string
+	DbUser       string
+	DbName       string
+	DbPassword   string
+	DbHost       string
+	TemplatePath string
+	StaticPath   string
+	CpuProfile   string
+}
 
 type ArticleMonth struct {
 	FirstOfTheYear bool
@@ -192,7 +196,7 @@ func main() {
 	yay := pq.ListenerEventConnected
 	log.Print(yay)
 	var err error
-	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, dbUser, dbName, dbPassword)
+	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", configuration.DbHost, configuration.DbUser, configuration.DbName, configuration.DbPassword)
 	log.Print(connectionString)
 	db, err = sql.Open("postgres", connectionString)
 	defer db.Close()
@@ -202,10 +206,10 @@ func main() {
 
 	router := gin.Default()
 	gin.SetMode(gin.ReleaseMode)
-	router.LoadHTMLGlob(path.Join(templatePath, "*.html"))
-	router.Static("/static/", staticPath)
+	router.LoadHTMLGlob(path.Join(configuration.TemplatePath, "*.html"))
+	router.Static("/static/", configuration.StaticPath)
 	//Get latest updated stylesheet
-	stylesheets, _ := ioutil.ReadDir(path.Join(staticPath, "css"))
+	stylesheets, _ := ioutil.ReadDir(path.Join(configuration.StaticPath, "css"))
 	var lastTimeCss time.Time
 	for _, file := range stylesheets {
 		if !file.IsDir() && (lastTimeCss.IsZero() || file.ModTime().After(lastTimeCss)) && strings.HasSuffix(file.Name(), ".www.css") {
@@ -217,7 +221,7 @@ func main() {
 		log.Fatal("No stylesheet found in staticpath. Perhaps run Grunt first?")
 	}
 
-	javascripts, _ := ioutil.ReadDir(path.Join(staticPath, "js"))
+	javascripts, _ := ioutil.ReadDir(path.Join(configuration.StaticPath, "js"))
 	var lastTimeJs time.Time
 
 	for _, file := range javascripts {
@@ -234,8 +238,8 @@ func main() {
 	watcher, err := fsnotify.NewWatcher()
 	if err == nil {
 		defer watcher.Close()
-		watcher.Add(path.Join(staticPath, "css"))
-		watcher.Add(path.Join(staticPath, "js"))
+		watcher.Add(path.Join(configuration.StaticPath, "css"))
+		watcher.Add(path.Join(configuration.StaticPath, "js"))
 		go func() {
 			for {
 				select {
@@ -260,11 +264,11 @@ func main() {
 	}
 
 	//Caching time
-	memcacheClient = memcache.New(memcacheUrl)
+	memcacheClient = memcache.New(configuration.MemcacheUrl)
 	memcacheClient.SetMaxIdleConnsPerAddr(10)
 
-	if cpuProfile != "" {
-		f, err := os.Create(cpuProfile)
+	if configuration.CpuProfile != "" {
+		f, err := os.Create(configuration.CpuProfile)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -291,28 +295,35 @@ func main() {
 }
 
 func init() {
-	flag.StringVar(&templatePath, "templatePath", "", "The path to the templates")
-	flag.StringVar(&staticPath, "staticPath", "", "The path to the static files")
-	flag.StringVar(&cpuProfile, "cpuprofile", "", "write cpu profile to file")
-	flag.StringVar(&memcacheUrl, "memcacheUrl", "tcp://localhost:11211", "Url to connect to memcache")
-	flag.StringVar(&dbUser, "dbUser", "www_growse_com", "Postgres username")
-	flag.StringVar(&dbPassword, "dbPassword", "", "Postgres database password")
-	flag.StringVar(&dbName, "dbName", "www_growse_com", "Postgres database name")
-	flag.StringVar(&dbHost, "dbHost", "/var/run/postgres", "Postgres database host")
 
+	configFile := flag.String("configFile", "config.json", "File path to the JSON configuration")
 	flag.Parse()
 
-	if templatePath == "" {
+	file, err := os.Open(*configFile)
+	if err != nil {
+		log.Fatalf("Unable to open configuration file: %v", err)
+	}
+
+	decoder := json.NewDecoder(file)
+
+	err = decoder.Decode(&configuration)
+	if err != nil {
+		log.Fatalf("Unable to parse configuration file: %v", err)
+	}
+
+	log.Print(configuration)
+
+	if configuration.TemplatePath == "" {
 		log.Fatalf("No template directory supplied")
 	}
-	if staticPath == "" {
+	if configuration.StaticPath == "" {
 		log.Fatalf("No static directory supplied")
 	}
-	if _, err := os.Stat(templatePath); os.IsNotExist(err) {
-		log.Fatalf("No such file or directory: %s", templatePath)
+	if _, err := os.Stat(configuration.TemplatePath); os.IsNotExist(err) {
+		log.Fatalf("No such file or directory: %s", configuration.TemplatePath)
 
 	}
-	if _, err := os.Stat(staticPath); os.IsNotExist(err) {
-		log.Fatalf("No such file or directory: %s", staticPath)
+	if _, err := os.Stat(configuration.StaticPath); os.IsNotExist(err) {
+		log.Fatalf("No such file or directory: %s", configuration.StaticPath)
 	}
 }

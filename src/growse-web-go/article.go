@@ -22,6 +22,10 @@ func (article *Article) getCacheKey() string {
 	return Truncate(fmt.Sprintf("growse.com-article-%d-%02d-%02d-%s", article.Timestamp.Year(), article.Timestamp.Month(), article.Timestamp.Day(), article.Slug), 250)
 }
 
+func (article *Article) getPageCacheKey(cssname string, jsname string) string {
+	return Truncate(fmt.Sprintf("growse.com-article-%d-%02d-%02d-%s-%s-%s", article.Timestamp.Year(), article.Timestamp.Month(), article.Timestamp.Day(), article.Slug, cssname, jsname), 250)
+}
+
 func getCacheKey(year int, month int, day int, slug string) string {
 	return Truncate(fmt.Sprintf("growse.com-article-%d-%02d-%02d-%s", year, month, day, slug), 250)
 }

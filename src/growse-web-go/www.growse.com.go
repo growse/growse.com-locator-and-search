@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 	"github.com/oxtoacart/bpool"
+	"github.com/revel/revel/cache"
 	"gopkg.in/fsnotify.v1"
 	"gopkgs.com/memcache.v1"
 	"html/template"
@@ -30,6 +31,7 @@ var (
 	templates          *template.Template
 	memcacheClient     *memcache.Client
 	bufPool            *bpool.BufferPool
+	memoryCache        cache.InMemoryCache
 )
 
 type Configuration struct {
@@ -153,9 +155,11 @@ func LatestArticleHandler(c *gin.Context) {
 		return
 	}
 
-	cachedItem, err := memcacheClient.Get(article.getCacheKey() + "-page")
+	var cacheBytes []byte
+	err = memoryCache.Get(article.getPageCacheKey(stylesheetfilename, javascriptfilename), &cacheBytes)
+
 	if err == nil {
-		c.Data(200, "text/html", cachedItem.Value)
+		c.Data(200, "text/html", cacheBytes)
 		return
 	}
 
@@ -165,7 +169,7 @@ func LatestArticleHandler(c *gin.Context) {
 
 	err = templates.ExecuteTemplate(buf, "article.html", obj)
 	pageBytes := buf.Bytes()
-	memcacheClient.Set(&memcache.Item{Key: article.getCacheKey() + "-page", Value: pageBytes})
+	memoryCache.Set(article.getPageCacheKey(stylesheetfilename, javascriptfilename), pageBytes, cache.FOREVER)
 
 	if err == nil {
 		c.Data(200, "text/html", pageBytes)
@@ -214,14 +218,51 @@ func loadIndex() (*[]Article, *[]ArticleMonth, error) {
 	return &articles, &months, nil
 }
 
+func RobotsHandler(c *gin.Context) {
+	c.File(path.Join(configuration.TemplatePath, "robots.txt"))
+}
+
 func main() {
+	//Flags
+	configFile := flag.String("configFile", "config.json", "File path to the JSON configuration")
+	flag.Parse()
+
+	//Config parsing
+	file, err := os.Open(*configFile)
+	if err != nil {
+		log.Fatalf("Unable to open configuration file: %v", err)
+	}
+
+	decoder := json.NewDecoder(file)
+
+	err = decoder.Decode(&configuration)
+	if err != nil {
+		log.Fatalf("Unable to parse configuration file: %v", err)
+	}
+
+	if configuration.TemplatePath == "" {
+		log.Fatalf("No template directory supplied")
+	}
+	if configuration.StaticPath == "" {
+		log.Fatalf("No static directory supplied")
+	}
+	if _, err := os.Stat(configuration.TemplatePath); os.IsNotExist(err) {
+		log.Fatalf("No such file or directory: %s", configuration.TemplatePath)
+
+	}
+	if _, err := os.Stat(configuration.StaticPath); os.IsNotExist(err) {
+		log.Fatalf("No such file or directory: %s", configuration.StaticPath)
+	}
+
+	//Initialize the template output buffer pool
 	bufPool = bpool.NewBufferPool(16)
 
 	//Get around auto removing of pq
 	yay := pq.ListenerEventConnected
 	log.Print(yay)
 
-	var err error
+	//Database time
+
 	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", configuration.DbHost, configuration.DbUser, configuration.DbName, configuration.DbPassword)
 	db, err = sql.Open("postgres", connectionString)
 	defer db.Close()
@@ -229,13 +270,17 @@ func main() {
 		log.Fatal(err)
 	}
 
+	//Get the router
 	router := gin.Default()
 	gin.SetMode(gin.ReleaseMode)
 
-	//router.LoadHTMLGlob()
+	//Load the templates. Don't use gin for this, because we want to render to a buffer later
 	templateGlob := path.Join(configuration.TemplatePath, "*.html")
 	templates = template.Must(template.ParseGlob(templateGlob))
+
+	//Static is over here
 	router.Static("/static/", configuration.StaticPath)
+
 	//Get latest updated stylesheet
 	stylesheets, _ := ioutil.ReadDir(path.Join(configuration.StaticPath, "css"))
 	var lastTimeCss time.Time
@@ -248,7 +293,7 @@ func main() {
 	if stylesheetfilename == "" {
 		log.Fatal("No stylesheet found in staticpath. Perhaps run Grunt first?")
 	}
-
+	//Get the latest javascript file
 	javascripts, _ := ioutil.ReadDir(path.Join(configuration.StaticPath, "js"))
 	var lastTimeJs time.Time
 
@@ -296,6 +341,9 @@ func main() {
 	defer memcacheClient.Close()
 	memcacheClient.SetMaxIdleConnsPerAddr(10)
 
+	memoryCache = cache.NewInMemoryCache(cache.FOREVER)
+
+	//Cpu Profiling time
 	if configuration.CpuProfile != "" {
 		f, err := os.Create(configuration.CpuProfile)
 		if err != nil {
@@ -305,6 +353,7 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
+	//Catch SIGTERM to stop the profiling
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
@@ -320,39 +369,6 @@ func main() {
 	router.GET("/2:year/:month/", MonthHandler)
 	router.GET("/2:year/:month/:day/:slug/", ArticleHandler)
 	router.GET("/", LatestArticleHandler)
+	router.GET("/robots.txt", RobotsHandler)
 	router.Run(":8080")
-}
-
-func init() {
-
-	configFile := flag.String("configFile", "config.json", "File path to the JSON configuration")
-	flag.Parse()
-
-	file, err := os.Open(*configFile)
-	if err != nil {
-		log.Fatalf("Unable to open configuration file: %v", err)
-	}
-
-	decoder := json.NewDecoder(file)
-
-	err = decoder.Decode(&configuration)
-	if err != nil {
-		log.Fatalf("Unable to parse configuration file: %v", err)
-	}
-
-	log.Print(configuration)
-
-	if configuration.TemplatePath == "" {
-		log.Fatalf("No template directory supplied")
-	}
-	if configuration.StaticPath == "" {
-		log.Fatalf("No static directory supplied")
-	}
-	if _, err := os.Stat(configuration.TemplatePath); os.IsNotExist(err) {
-		log.Fatalf("No such file or directory: %s", configuration.TemplatePath)
-
-	}
-	if _, err := os.Stat(configuration.StaticPath); os.IsNotExist(err) {
-		log.Fatalf("No such file or directory: %s", configuration.StaticPath)
-	}
 }

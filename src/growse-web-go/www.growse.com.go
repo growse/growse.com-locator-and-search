@@ -265,6 +265,7 @@ func main() {
 
 	//Caching time
 	memcacheClient = memcache.New(configuration.MemcacheUrl)
+	defer memcacheClient.Close()
 	memcacheClient.SetMaxIdleConnsPerAddr(10)
 
 	if configuration.CpuProfile != "" {

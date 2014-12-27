@@ -6,6 +6,7 @@ import (
 	"github.com/russross/blackfriday"
 	"gopkgs.com/memcache.v1"
 	"html/template"
+	"log"
 	"time"
 )
 
@@ -32,6 +33,9 @@ func (article *Article) cacheArticle() error {
 	}
 	memcacheItem := memcache.Item{Key: article.getCacheKey(), Value: articleAsJson}
 	err = memcacheClient.Set(&memcacheItem)
+	if err != nil {
+		log.Printf("Error caching article: %v", err)
+	}
 	return err
 }
 

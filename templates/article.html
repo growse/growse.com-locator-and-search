@@ -2,14 +2,14 @@
 <article itemscope itemtype="http://schema.org/blogposting">
     <header>
         <time class="fancy" itemprop="datePublished"
-        datetime="{{ .Article.Timestamp.Format "2006-01-02T15:04:05Z07:00" }}">
-        <p>{{ .Article.Timestamp.Format "Jan"}} <span
-        class="day">{{ printf "%02d" .Article.Timestamp.Day }}</span><span
-        class="year">{{ .Article.Timestamp.Year }}</span></p></time>
+        datetime="{{ .Article.Timestamp.UTC.Format "2006-01-02T15:04:05Z07:00" }}">
+        <p>{{ .Article.Timestamp.UTC.Format "Jan"}} <span
+        class="day">{{ printf "%02d" .Article.Timestamp.UTC.Day }}</span><span
+        class="year">{{ .Article.Timestamp.UTC.Year }}</span></p></time>
         <h1 itemprop="name headline">{{ .Article.Title }}</h1>
         <time class="plain" itemprop="datePublished"
-        datetime="{{ .Article.Timestamp.Format "2006-01-02T15:04:05Z07:00" }}">
-        {{ .Article.Timestamp.Format "Monday, 02-Jan-06 15:04:05 MST"}}
+        datetime="{{ .Article.Timestamp.UTC.Format "2006-01-02T15:04:05Z07:00" }}">
+        {{ .Article.Timestamp.UTC.Format "Monday, 02-Jan-06 15:04:05 MST"}}
         </time>
         <meta itemprop="author" content="Andrew Rowson"/>
     </header>

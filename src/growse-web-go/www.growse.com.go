@@ -6,11 +6,10 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/growse/concurrent-map"
 	"github.com/lib/pq"
 	"github.com/oxtoacart/bpool"
-	"github.com/revel/revel/cache"
 	"gopkg.in/fsnotify.v1"
-	"gopkgs.com/memcache.v1"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -29,9 +28,8 @@ var (
 	javascriptfilename string
 	configuration      Configuration
 	templates          *template.Template
-	memcacheClient     *memcache.Client
 	bufPool            *bpool.BufferPool
-	memoryCache        cache.InMemoryCache
+	memoryCache        cmap.ConcurrentMap
 )
 
 type Configuration struct {
@@ -52,13 +50,16 @@ type ArticleMonth struct {
 	Count          int
 }
 
-func loadLatestArticle() (*Article, error) {
-	articleCacheKey, err := memcacheClient.Get("growse.com-latest")
+func GetLatestArticle() (*Article, error) {
 	var article Article
-	if err == nil {
-		articleFromCache, err := memcacheClient.Get(string(articleCacheKey.Value))
-		if err == nil {
-			json.Unmarshal(articleFromCache.Value, &article)
+	log.Printf("Fetching cache key: %s", "growse.com-latest")
+	articleBytes, ok := memoryCache.Get("growse.com-latest")
+	if ok {
+		article, err := FromBytes(articleBytes)
+		if err != nil {
+			return nil, err
+		} else {
+			return &article, nil
 		}
 	} else {
 		err := db.QueryRow(`Select id,datestamp,shorttitle,title,markdown from articles where published=true order by datestamp desc limit 1`).Scan(&article.Id, &article.Timestamp, &article.Slug, &article.Title, &article.Markdown)
@@ -68,17 +69,19 @@ func loadLatestArticle() (*Article, error) {
 		case err != nil:
 			return nil, err
 		default:
-			err := article.cacheArticle()
-			if err == nil {
-				memcacheClient.Set(&memcache.Item{Key: "growse.com-latest", Value: []byte(article.getCacheKey())})
+			articleBytes, err := article.ToBytes()
+			if err != nil {
+				log.Printf("Error marshelling article to binary: %v", err)
+			} else {
+				memoryCache.Set("growse.com-latest", articleBytes)
 			}
+			return &article, nil
 		}
 	}
-	return &article, nil
+
 }
 
 func MonthHandler(c *gin.Context) {
-	log.Print("MonthHandler")
 	year, err := strconv.Atoi("2" + c.Params.ByName("year"))
 	if err != nil {
 		c.String(404, "404 Not Found")
@@ -91,9 +94,12 @@ func MonthHandler(c *gin.Context) {
 		return
 	}
 
-	resultSlug, err := memcacheClient.Get(fmt.Sprintf("growse.com-bymonth-%d-%d", year, month))
-	if err == nil {
-		c.Redirect(302, string(resultSlug.Value))
+	var resultSlug []byte
+
+	resultSlug, ok := memoryCache.Get(fmt.Sprintf("growse.com-bymonth-%d-%d", year, month))
+
+	if ok {
+		c.Redirect(302, string(resultSlug))
 	} else {
 		var article Article
 		err := db.QueryRow("select id,datestamp, shorttitle,title from articles where date_part('year',datestamp at time zone 'UTC')=$1 and date_part('month',datestamp at time zone 'UTC')=$2 order by datestamp desc limit 1", year, month).Scan(&article.Id, &article.Timestamp, &article.Slug, &article.Title)
@@ -101,13 +107,12 @@ func MonthHandler(c *gin.Context) {
 			c.String(404, err.Error())
 		}
 		redirect := article.GetAbsoluteUrl()
-		memcacheClient.Set(&memcache.Item{Key: fmt.Sprintf("growse.com-bymonth-%d-%d", year, month), Value: []byte(redirect)})
+		memoryCache.Set(fmt.Sprintf("growse.com-bymonth-%d-%d", year, month), []byte(redirect))
 		c.Redirect(302, redirect)
 	}
 }
 
 func ArticleHandler(c *gin.Context) {
-	log.Print("ArticleHandler")
 	year, err := strconv.Atoi("2" + c.Params.ByName("year"))
 	if err != nil {
 		c.String(404, err.Error())
@@ -128,11 +133,26 @@ func ArticleHandler(c *gin.Context) {
 
 	slug := c.Params.ByName("slug")
 
-	article, err := GetArticle(year, month, day, slug)
-	if err != nil {
-		c.String(404, "404 Not Found")
+	//Check the page cache
+	var cachedBytes []byte
+	cacheKey := getCacheKey(year, month, day, slug)
+	log.Printf("Fetching cache key: %s", cacheKey)
+
+	cachedBytes, ok := memoryCache.Get(cacheKey)
+
+	if ok {
+		c.Data(200, "text/html", cachedBytes)
 		return
 	}
+
+	//Cache miss, load from DB
+	article, err := GetArticle(year, month, day, slug)
+	if err != nil {
+		c.String(404, err.Error())
+		return
+	}
+
+	//Get the indeces from DB
 	index, months, err := loadIndex()
 	if err != nil {
 		c.String(500, err.Error())
@@ -140,36 +160,56 @@ func ArticleHandler(c *gin.Context) {
 	}
 	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "CurrentYear": time.Now().Year(), "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename}
 
-	c.HTML(200, "article.html", obj)
+	buf := bufPool.Get()
+	buf.Reset()
+	defer bufPool.Put(buf)
+	err = templates.ExecuteTemplate(buf, "article.html", obj)
+	pageBytes := buf.Bytes()
+	//Cache the page
+	log.Printf("Caching page in: %s", article.getCacheKey())
+
+	memoryCache.Set(article.getCacheKey(), pageBytes)
+
+	if err == nil {
+		c.Data(200, "text/html", pageBytes)
+	} else {
+		c.String(500, fmt.Sprintf("Internal Error: %v", err))
+	}
 }
 
 func LatestArticleHandler(c *gin.Context) {
-	article, err := loadLatestArticle()
+	//Get article latest
+	article, err := GetLatestArticle()
 	if err != nil {
 		c.String(404, err.Error())
 		return
 	}
+
+	var cacheBytes []byte
+	log.Printf("Fetching cache key: %s", article.getCacheKey())
+	cacheBytes, ok := memoryCache.Get(article.getCacheKey())
+
+	if ok {
+		c.Data(200, "text/html", cacheBytes)
+		return
+	}
+	log.Print(err)
+
 	index, months, err := loadIndex()
 	if err != nil {
 		c.String(500, err.Error())
 		return
 	}
 
-	var cacheBytes []byte
-	err = memoryCache.Get(article.getPageCacheKey(stylesheetfilename, javascriptfilename), &cacheBytes)
-
-	if err == nil {
-		c.Data(200, "text/html", cacheBytes)
-		return
-	}
-
 	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename}
 
 	buf := bufPool.Get()
-
+	defer bufPool.Put(buf)
 	err = templates.ExecuteTemplate(buf, "article.html", obj)
 	pageBytes := buf.Bytes()
-	memoryCache.Set(article.getPageCacheKey(stylesheetfilename, javascriptfilename), pageBytes, cache.FOREVER)
+	log.Printf("Caching page in: %s", article.getCacheKey())
+
+	memoryCache.Set(article.getCacheKey(), pageBytes)
 
 	if err == nil {
 		c.Data(200, "text/html", pageBytes)
@@ -180,26 +220,17 @@ func LatestArticleHandler(c *gin.Context) {
 }
 
 func loadIndex() (*[]Article, *[]ArticleMonth, error) {
-	indexFromCache, err := memcacheClient.Get("growse.com-index")
 	var articles []Article
+	rows, err := db.Query("Select id, datestamp,shorttitle,title from articles where published=true order by datestamp desc;")
 	if err != nil {
+		return nil, nil, err
+	}
+	defer rows.Close()
 
-		rows, err := db.Query("Select id, datestamp,shorttitle,title from articles where published=true order by datestamp desc;")
-		if err != nil {
-			return nil, nil, err
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			var article Article
-			rows.Scan(&article.Id, &article.Timestamp, &article.Slug, &article.Title)
-			articles = append(articles, article)
-		}
-		indexToCache, _ := json.Marshal(articles)
-		memcacheItem := memcache.Item{Key: "growse.com-index", Value: indexToCache}
-		memcacheClient.Set(&memcacheItem)
-	} else {
-		json.Unmarshal(indexFromCache.Value, &articles)
+	for rows.Next() {
+		var article Article
+		rows.Scan(&article.Id, &article.Timestamp, &article.Slug, &article.Title)
+		articles = append(articles, article)
 	}
 
 	monthRows, err := db.Query("with t as (select date_part('year',datestamp at time zone 'UTC') as year, date_part('month',datestamp at time zone 'UTC') as month, count(*) as c from articles group by date_part('year',datestamp at time zone 'UTC'),date_part('month',datestamp at time zone 'UTC') order by year desc, month desc) select case when lag(year,1) over () = year then false else true end as first, year,month,c from t;")
@@ -211,7 +242,6 @@ func loadIndex() (*[]Article, *[]ArticleMonth, error) {
 	for monthRows.Next() {
 		var month ArticleMonth
 		monthRows.Scan(&month.FirstOfTheYear, &month.Year, &month.Month, &month.Count)
-
 		months = append(months, month)
 
 	}
@@ -321,10 +351,13 @@ func main() {
 						if strings.HasSuffix(event.Name, ".www.css") {
 							log.Printf("New CSS Detected: %s", path.Base(event.Name))
 							stylesheetfilename = path.Base(event.Name)
+							memoryCache.Flush()
+
 						}
 						if strings.HasSuffix(event.Name, ".www.js") {
 							log.Printf("New JS Detected: %s", path.Base(event.Name))
 							javascriptfilename = path.Base(event.Name)
+							memoryCache.Flush()
 						}
 					}
 				case err := <-watcher.Errors:
@@ -337,11 +370,7 @@ func main() {
 	}
 
 	//Caching time
-	memcacheClient = memcache.New(configuration.MemcacheUrl)
-	defer memcacheClient.Close()
-	memcacheClient.SetMaxIdleConnsPerAddr(10)
-
-	memoryCache = cache.NewInMemoryCache(cache.FOREVER)
+	memoryCache = cmap.New()
 
 	//Cpu Profiling time
 	if configuration.CpuProfile != "" {
@@ -370,5 +399,20 @@ func main() {
 	router.GET("/2:year/:month/:day/:slug/", ArticleHandler)
 	router.GET("/", LatestArticleHandler)
 	router.GET("/robots.txt", RobotsHandler)
+	router.GET("/cachedump", CacheDumpHandler)
 	router.Run(":8080")
+}
+
+func CacheDumpHandler(c *gin.Context) {
+	/*var buffer bytes.Buffer
+	for item := range memoryCache.Iter() {
+		buffer.WriteString(item.Key)
+		buffer.WriteString("\n")
+		buffer.Write(item.Val)
+		buffer.WriteString("\n")
+		buffer.WriteString("\n")
+	}
+	c.String(200, buffer.String())*/
+	thing, _ := memoryCache.Get("article-2014-11-28-a-day-off")
+	c.String(200, string(thing))
 }

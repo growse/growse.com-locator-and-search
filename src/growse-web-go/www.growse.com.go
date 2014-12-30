@@ -51,6 +51,10 @@ type ArticleMonth struct {
 	Count          int
 }
 
+var funcMap = template.FuncMap{
+	"RenderFloat": RenderFloat,
+}
+
 func GetLatestArticle() (*Article, error) {
 	var article Article
 	log.Printf("Fetching cache key: %s", "growse.com-latest")
@@ -236,11 +240,33 @@ func LatestArticleHandler(c *gin.Context) {
 }
 
 func WhereHandler(c *gin.Context) {
-	obj := gin.H{"Title": "Where", "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename}
+
+	avgspeed, err := GetAverageSpeed()
+	if err != nil {
+		log.Printf("%v", err)
+		c.String(500, "Internal Error")
+		return
+	}
+
+	totaldistance, err := GetTotalDistance()
+	if err != nil {
+		log.Printf("%v", err)
+		c.String(500, "Internal Error")
+		return
+	}
+
+	lastlocation, err := GetLastLoction()
+	if err != nil {
+		log.Printf("%v", err)
+		c.String(500, "Internal Error")
+		return
+	}
+	log.Print(totaldistance)
+	obj := gin.H{"Title": "Where", "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "Avgspeed": avgspeed, "Totaldistance": totaldistance, "LastLocation": lastlocation}
 	buf := bufPool.Get()
 	defer bufPool.Put(buf)
 
-	err := templates.ExecuteTemplate(buf, "where.html", obj)
+	err = templates.ExecuteTemplate(buf, "where.html", obj)
 	pageBytes := buf.Bytes()
 	if err == nil {
 		c.Data(200, "text/html", pageBytes)
@@ -337,7 +363,7 @@ func main() {
 
 	//Load the templates. Don't use gin for this, because we want to render to a buffer later
 	templateGlob := path.Join(configuration.TemplatePath, "*.html")
-	templates = template.Must(template.ParseGlob(templateGlob))
+	templates = template.Must(template.New("Yay Templates").Funcs(funcMap).ParseGlob(templateGlob))
 
 	//Static is over here
 	router.Static("/static/", configuration.StaticPath)

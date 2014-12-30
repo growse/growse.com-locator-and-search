@@ -44,9 +44,27 @@ type GeoName struct {
 
 func GetLastLoction() (*Location, error) {
 	var location Location
-	err := db.QueryRow("select geocoding, latitude,longitude from locations where geocoding like '%geonames%' order by timestamp desc limit 1").Scan(&location.Geocoding, &location.Latitude, &location.Longitude)
+	err := db.QueryRow("select geocoding, latitude,longitude,timestamp from locations where geocoding like '%geonames%' order by timestamp desc limit 1").Scan(&location.Geocoding, &location.Latitude, &location.Longitude, &location.Timestamp)
 
 	return &location, err
+}
+
+func GetAverageSpeed() (float64, error) {
+	var speed float64
+	err := db.QueryRow("select 2.23693629*avg(distance/(timedelta/1000000::float)) from locations where extract(year from devicetimestamp at time zone 'UTC') = date_part('year', now() at time zone 'UTC');").Scan(&speed)
+	if err != nil {
+		return 0, err
+	}
+	return speed, nil
+}
+
+func GetTotalDistance() (float64, error) {
+	var distance float64
+	err := db.QueryRow("select 0.000621371192*sum(distance) from locations where extract(year from devicetimestamp at time zone 'UTC') = date_part('year', now() at time zone 'UTC');").Scan(&distance)
+	if err != nil {
+		return 0, err
+	}
+	return distance, nil
 }
 
 func (location *Location) Name() string {

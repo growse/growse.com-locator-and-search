@@ -10,6 +10,7 @@ $(function () {
             $(".nano").nanoScroller();
         }
     }
+    $('time.timeago').timeago();
 
 });
 

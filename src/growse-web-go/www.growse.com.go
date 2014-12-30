@@ -33,7 +33,6 @@ var (
 )
 
 type Configuration struct {
-	MemcacheUrl        string
 	DbUser             string
 	DbName             string
 	DbPassword         string

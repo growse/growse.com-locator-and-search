@@ -6,7 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/growse/concurrent-map"
+	"github.com/growse/concurrent-expiring-map"
 	"github.com/lib/pq"
 	"github.com/oxtoacart/bpool"
 	"gopkg.in/fsnotify.v1"
@@ -33,14 +33,16 @@ var (
 )
 
 type Configuration struct {
-	MemcacheUrl  string
-	DbUser       string
-	DbName       string
-	DbPassword   string
-	DbHost       string
-	TemplatePath string
-	StaticPath   string
-	CpuProfile   string
+	MemcacheUrl        string
+	DbUser             string
+	DbName             string
+	DbPassword         string
+	DbHost             string
+	TemplatePath       string
+	StaticPath         string
+	CpuProfile         string
+	GeocodeApiURL      string
+	DefaultCacheExpiry time.Duration
 }
 
 type ArticleMonth struct {
@@ -73,7 +75,7 @@ func GetLatestArticle() (*Article, error) {
 			if err != nil {
 				log.Printf("Error marshelling article to binary: %v", err)
 			} else {
-				memoryCache.Set("growse.com-latest", articleBytes)
+				memoryCache.Set("growse.com-latest", articleBytes, time.Now().Add(configuration.DefaultCacheExpiry))
 			}
 			return &article, nil
 		}
@@ -107,7 +109,7 @@ func MonthHandler(c *gin.Context) {
 			c.String(404, err.Error())
 		}
 		redirect := article.GetAbsoluteUrl()
-		memoryCache.Set(fmt.Sprintf("growse.com-bymonth-%d-%d", year, month), []byte(redirect))
+		memoryCache.Set(fmt.Sprintf("growse.com-bymonth-%d-%d", year, month), []byte(redirect), time.Now().Add(configuration.DefaultCacheExpiry))
 		c.Redirect(302, redirect)
 	}
 }
@@ -158,7 +160,13 @@ func ArticleHandler(c *gin.Context) {
 		c.String(500, err.Error())
 		return
 	}
-	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "CurrentYear": time.Now().Year(), "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename}
+
+	lastlocation, err := GetLastLoction()
+	if err != nil {
+		log.Printf("Error fetching location: %v", err)
+	}
+
+	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "CurrentYear": time.Now().Year(), "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation}
 
 	buf := bufPool.Get()
 	buf.Reset()
@@ -168,7 +176,7 @@ func ArticleHandler(c *gin.Context) {
 	//Cache the page
 	log.Printf("Caching page in: %s", article.getCacheKey())
 
-	memoryCache.Set(article.getCacheKey(), pageBytes)
+	memoryCache.Set(article.getCacheKey(), pageBytes, time.Now().Add(configuration.DefaultCacheExpiry))
 
 	if err == nil {
 		c.Data(200, "text/html", pageBytes)
@@ -193,7 +201,7 @@ func LatestArticleHandler(c *gin.Context) {
 		c.Data(200, "text/html", cacheBytes)
 		return
 	}
-	log.Print(err)
+	log.Printf("Cache MISS: %v", article.getCacheKey())
 
 	index, months, err := loadIndex()
 	if err != nil {
@@ -209,7 +217,7 @@ func LatestArticleHandler(c *gin.Context) {
 	pageBytes := buf.Bytes()
 	log.Printf("Caching page in: %s", article.getCacheKey())
 
-	memoryCache.Set(article.getCacheKey(), pageBytes)
+	memoryCache.Set(article.getCacheKey(), pageBytes, time.Now().Add(configuration.DefaultCacheExpiry))
 
 	if err == nil {
 		c.Data(200, "text/html", pageBytes)
@@ -289,7 +297,7 @@ func main() {
 
 	//Get around auto removing of pq
 	yay := pq.ListenerEventConnected
-	log.Print(yay)
+	log.Printf("Here's the number zero: %v", yay)
 
 	//Database time
 
@@ -399,20 +407,13 @@ func main() {
 	router.GET("/2:year/:month/:day/:slug/", ArticleHandler)
 	router.GET("/", LatestArticleHandler)
 	router.GET("/robots.txt", RobotsHandler)
-	router.GET("/cachedump", CacheDumpHandler)
+	router.POST("/search/", SearchPostHandler)
+	router.GET("/search/:searchterm", SearchHandler)
 	router.Run(":8080")
 }
 
-func CacheDumpHandler(c *gin.Context) {
-	/*var buffer bytes.Buffer
-	for item := range memoryCache.Iter() {
-		buffer.WriteString(item.Key)
-		buffer.WriteString("\n")
-		buffer.Write(item.Val)
-		buffer.WriteString("\n")
-		buffer.WriteString("\n")
-	}
-	c.String(200, buffer.String())*/
-	thing, _ := memoryCache.Get("article-2014-11-28-a-day-off")
-	c.String(200, string(thing))
+func SearchPostHandler(c *gin.Context) {
+}
+
+func SearchHandler(c *gin.Context) {
 }

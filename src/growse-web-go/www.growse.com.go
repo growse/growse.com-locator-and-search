@@ -47,7 +47,7 @@ type Configuration struct {
 type ArticleMonth struct {
 	FirstOfTheYear bool
 	Year           int
-	Month          int
+	Month          string
 	Count          int
 }
 
@@ -156,6 +156,7 @@ func ArticleHandler(c *gin.Context) {
 	//Get the indeces from DB
 	index, months, err := loadIndex()
 	if err != nil {
+		log.Printf("%v", err)
 		c.String(500, err.Error())
 		return
 	}
@@ -180,6 +181,7 @@ func ArticleHandler(c *gin.Context) {
 	if err == nil {
 		c.Data(200, "text/html", pageBytes)
 	} else {
+		log.Printf("%v", err)
 		c.String(500, fmt.Sprintf("Internal Error: %v", err))
 	}
 }
@@ -202,13 +204,19 @@ func LatestArticleHandler(c *gin.Context) {
 	}
 	log.Printf("Cache MISS: %v", article.getCacheKey())
 
+	lastlocation, err := GetLastLoction()
+	if err != nil {
+		log.Printf("Error fetching location: %v", err)
+	}
+
 	index, months, err := loadIndex()
 	if err != nil {
+		log.Printf("%v", err)
 		c.String(500, err.Error())
 		return
 	}
 
-	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename}
+	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation}
 
 	buf := bufPool.Get()
 	defer bufPool.Put(buf)
@@ -221,9 +229,25 @@ func LatestArticleHandler(c *gin.Context) {
 	if err == nil {
 		c.Data(200, "text/html", pageBytes)
 	} else {
+		log.Printf("%v", err)
 		c.String(500, "Internal Error")
 	}
 
+}
+
+func WhereHandler(c *gin.Context) {
+	obj := gin.H{"Title": "Where", "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename}
+	buf := bufPool.Get()
+	defer bufPool.Put(buf)
+
+	err := templates.ExecuteTemplate(buf, "where.html", obj)
+	pageBytes := buf.Bytes()
+	if err == nil {
+		c.Data(200, "text/html", pageBytes)
+	} else {
+		log.Printf("%v", err)
+		c.String(500, "Internal Error")
+	}
 }
 
 func loadIndex() (*[]Article, *[]ArticleMonth, error) {
@@ -404,6 +428,7 @@ func main() {
 	//All years will begin with 2. So this sort of helps. Kinda.
 	router.GET("/2:year/:month/", MonthHandler)
 	router.GET("/2:year/:month/:day/:slug/", ArticleHandler)
+	router.GET("/where/", WhereHandler)
 	router.GET("/", LatestArticleHandler)
 	router.GET("/robots.txt", RobotsHandler)
 	router.POST("/search/", SearchPostHandler)

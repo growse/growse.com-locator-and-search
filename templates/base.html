@@ -54,18 +54,20 @@ transform: scaleX(-1) filter : FlipH;
         <div id="previous">
             <h2>Previous things</h2>
             <ul id="previousyears">
-            {{range $index, $element := .Months}}
-                {{if $element.FirstOfTheYear}}
-                    {{if ne $index 0}}
-                        </ul>
+                {{if .Months}}
+                    {{range $index, $element := .Months}}
+                        {{if $element.FirstOfTheYear}}
+                            {{if ne $index 0}}
+                                </ul>
+                            {{end}}
+                            <li class="year">
+                                <a href="javascript:$('ul#{{$element.Year}}').slideToggle(100);">{{$element.Year}}</a>
+                            </li>
+                            <ul id="{{$element.Year}}" class="hide">
+                        {{end}}
+                        <li><a href="/{{$element.Year}}/{{printf "%02d" $element.Month}}/" title="{{printf "%02d" $element.Month}} {{$element.Year}} ({{$element.Count}})">{{printf "%02d" $element.Month}}</a> ({{$element.Count}})</li>
                     {{end}}
-                    <li class="year">
-                        <a href="javascript:$('ul#{{$element.Year}}').slideToggle(100);">{{$element.Year}}</a>
-                    </li>
-                    <ul id="{{$element.Year}}" class="hide">
                 {{end}}
-                <li><a href="/{{$element.Year}}/{{printf "%02d" $element.Month}}/" title="{{printf "%02d" $element.Month}} {{$element.Year}} ({{$element.Count}})">{{printf "%02d" $element.Month}}</a> ({{$element.Count}})</li>
-            {{end}}
             </ul>
         </div>
         <div id="location">
@@ -77,10 +79,12 @@ transform: scaleX(-1) filter : FlipH;
     </header>
     <nav class="nano">
         <ul id="articlenav" class="nano-content">
-            {{ range .Index }}
-            <li data-datestamp="{{ .Timestamp.UTC}}" data-id="{{ .Id }}">
-                <a href="{{.GetAbsoluteUrl}}" title="{{ .Title }}" {{if eq $.Article.Id .Id}}class="here"{{end}}><span>{{ .Title }}</span></a>
-            </li>
+            {{if .Index}}
+                {{ range .Index }}
+                <li data-datestamp="{{ .Timestamp.UTC}}" data-id="{{ .Id }}">
+                    <a href="{{.GetAbsoluteUrl}}" title="{{ .Title }}" {{if eq $.Article.Id .Id}}class="here"{{end}}><span>{{ .Title }}</span></a>
+                </li>
+                {{ end }}
             {{ end }}
         </ul>
     </nav>

@@ -16,6 +16,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"runtime/debug"
 	"runtime/pprof"
 	"strconv"
 	"strings"
@@ -240,10 +241,10 @@ func LatestArticleHandler(c *gin.Context) {
 }
 
 func WhereHandler(c *gin.Context) {
-
 	avgspeed, err := GetAverageSpeed()
 	if err != nil {
 		log.Printf("%v", err)
+		debug.PrintStack()
 		c.String(500, "Internal Error")
 		return
 	}
@@ -251,6 +252,7 @@ func WhereHandler(c *gin.Context) {
 	totaldistance, err := GetTotalDistance()
 	if err != nil {
 		log.Printf("%v", err)
+		debug.PrintStack()
 		c.String(500, "Internal Error")
 		return
 	}
@@ -258,6 +260,7 @@ func WhereHandler(c *gin.Context) {
 	lastlocation, err := GetLastLoction()
 	if err != nil {
 		log.Printf("%v", err)
+		debug.PrintStack()
 		c.String(500, "Internal Error")
 		return
 	}
@@ -274,6 +277,15 @@ func WhereHandler(c *gin.Context) {
 		log.Printf("%v", err)
 		c.String(500, "Internal Error")
 	}
+}
+
+func WhereLineStringHandler(c *gin.Context) {
+	linestring, err := GetLineStringAsJSON(c.Params.ByName("year"))
+	if err != nil {
+		log.Printf("%v", err)
+		c.String(500, "Internal Error")
+	}
+	c.Data(200, "application/json", []byte(linestring))
 }
 
 func loadIndex() (*[]Article, *[]ArticleMonth, error) {
@@ -307,6 +319,11 @@ func loadIndex() (*[]Article, *[]ArticleMonth, error) {
 
 func RobotsHandler(c *gin.Context) {
 	c.File(path.Join(configuration.TemplatePath, "robots.txt"))
+}
+
+func LoadTemplates() {
+	templateGlob := path.Join(configuration.TemplatePath, "*.html")
+	templates = template.Must(template.New("Yay Templates").Funcs(funcMap).ParseGlob(templateGlob))
 }
 
 func main() {
@@ -362,9 +379,7 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 
 	//Load the templates. Don't use gin for this, because we want to render to a buffer later
-	templateGlob := path.Join(configuration.TemplatePath, "*.html")
-	templates = template.Must(template.New("Yay Templates").Funcs(funcMap).ParseGlob(templateGlob))
-
+	LoadTemplates()
 	//Static is over here
 	router.Static("/static/", configuration.StaticPath)
 
@@ -400,6 +415,7 @@ func main() {
 		defer watcher.Close()
 		watcher.Add(path.Join(configuration.StaticPath, "css"))
 		watcher.Add(path.Join(configuration.StaticPath, "js"))
+		watcher.Add(configuration.TemplatePath)
 		go func() {
 			for {
 				select {
@@ -416,6 +432,10 @@ func main() {
 							javascriptfilename = path.Base(event.Name)
 							memoryCache.Flush()
 						}
+					} else if strings.HasSuffix(event.Name, ".html") {
+						log.Printf("Template changed: %s", path.Base(event.Name))
+						LoadTemplates()
+						memoryCache.Flush()
 					}
 				case err := <-watcher.Errors:
 					log.Println("error:", err)
@@ -455,6 +475,7 @@ func main() {
 	router.GET("/2:year/:month/", MonthHandler)
 	router.GET("/2:year/:month/:day/:slug/", ArticleHandler)
 	router.GET("/where/", WhereHandler)
+	router.GET("/where/linestring/:year/", WhereLineStringHandler)
 	router.GET("/", LatestArticleHandler)
 	router.GET("/robots.txt", RobotsHandler)
 	router.POST("/search/", SearchPostHandler)

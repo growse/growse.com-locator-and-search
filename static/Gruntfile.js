@@ -26,9 +26,10 @@ module.exports = function(grunt) {
                 }
             },
             options: {
-                mangle: true,
-                compress: true,
-                beautify: false
+                mangle: false,
+                compress: false,
+                beautify: false,
+                sourceMap: true,
             }
         },
         rev: {

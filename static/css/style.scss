@@ -272,6 +272,9 @@ html {
               }
             }
           }
+          img {
+            max-width: 100%;
+          }
           pre {
             code {
               font-family: $monospacefont;

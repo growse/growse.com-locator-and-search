@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/growse/concurrent-expiring-map"
 	"github.com/lib/pq"
+	"github.com/mailgun/mailgun-go"
 	"github.com/oxtoacart/bpool"
 	"gopkg.in/fsnotify.v1"
 	"html/template"
@@ -28,6 +29,7 @@ var (
 	stylesheetfilename string
 	javascriptfilename string
 	configuration      Configuration
+	gun                mailgun.Mailgun
 	templates          *template.Template
 	bufPool            *bpool.BufferPool
 	memoryCache        cmap.ConcurrentMap
@@ -42,6 +44,7 @@ type Configuration struct {
 	StaticPath         string
 	CpuProfile         string
 	GeocodeApiURL      string
+	MailgunKey         string
 	DefaultCacheExpiry time.Duration
 }
 
@@ -58,7 +61,6 @@ var funcMap = template.FuncMap{
 
 func GetLatestArticle() (*Article, error) {
 	var article Article
-	log.Printf("Fetching cache key: %s", "growse.com-latest")
 	articleBytes, ok := memoryCache.Get("growse.com-latest")
 	if ok {
 		article, err := FromBytes(articleBytes)
@@ -77,7 +79,7 @@ func GetLatestArticle() (*Article, error) {
 		default:
 			articleBytes, err := article.ToBytes()
 			if err != nil {
-				log.Printf("Error marshelling article to binary: %v", err)
+				InternalError(err)
 			} else {
 				memoryCache.Set("growse.com-latest", articleBytes, time.Now().Add(configuration.DefaultCacheExpiry))
 			}
@@ -142,7 +144,6 @@ func ArticleHandler(c *gin.Context) {
 	//Check the page cache
 	var cachedBytes []byte
 	cacheKey := getCacheKey(year, month, day, slug)
-	log.Printf("Fetching cache key: %s", cacheKey)
 
 	cachedBytes, ok := memoryCache.Get(cacheKey)
 
@@ -162,14 +163,15 @@ func ArticleHandler(c *gin.Context) {
 	//Get the indeces from DB
 	index, months, err := LoadArticleIndex()
 	if err != nil {
-		log.Printf("%v", err)
-		c.String(500, err.Error())
+		InternalError(err)
+		c.String(500, "Internal Error")
 		return
 	}
 
 	lastlocation, err := GetLastLoction()
 	if err != nil {
-		log.Printf("Error fetching location: %v", err)
+		InternalError(err)
+		c.String(500, "Internal Error")
 	}
 
 	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "CurrentYear": time.Now().Year(), "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation}
@@ -187,8 +189,8 @@ func ArticleHandler(c *gin.Context) {
 	if err == nil {
 		c.Data(200, "text/html", pageBytes)
 	} else {
-		log.Printf("%v", err)
-		c.String(500, fmt.Sprintf("Internal Error: %v", err))
+		InternalError(err)
+		c.String(500, "Internal Error")
 	}
 }
 
@@ -217,7 +219,7 @@ func LatestArticleHandler(c *gin.Context) {
 
 	index, months, err := LoadArticleIndex()
 	if err != nil {
-		log.Printf("%v", err)
+		InternalError(err)
 		c.String(500, err.Error())
 		return
 	}
@@ -260,8 +262,7 @@ func WhereHandler(c *gin.Context) {
 
 	lastlocation, err := GetLastLoction()
 	if err != nil {
-		log.Printf("%v", err)
-		debug.PrintStack()
+		InternalError(err)
 		c.String(500, "Internal Error")
 		return
 	}
@@ -275,7 +276,7 @@ func WhereHandler(c *gin.Context) {
 	if err == nil {
 		c.Data(200, "text/html", pageBytes)
 	} else {
-		log.Printf("%v", err)
+		InternalError(err)
 		c.String(500, "Internal Error")
 	}
 }
@@ -283,7 +284,7 @@ func WhereHandler(c *gin.Context) {
 func WhereLineStringHandler(c *gin.Context) {
 	linestring, err := GetLineStringAsJSON(c.Params.ByName("year"))
 	if err != nil {
-		log.Printf("%v", err)
+		InternalError(err)
 		c.String(500, "Internal Error")
 	}
 	c.Data(200, "application/json", []byte(linestring))
@@ -301,16 +302,14 @@ func SearchPostHandler(c *gin.Context) {
 func SearchHandler(c *gin.Context) {
 	lastlocation, err := GetLastLoction()
 	if err != nil {
-		log.Printf("%v", err)
-		debug.PrintStack()
+		InternalError(err)
 		c.String(500, "Internal Error")
 		return
 	}
 	searchterm := c.Params.ByName("searchterm")
 	articles, err := SearchArticle(searchterm)
 	if err != nil {
-		log.Printf("%v", err)
-		debug.PrintStack()
+		InternalError(err)
 		c.String(500, "Internal Error")
 		return
 	}
@@ -324,10 +323,8 @@ func SearchHandler(c *gin.Context) {
 	if err == nil {
 		c.Data(200, "text/html", pageBytes)
 	} else {
-		log.Printf("%v", err)
+		InternalError(err)
 		c.String(500, "Internal Error")
-		debug.PrintStack()
-
 	}
 }
 
@@ -338,6 +335,11 @@ func RobotsHandler(c *gin.Context) {
 func LoadTemplates() {
 	templateGlob := path.Join(configuration.TemplatePath, "*.html")
 	templates = template.Must(template.New("Yay Templates").Funcs(funcMap).ParseGlob(templateGlob))
+}
+
+func InternalError(err error) {
+	log.Printf("%v", err)
+	debug.PrintStack()
 }
 
 func main() {
@@ -371,6 +373,8 @@ func main() {
 	if _, err := os.Stat(configuration.StaticPath); os.IsNotExist(err) {
 		log.Fatalf("No such file or directory: %s", configuration.StaticPath)
 	}
+
+	gun = mailgun.NewMailgun("valid-mailgun-domain", "private-mailgun-key", "public-mailgun-key")
 
 	//Initialize the template output buffer pool
 	bufPool = bpool.NewBufferPool(16)

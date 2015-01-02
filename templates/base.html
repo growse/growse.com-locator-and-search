@@ -51,10 +51,10 @@ transform: scaleX(-1) filter : FlipH;
                 </fieldset>
             </form>
         </div>
-        <div id="previous">
-            <h2>Previous things</h2>
-            <ul id="previousyears">
-                {{if .Months}}
+        {{if .Months}}
+            <div id="previous">
+                <h2>Previous things</h2>
+                <ul id="previousyears">
                     {{range $index, $element := .Months}}
                         {{if $element.FirstOfTheYear}}
                             {{if ne $index 0}}
@@ -67,9 +67,9 @@ transform: scaleX(-1) filter : FlipH;
                         {{end}}
                         <li><a href="/{{$element.Year}}/{{printf "%02d" $element.Month}}/" title="{{printf "%02d" $element.Month}} {{$element.Year}} ({{$element.Count}})">{{printf "%02d" $element.Month}}</a> ({{$element.Count}})</li>
                     {{end}}
-                {{end}}
-            </ul>
-        </div>
+                </ul>
+            </div>
+        {{end}}
         <div id="location">
             <p>Last seen floating around near <a
                 href="http://maps.google.com/?q={{ .LastLocation.Latitude }},{{ .LastLocation.Longitude }}">
@@ -77,21 +77,20 @@ transform: scaleX(-1) filter : FlipH;
             </p>
         </div>
     </header>
-    <nav class="nano">
-        <ul id="articlenav" class="nano-content">
-            {{if .Index}}
+    {{if .Index}}
+        <nav class="nano">
+            <ul id="articlenav" class="nano-content">
                 {{ range .Index }}
                 <li data-datestamp="{{ .Timestamp.UTC}}" data-id="{{ .Id }}">
                     <a href="{{.GetAbsoluteUrl}}" title="{{ .Title }}" {{if eq $.Article.Id .Id}}class="here"{{end}}><span>{{ .Title }}</span></a>
                 </li>
                 {{ end }}
-            {{ end }}
-        </ul>
-    </nav>
-    <div id="content">
-        {{end}}
-        {{define "footer"}}
-    </div>
+            </ul>
+        </nav>
+    {{ end }}
+
+    {{end}}
+    {{define "footer"}}
     <footer>
         Almost everything (c) 2002-{{ .CurrentYear }} <a rel="author" href="https://plus.google.com/+AndrewRowson">Andrew
         Rowson</a>. If you break anything because of something you read here, that's your own problem.

@@ -84,7 +84,7 @@ var growse = {
             .projection(growse.projection);
 
         growse.map.zoom = d3.behavior.zoom()
-            .scaleExtent([1, 50])
+            .scaleExtent([1, 500])
             .on("zoom", growse.map.move);
         growse.map.svg = d3.select(elemId).append("svg")
             .attr("width", growse.map.width)

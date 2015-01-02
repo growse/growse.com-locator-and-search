@@ -150,6 +150,7 @@ func ArticleHandler(c *gin.Context) {
 		c.Data(200, "text/html", cachedBytes)
 		return
 	}
+	log.Printf("Cache MISS: %v", cacheKey)
 
 	//Cache miss, load from DB
 	article, err := GetArticle(year, month, day, slug)
@@ -159,7 +160,7 @@ func ArticleHandler(c *gin.Context) {
 	}
 
 	//Get the indeces from DB
-	index, months, err := loadIndex()
+	index, months, err := LoadArticleIndex()
 	if err != nil {
 		log.Printf("%v", err)
 		c.String(500, err.Error())
@@ -214,7 +215,7 @@ func LatestArticleHandler(c *gin.Context) {
 		log.Printf("Error fetching location: %v", err)
 	}
 
-	index, months, err := loadIndex()
+	index, months, err := LoadArticleIndex()
 	if err != nil {
 		log.Printf("%v", err)
 		c.String(500, err.Error())
@@ -288,33 +289,46 @@ func WhereLineStringHandler(c *gin.Context) {
 	c.Data(200, "application/json", []byte(linestring))
 }
 
-func loadIndex() (*[]Article, *[]ArticleMonth, error) {
-	var articles []Article
-	rows, err := db.Query("Select id, datestamp,shorttitle,title from articles where published=true order by datestamp desc;")
+func SearchPostHandler(c *gin.Context) {
+	var searchForm struct {
+		SearchTerm string `form:"a" binding:"required"`
+	}
+	c.Bind(&searchForm)
+	log.Printf("%v", c.Params)
+	c.Redirect(303, fmt.Sprintf("/search/%s/", searchForm.SearchTerm))
+}
+
+func SearchHandler(c *gin.Context) {
+	lastlocation, err := GetLastLoction()
 	if err != nil {
-		return nil, nil, err
+		log.Printf("%v", err)
+		debug.PrintStack()
+		c.String(500, "Internal Error")
+		return
 	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var article Article
-		rows.Scan(&article.Id, &article.Timestamp, &article.Slug, &article.Title)
-		articles = append(articles, article)
-	}
-
-	monthRows, err := db.Query("with t as (select date_part('year',datestamp at time zone 'UTC') as year, date_part('month',datestamp at time zone 'UTC') as month, count(*) as c from articles group by date_part('year',datestamp at time zone 'UTC'),date_part('month',datestamp at time zone 'UTC') order by year desc, month desc) select case when lag(year,1) over () = year then false else true end as first, year,month,c from t;")
-	defer monthRows.Close()
+	searchterm := c.Params.ByName("searchterm")
+	articles, err := SearchArticle(searchterm)
 	if err != nil {
-		return nil, nil, err
+		log.Printf("%v", err)
+		debug.PrintStack()
+		c.String(500, "Internal Error")
+		return
 	}
-	var months []ArticleMonth
-	for monthRows.Next() {
-		var month ArticleMonth
-		monthRows.Scan(&month.FirstOfTheYear, &month.Year, &month.Month, &month.Count)
-		months = append(months, month)
+
+	obj := gin.H{"Searchterm": searchterm, "SearchResults": articles, "Title": fmt.Sprintf("%v :: search", searchterm), "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation}
+	buf := bufPool.Get()
+	defer bufPool.Put(buf)
+
+	err = templates.ExecuteTemplate(buf, "search.html", obj)
+	pageBytes := buf.Bytes()
+	if err == nil {
+		c.Data(200, "text/html", pageBytes)
+	} else {
+		log.Printf("%v", err)
+		c.String(500, "Internal Error")
+		debug.PrintStack()
 
 	}
-	return &articles, &months, nil
 }
 
 func RobotsHandler(c *gin.Context) {
@@ -479,12 +493,6 @@ func main() {
 	router.GET("/", LatestArticleHandler)
 	router.GET("/robots.txt", RobotsHandler)
 	router.POST("/search/", SearchPostHandler)
-	router.GET("/search/:searchterm", SearchHandler)
+	router.GET("/search/:searchterm/", SearchHandler)
 	router.Run(":8080")
-}
-
-func SearchPostHandler(c *gin.Context) {
-}
-
-func SearchHandler(c *gin.Context) {
 }

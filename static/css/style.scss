@@ -175,6 +175,9 @@ html {
         }
       }
       #content {
+        &.nonav {
+          margin-left: 0;
+        }
         background-color: $background-color;
         height: 100%;
         @media screen and (max-width: 767px) {

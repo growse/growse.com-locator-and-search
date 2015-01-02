@@ -109,42 +109,39 @@ func removePunctuation(text string) string {
 	return pattern.ReplaceAllString(text, "")
 }
 
-func smartTruncate(input string, searchterm string, surroundingWords int, suffix string) string {
+func SmartTruncateWithHighlight(input string, searchterm string, surroundingWords int, suffix string, highlightFormat string) string {
 	words := strings.Split(input, " ")
 	searchterm = removePunctuation(searchterm)
-	var trimmedWords []string
-	/*for _, word := range words {
-		trimmedWords = append(trimmedWords, removePunctuation(word))
-	}*/
-	trimmedWords = words
-	index := indexOfCaseInsensitive(trimmedWords, searchterm)
+
+	index := indexOfCaseInsensitive(words, searchterm)
 	result := ""
 	if index >= 0 {
+		words[index] = fmt.Sprintf(highlightFormat, words[index])
 		startIndex := index - surroundingWords
 		endIndex := index + surroundingWords
 		if startIndex < 0 {
 			startIndex = 0
 			endIndex = 2 * surroundingWords
 		}
-		if endIndex >= len(trimmedWords) {
-			endIndex = len(trimmedWords) - 1
+		if endIndex >= len(words) {
+			endIndex = len(words) - 1
 			startIndex = endIndex - (2 * surroundingWords)
 			if startIndex < 0 {
 				startIndex = 0
 			}
 		}
-		result = strings.Join(trimmedWords[startIndex:endIndex+1], " ")
+		result = strings.Join(words[startIndex:endIndex+1], " ")
 		if startIndex > 0 {
 			result = suffix + result
 		}
-		if endIndex < len(trimmedWords)-1 {
+		if endIndex < len(words)-1 {
 			result += suffix
 		}
 	} else {
-		if 2*surroundingWords > len(trimmedWords)-1 {
-			result = strings.Join(trimmedWords, " ")
+		if 2*surroundingWords > len(words)-1 {
+			result = strings.Join(words, " ")
 		} else {
-			result = strings.Join(trimmedWords[0:2*surroundingWords], " ") + suffix
+			result = strings.Join(words[0:2*surroundingWords], " ") + suffix
 		}
 	}
 	return result
@@ -160,7 +157,7 @@ func indexOfCaseInsensitive(slice []string, thing string) int {
 }
 
 func (article *Article) RenderAsSearchResult(searchterm string) template.HTML {
-	return template.HTML(smartTruncate(article.Markdown, searchterm, 15, "..."))
+	return template.HTML(SmartTruncateWithHighlight(article.Markdown, searchterm, 15, "...", "<b>%s</b>"))
 }
 
 func (article *Article) Rendered() template.HTML {

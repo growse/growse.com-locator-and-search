@@ -1,9 +1,7 @@
 package main
 
-import (
-	"testing"
-	"time"
-)
+import "testing"
+import "time"
 
 func TestEncodeDecode(t *testing.T) {
 	now := time.Now()
@@ -78,6 +76,33 @@ func TestSmartTruncateNotFound(t *testing.T) {
 	inputString := "Lorem ipsum dolor Sit amet, consectetur adipiscing elit. In in erat pretium nisi ornare tempor. Phasellus molestie lectus tellus, a facilisis enim commodo at. Ut vel dui eu libero lacinia congue pretium et ex. Etiam commodo accumsan scelerisque. Suspendisse augue lorem, sodales id ex vel, scelerisque porta neque. Sed posuere sed ligula a accumsan. Nam pellentesque sodales nisl eu placerat. Quisque at odio nunc."
 	expected := "Lorem ipsum dolor Sit amet, consectetur adipiscing elit. In in..."
 	actual := smartTruncate(inputString, "wibble", 5, "...")
+	if actual != expected {
+		t.Errorf("Incorrect truncating. Expected \"%s\". Actual: \"%s\"", expected, actual)
+	}
+}
+
+func TestSmartTruncateStringStart(t *testing.T) {
+	inputString := "Lorem ipsum dolor Sit amet, consectetur adipiscing elit. In in erat pretium nisi ornare tempor. Phasellus molestie lectus tellus, a facilisis enim commodo at. Ut vel dui eu libero lacinia congue pretium et ex. Etiam commodo accumsan scelerisque. Suspendisse augue lorem, sodales id ex vel, scelerisque porta neque. Sed posuere sed ligula a accumsan. Nam pellentesque sodales nisl eu placerat. Quisque at odio nunc."
+	expected := "Lorem ipsum dolor Sit amet,..."
+	actual := smartTruncate(inputString, "ipsum", 2, "...")
+	if actual != expected {
+		t.Errorf("Incorrect truncating. Expected \"%s\". Actual: \"%s\"", expected, actual)
+	}
+}
+
+func TestSmartTruncateStringEnd(t *testing.T) {
+	inputString := "Lorem ipsum dolor Sit amet, consectetur adipiscing elit. In in erat pretium nisi ornare tempor. Phasellus molestie lectus tellus, a facilisis enim commodo at. Ut vel dui eu libero lacinia congue pretium et ex. Etiam commodo accumsan scelerisque. Suspendisse augue lorem, sodales id ex vel, scelerisque porta neque. Sed posuere sed ligula a accumsan. Nam pellentesque sodales nisl eu placerat. Quisque at odio nunc."
+	expected := "...placerat. Quisque at odio nunc."
+	actual := smartTruncate(inputString, "odio", 2, "...")
+	if actual != expected {
+		t.Errorf("Incorrect truncating. Expected \"%s\". Actual: \"%s\"", expected, actual)
+	}
+}
+
+func TestSmartTruncateStringLastWordWithPunctuation(t *testing.T) {
+	inputString := "Lorem ipsum dolor Sit amet, consectetur adipiscing elit. In in erat pretium nisi ornare tempor. Phasellus molestie lectus tellus, a facilisis enim commodo at. Ut vel dui eu libero lacinia congue pretium et ex. Etiam commodo accumsan scelerisque. Suspendisse augue lorem, sodales id ex vel, scelerisque porta neque. Sed posuere sed ligula a accumsan. Nam pellentesque sodales nisl eu placerat. Quisque at odio nunc."
+	expected := "...placerat. Quisque at odio nunc."
+	actual := smartTruncate(inputString, "nunc", 2, "...")
 	if actual != expected {
 		t.Errorf("Incorrect truncating. Expected \"%s\". Actual: \"%s\"", expected, actual)
 	}

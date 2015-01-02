@@ -104,7 +104,8 @@ func (article *Article) GetAbsoluteUrl() string {
 }
 
 func removePunctuation(text string) string {
-	pattern := regexp.MustCompile("([^\\s\\w]|_)+")
+	//pattern := regexp.MustCompile("([^\\s\\w]|_)+")
+	pattern := regexp.MustCompile("[^\\P{P}-]+")
 	return pattern.ReplaceAllString(text, "")
 }
 
@@ -125,7 +126,7 @@ func smartTruncate(input string, searchterm string, surroundingWords int, suffix
 			startIndex = 0
 			endIndex = 2 * surroundingWords
 		}
-		if endIndex > len(trimmedWords) {
+		if endIndex >= len(trimmedWords) {
 			endIndex = len(trimmedWords) - 1
 			startIndex = endIndex - (2 * surroundingWords)
 			if startIndex < 0 {
@@ -151,8 +152,8 @@ func smartTruncate(input string, searchterm string, surroundingWords int, suffix
 
 func indexOfCaseInsensitive(slice []string, thing string) int {
 	for index, item := range slice {
-		if strings.ToLower(item) == strings.ToLower(thing) {
-			return index
+		if strings.ToLower(removePunctuation(item)) == strings.ToLower(thing) {
+			return int(index)
 		}
 	}
 	return -1

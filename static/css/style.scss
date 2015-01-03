@@ -33,6 +33,34 @@ $datefont: $sansfont;
 
 $lefthandwidth: 200px;
 
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Open Sans Light'), url(/static/fonts/opensans-300.woff) format('woff')
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans Regular'), url(/static/fonts/opensans-400.woff) format('woff')
+}
+
+@font-face {
+  font-family: 'Inconsolata';
+  font-style: normal;
+  font-weight: 500;
+  src: local('Inconsolata'), url(/static/fonts/inconsolata-500.woff) format('woff')
+}
+
+@font-face {
+  font-family: 'Andada';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Andada'), url(/static/fonts/andada-400.woff) format('woff')
+}
+
 html {
   font-size: 100%;
   body {

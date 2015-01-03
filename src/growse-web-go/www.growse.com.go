@@ -45,13 +45,14 @@ type Configuration struct {
 	CpuProfile         string
 	GeocodeApiURL      string
 	MailgunKey         string
+	Production         bool
 	DefaultCacheExpiry time.Duration
 }
 
 type ArticleMonth struct {
 	FirstOfTheYear bool
 	Year           int
-	Month          string
+	Month          time.Month
 	Count          int
 }
 
@@ -182,11 +183,9 @@ func ArticleHandler(c *gin.Context) {
 	err = templates.ExecuteTemplate(buf, "article.html", obj)
 	pageBytes := buf.Bytes()
 	//Cache the page
-	log.Printf("Caching page in: %s", article.getCacheKey())
-
-	memoryCache.Set(article.getCacheKey(), pageBytes, time.Now().Add(configuration.DefaultCacheExpiry))
 
 	if err == nil {
+		memoryCache.Set(article.getCacheKey(), pageBytes, time.Now().Add(configuration.DefaultCacheExpiry))
 		c.Data(200, "text/html", pageBytes)
 	} else {
 		InternalError(err)
@@ -203,7 +202,6 @@ func LatestArticleHandler(c *gin.Context) {
 	}
 
 	var cacheBytes []byte
-	log.Printf("Fetching cache key: %s", article.getCacheKey())
 	cacheBytes, ok := memoryCache.Get(article.getCacheKey())
 
 	if ok {
@@ -214,13 +212,14 @@ func LatestArticleHandler(c *gin.Context) {
 
 	lastlocation, err := GetLastLoction()
 	if err != nil {
-		log.Printf("Error fetching location: %v", err)
+		InternalError(err)
+		c.String(500, "Internal Error")
 	}
 
 	index, months, err := LoadArticleIndex()
 	if err != nil {
 		InternalError(err)
-		c.String(500, err.Error())
+		c.String(500, "Internal Error")
 		return
 	}
 
@@ -230,14 +229,12 @@ func LatestArticleHandler(c *gin.Context) {
 	defer bufPool.Put(buf)
 	err = templates.ExecuteTemplate(buf, "article.html", obj)
 	pageBytes := buf.Bytes()
-	log.Printf("Caching page in: %s", article.getCacheKey())
-
-	memoryCache.Set(article.getCacheKey(), pageBytes, time.Now().Add(configuration.DefaultCacheExpiry))
 
 	if err == nil {
+		memoryCache.Set(article.getCacheKey(), pageBytes, time.Now().Add(configuration.DefaultCacheExpiry))
 		c.Data(200, "text/html", pageBytes)
 	} else {
-		log.Printf("%v", err)
+		InternalError(err)
 		c.String(500, "Internal Error")
 	}
 
@@ -246,16 +243,14 @@ func LatestArticleHandler(c *gin.Context) {
 func WhereHandler(c *gin.Context) {
 	avgspeed, err := GetAverageSpeed()
 	if err != nil {
-		log.Printf("%v", err)
-		debug.PrintStack()
+		InternalError(err)
 		c.String(500, "Internal Error")
 		return
 	}
 
 	totaldistance, err := GetTotalDistance()
 	if err != nil {
-		log.Printf("%v", err)
-		debug.PrintStack()
+		InternalError(err)
 		c.String(500, "Internal Error")
 		return
 	}
@@ -266,7 +261,6 @@ func WhereHandler(c *gin.Context) {
 		c.String(500, "Internal Error")
 		return
 	}
-	log.Print(totaldistance)
 	obj := gin.H{"Title": "Where", "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "Avgspeed": avgspeed, "Totaldistance": totaldistance, "LastLocation": lastlocation}
 	buf := bufPool.Get()
 	defer bufPool.Put(buf)
@@ -295,19 +289,28 @@ func SearchPostHandler(c *gin.Context) {
 		SearchTerm string `form:"a" binding:"required"`
 	}
 	c.Bind(&searchForm)
-	log.Printf("%v", c.Params)
 	c.Redirect(303, fmt.Sprintf("/search/%s/", searchForm.SearchTerm))
 }
 
 func SearchHandler(c *gin.Context) {
-	lastlocation, err := GetLastLoction()
+	searchterm := c.Params.ByName("searchterm")
+
+	cacheKey := fmt.Sprintf("search-%v", searchterm)
+	page, ok := memoryCache.Get(cacheKey)
+	if ok {
+		c.Data(200, "text/html", page)
+		return
+	}
+	log.Printf("Cache MISS: %v", cacheKey)
+
+	articles, err := SearchArticle(searchterm)
 	if err != nil {
 		InternalError(err)
 		c.String(500, "Internal Error")
 		return
 	}
-	searchterm := c.Params.ByName("searchterm")
-	articles, err := SearchArticle(searchterm)
+
+	lastlocation, err := GetLastLoction()
 	if err != nil {
 		InternalError(err)
 		c.String(500, "Internal Error")
@@ -321,6 +324,7 @@ func SearchHandler(c *gin.Context) {
 	err = templates.ExecuteTemplate(buf, "search.html", obj)
 	pageBytes := buf.Bytes()
 	if err == nil {
+		memoryCache.Set(cacheKey, pageBytes, time.Now().Add(5*time.Minute))
 		c.Data(200, "text/html", pageBytes)
 	} else {
 		InternalError(err)
@@ -340,6 +344,12 @@ func LoadTemplates() {
 func InternalError(err error) {
 	log.Printf("%v", err)
 	debug.PrintStack()
+	if configuration.Production {
+		m := mailgun.NewMessage("Sender <blogbot@growse.com>", "ERROR: www.growse.com", fmt.Sprintf("%v\n%v", err, string(debug.Stack())), "sysadmin@growse.com")
+		response, id, _ := gun.Send(m)
+		fmt.Printf("Response ID: %s\n", id)
+		fmt.Printf("Message from server: %s\n", response)
+	}
 }
 
 func main() {

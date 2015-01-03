@@ -14,7 +14,7 @@
                 <header>
                     <time itemprop="datePublished" datetime="{{ .Timestamp.UTC.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Timestamp.UTC.Format "02 Jan 2006" }}</time>
                     <h2>
-                        <a href="/news/comments/{{ .Slug }}/">{{ .Title }}</a>
+                        <a href="{{ .GetAbsoluteUrl }}">{{ .Title }}</a>
                     </h2>
 
                 </header>

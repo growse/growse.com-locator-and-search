@@ -2,14 +2,13 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <link rel="stylesheet" href="//brick.a.ssl.fastly.net/Open+Sans:300,400/Inconsolata:500/Andada:400">
+        <!--<link rel="stylesheet" href="//brick.a.ssl.fastly.net/Open+Sans:300,400/Inconsolata:500/Andada:400">-->
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8"/>
 <meta name="google-site-verification" content="Sr-L2EMmHr-hc4npzb8p1f7zi9ew1Iev84ly519r1p4"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description"
 content="Various thoughts, happenings, projects and other things going on in the world of Andrew Rowson"/>
 <title>{{ .Title }} :: growse.com</title>
-<link rel="dns-prefetch" href="//fonts.googleapis.com">
 <link rel="dns-prefetch" href="//ajax.googleapis.com">
 <link rel="dns-prefetch" href="//themes.googleusercontent.com">
 <link rel="dns-prefetch" href="//ssl.google-analytics.com">
@@ -65,7 +64,7 @@ transform: scaleX(-1) filter : FlipH;
                             </li>
                             <ul id="{{$element.Year}}" class="hide">
                         {{end}}
-                        <li><a href="/{{$element.Year}}/{{printf "%02d" $element.Month}}/" title="{{printf "%02d" $element.Month}} {{$element.Year}} ({{$element.Count}})">{{printf "%02d" $element.Month}}</a> ({{$element.Count}})</li>
+                        <li><a href="/{{$element.Year}}/{{printf "%02d" $element.Month}}/" title="{{printf "%02d" $element.Month}} {{$element.Year}} ({{$element.Count}})">{{$element.Month.String}}</a> ({{$element.Count}})</li>
                     {{end}}
                 </ul>
             </div>

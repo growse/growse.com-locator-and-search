@@ -2,11 +2,15 @@ package main
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/gob"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/russross/blackfriday"
 	"html/template"
+	"log"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -169,5 +173,235 @@ func Truncate(input string, length int) string {
 		return input
 	} else {
 		return string(input[:length])
+	}
+}
+
+/* HTTP Handlers */
+
+func GetLatestArticle() (*Article, error) {
+	var article Article
+	articleBytes, ok := memoryCache.Get("growse.com-latest")
+	if ok {
+		article, err := FromBytes(articleBytes)
+		if err != nil {
+			return nil, err
+		} else {
+			return &article, nil
+		}
+	} else {
+		err := db.QueryRow(`Select id,datestamp,shorttitle,title,markdown from articles where published=true order by datestamp desc limit 1`).Scan(&article.Id, &article.Timestamp, &article.Slug, &article.Title, &article.Markdown)
+		switch {
+		case err == sql.ErrNoRows:
+			return nil, fmt.Errorf("No article found")
+		case err != nil:
+			return nil, err
+		default:
+			articleBytes, err := article.ToBytes()
+			if err != nil {
+				InternalError(err)
+			} else {
+				memoryCache.Set("growse.com-latest", articleBytes, time.Now().Add(configuration.DefaultCacheExpiry))
+			}
+			return &article, nil
+		}
+	}
+
+}
+
+func MonthHandler(c *gin.Context) {
+	year, err := strconv.Atoi("2" + c.Params.ByName("year"))
+	if err != nil {
+		c.String(404, "404 Not Found")
+		return
+	}
+
+	month, err := strconv.Atoi(c.Params.ByName("month"))
+	if err != nil {
+		c.String(404, "404 Not Found")
+		return
+	}
+
+	var resultSlug []byte
+
+	resultSlug, ok := memoryCache.Get(fmt.Sprintf("growse.com-bymonth-%d-%d", year, month))
+
+	if ok {
+		c.Redirect(302, string(resultSlug))
+	} else {
+		var article Article
+		err := db.QueryRow("select id,datestamp, shorttitle,title from articles where date_part('year',datestamp at time zone 'UTC')=$1 and date_part('month',datestamp at time zone 'UTC')=$2 order by datestamp desc limit 1", year, month).Scan(&article.Id, &article.Timestamp, &article.Slug, &article.Title)
+		if err != nil {
+			c.String(404, err.Error())
+		}
+		redirect := article.GetAbsoluteUrl()
+		memoryCache.Set(fmt.Sprintf("growse.com-bymonth-%d-%d", year, month), []byte(redirect), time.Now().Add(configuration.DefaultCacheExpiry))
+		c.Redirect(302, redirect)
+	}
+}
+
+func ArticleHandler(c *gin.Context) {
+	year, err := strconv.Atoi("2" + c.Params.ByName("year"))
+	if err != nil {
+		c.String(404, err.Error())
+		return
+	}
+
+	month, err := strconv.Atoi(c.Params.ByName("month"))
+	if err != nil {
+		c.String(404, err.Error())
+		return
+	}
+
+	day, err := strconv.Atoi(c.Params.ByName("day"))
+	if err != nil {
+		c.String(404, err.Error())
+		return
+	}
+
+	slug := c.Params.ByName("slug")
+
+	//Check the page cache
+	var cachedBytes []byte
+	cacheKey := getCacheKey(year, month, day, slug)
+
+	cachedBytes, ok := memoryCache.Get(cacheKey)
+
+	if ok {
+		c.Data(200, "text/html", cachedBytes)
+		return
+	}
+	log.Printf("Cache MISS: %v", cacheKey)
+
+	//Cache miss, load from DB
+	article, err := GetArticle(year, month, day, slug)
+	if err != nil {
+		c.String(404, err.Error())
+		return
+	}
+
+	//Get the indeces from DB
+	index, months, err := LoadArticleIndex()
+	if err != nil {
+		InternalError(err)
+		c.String(500, "Internal Error")
+		return
+	}
+
+	lastlocation, err := GetLastLoction()
+	if err != nil {
+		InternalError(err)
+		c.String(500, "Internal Error")
+	}
+
+	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "CurrentYear": time.Now().Year(), "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation, "Production": configuration.Production}
+
+	buf := bufPool.Get()
+	buf.Reset()
+	defer bufPool.Put(buf)
+	err = templates.ExecuteTemplate(buf, "article.html", obj)
+	pageBytes := buf.Bytes()
+	//Cache the page
+
+	if err == nil {
+		memoryCache.Set(article.getCacheKey(), pageBytes, time.Now().Add(configuration.DefaultCacheExpiry))
+		c.Data(200, "text/html", pageBytes)
+	} else {
+		InternalError(err)
+		c.String(500, "Internal Error")
+	}
+}
+
+func LatestArticleHandler(c *gin.Context) {
+	//Get article latest
+	article, err := GetLatestArticle()
+	if err != nil {
+		c.String(404, err.Error())
+		return
+	}
+
+	var cacheBytes []byte
+	cacheBytes, ok := memoryCache.Get(article.getCacheKey())
+
+	if ok {
+		c.Data(200, "text/html", cacheBytes)
+		return
+	}
+	log.Printf("Cache MISS: %v", article.getCacheKey())
+
+	lastlocation, err := GetLastLoction()
+	if err != nil {
+		InternalError(err)
+		c.String(500, "Internal Error")
+	}
+
+	index, months, err := LoadArticleIndex()
+	if err != nil {
+		InternalError(err)
+		c.String(500, "Internal Error")
+		return
+	}
+
+	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation, "Production": configuration.Production}
+
+	buf := bufPool.Get()
+	defer bufPool.Put(buf)
+	err = templates.ExecuteTemplate(buf, "article.html", obj)
+	pageBytes := buf.Bytes()
+
+	if err == nil {
+		memoryCache.Set(article.getCacheKey(), pageBytes, time.Now().Add(configuration.DefaultCacheExpiry))
+		c.Data(200, "text/html", pageBytes)
+	} else {
+		InternalError(err)
+		c.String(500, "Internal Error")
+	}
+
+}
+
+func SearchPostHandler(c *gin.Context) {
+	var searchForm struct {
+		SearchTerm string `form:"a" binding:"required"`
+	}
+	c.Bind(&searchForm)
+	c.Redirect(303, fmt.Sprintf("/search/%s/", searchForm.SearchTerm))
+}
+
+func SearchHandler(c *gin.Context) {
+	searchterm := c.Params.ByName("searchterm")
+
+	cacheKey := fmt.Sprintf("search-%v", searchterm)
+	page, ok := memoryCache.Get(cacheKey)
+	if ok {
+		c.Data(200, "text/html", page)
+		return
+	}
+	log.Printf("Cache MISS: %v", cacheKey)
+
+	articles, err := SearchArticle(searchterm)
+	if err != nil {
+		InternalError(err)
+		c.String(500, "Internal Error")
+		return
+	}
+
+	lastlocation, err := GetLastLoction()
+	if err != nil {
+		InternalError(err)
+		c.String(500, "Internal Error")
+		return
+	}
+
+	obj := gin.H{"Searchterm": searchterm, "SearchResults": articles, "Title": fmt.Sprintf("%v :: search", searchterm), "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation}
+	buf := bufPool.Get()
+	defer bufPool.Put(buf)
+
+	err = templates.ExecuteTemplate(buf, "search.html", obj)
+	pageBytes := buf.Bytes()
+	if err == nil {
+		memoryCache.Set(cacheKey, pageBytes, time.Now().Add(5*time.Minute))
+		c.Data(200, "text/html", pageBytes)
+	} else {
+		InternalError(err)
+		c.String(500, "Internal Error")
 	}
 }

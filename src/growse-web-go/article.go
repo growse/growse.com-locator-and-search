@@ -168,6 +168,10 @@ func (article *Article) Rendered() template.HTML {
 	return template.HTML(blackfriday.MarkdownCommon(([]byte)(article.Markdown)))
 }
 
+func (article *Article) GetUnsafeAbsoluteUrl() template.URL {
+	return template.URL(article.GetAbsoluteUrl())
+}
+
 func Truncate(input string, length int) string {
 	if len(input) < length {
 		return input
@@ -293,7 +297,7 @@ func ArticleHandler(c *gin.Context) {
 		c.String(500, "Internal Error")
 	}
 
-	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "CurrentYear": time.Now().Year(), "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation, "Production": configuration.Production}
+	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "CurrentYear": time.Now().Year(), "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation, "Production": configuration.Production, "DisqusUrl": template.JS(fmt.Sprintf("var disqus_url = 'https://www.growse.com%s';", article.GetAbsoluteUrl()))}
 
 	buf := bufPool.Get()
 	buf.Reset()
@@ -341,7 +345,7 @@ func LatestArticleHandler(c *gin.Context) {
 		return
 	}
 
-	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation, "Production": configuration.Production}
+	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation, "Production": configuration.Production, "DisqusUrl": template.JS(fmt.Sprintf("var disqus_url = 'https://www.growse.com%s';", article.GetAbsoluteUrl()))}
 
 	buf := bufPool.Get()
 	defer bufPool.Put(buf)

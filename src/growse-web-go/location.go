@@ -59,7 +59,7 @@ func GetLastLoction() (*Location, error) {
 
 func GetAverageSpeed() (float64, error) {
 	var speed float64
-	err := db.QueryRow("select 2.23693629*avg(distance/(timedelta/1000000::float)) from locations where extract(year from devicetimestamp at time zone 'UTC') = date_part('year', now() at time zone 'UTC')-1;").Scan(&speed)
+	err := db.QueryRow("select 2.23693629*avg(distance/(timedelta/1000000000::float)) from locations where extract(year from devicetimestamp at time zone 'UTC') = date_part('year', now() at time zone 'UTC');").Scan(&speed)
 	if err != nil {
 		return 0, err
 	}
@@ -68,7 +68,7 @@ func GetAverageSpeed() (float64, error) {
 
 func GetTotalDistance() (float64, error) {
 	var distance float64
-	err := db.QueryRow("select 0.000621371192*sum(distance) from locations where extract(year from devicetimestamp at time zone 'UTC') = date_part('year', now() at time zone 'UTC')-1;").Scan(&distance)
+	err := db.QueryRow("select 0.000621371192*sum(distance) from locations where extract(year from devicetimestamp at time zone 'UTC') = date_part('year', now() at time zone 'UTC');").Scan(&distance)
 	if err != nil {
 		return 0, err
 	}
@@ -76,7 +76,6 @@ func GetTotalDistance() (float64, error) {
 }
 
 func GetLineStringAsJSON(year string) (string, error) {
-
 	lineString := geojson.NewLineString(nil)
 	rows, err := db.Query("select longitude,latitude from locations where extract (year from devicetimestamp at time zone 'UTC')=$1 order by devicetimestamp asc", year)
 	if err != nil {

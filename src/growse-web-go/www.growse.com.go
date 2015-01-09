@@ -175,7 +175,7 @@ func ArticleHandler(c *gin.Context) {
 		c.String(500, "Internal Error")
 	}
 
-	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "CurrentYear": time.Now().Year(), "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation}
+	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "CurrentYear": time.Now().Year(), "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation, "Production": configuration.Production}
 
 	buf := bufPool.Get()
 	buf.Reset()
@@ -223,7 +223,7 @@ func LatestArticleHandler(c *gin.Context) {
 		return
 	}
 
-	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation}
+	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation, "Production": configuration.Production}
 
 	buf := bufPool.Get()
 	defer bufPool.Put(buf)

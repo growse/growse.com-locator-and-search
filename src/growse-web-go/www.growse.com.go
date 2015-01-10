@@ -229,6 +229,7 @@ func main() {
 	//All years will begin with 2. So this sort of helps. Kinda.
 	router.GET("/2:year/:month/", MonthHandler)
 	router.GET("/2:year/:month/:day/:slug/", ArticleHandler)
+	router.GET("/rss/", RSSHandler)
 	router.GET("/where/", WhereHandler)
 	router.GET("/where/linestring/:year/", WhereLineStringHandler)
 	router.GET("/", LatestArticleHandler)

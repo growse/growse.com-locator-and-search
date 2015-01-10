@@ -6,6 +6,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/feeds"
 	"github.com/russross/blackfriday"
 	"html/template"
 	"log"
@@ -408,4 +409,40 @@ func SearchHandler(c *gin.Context) {
 		InternalError(err)
 		c.String(500, "Internal Error")
 	}
+}
+
+func RSSHandler(c *gin.Context) {
+	feed := &feeds.Feed{
+		Title:       "growse.com",
+		Link:        &feeds.Link{Href: "https://www.growse.com"},
+		Description: "ARGLEFARGLE",
+		Created:     time.Now(),
+	}
+	feed.Items = []*feeds.Item{}
+
+	rows, err := db.Query("select title,shorttitle,datestamp from articles where published=true order by datestamp desc limit 20")
+	if err != nil {
+		InternalError(err)
+		c.String(500, "Internal Error")
+		return
+	}
+
+	for rows.Next() {
+		article := Article{}
+		rows.Scan(&article.Title, &article.Slug, &article.Timestamp)
+		item := feeds.Item{
+			Title:   article.Title,
+			Link:    &feeds.Link{Href: fmt.Sprintf("https://www.growse.com%s", article.GetAbsoluteUrl())},
+			Created: article.Timestamp,
+		}
+		feed.Items = append(feed.Items, &item)
+	}
+
+	rss, err := feed.ToRss()
+	if err != nil {
+		InternalError(err)
+		c.String(500, "Internal Error")
+	}
+	c.Data(200, "application/xml", []byte(rss))
+
 }

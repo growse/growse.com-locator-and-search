@@ -234,6 +234,7 @@ func main() {
 	router.GET("/where/linestring/:year/", WhereLineStringHandler)
 	router.GET("/", LatestArticleHandler)
 	router.GET("/robots.txt", RobotsHandler)
+	router.GET("/news/rss/", func(c *gin.Context) { c.Redirect(301, "/rss/") })
 	router.POST("/search/", SearchPostHandler)
 	router.POST("/locator/", LocatorHandler)
 	router.GET("/search/:searchterm/", SearchHandler)

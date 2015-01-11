@@ -235,6 +235,8 @@ func main() {
 	router.GET("/", LatestArticleHandler)
 	router.GET("/robots.txt", RobotsHandler)
 	router.GET("/news/rss/", func(c *gin.Context) { c.Redirect(301, "/rss/") })
+	router.GET("/sitemap.xml", UncompressedSiteMapHandler)
+	router.GET("/sitemap.xml.gz", CompressedSiteMapHandler)
 	router.POST("/search/", SearchPostHandler)
 	router.POST("/locator/", LocatorHandler)
 	router.GET("/search/:searchterm/", SearchHandler)

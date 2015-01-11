@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"compress/gzip"
 	"database/sql"
 	"encoding/gob"
 	"fmt"
@@ -444,5 +445,70 @@ func RSSHandler(c *gin.Context) {
 		c.String(500, "Internal Error")
 	}
 	c.Data(200, "application/xml", []byte(rss))
+
+}
+
+const (
+	sitemapHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">"
+	sitemapFooter = "</urlset>"
+	sitemapUrl    = "<url><loc><![CDATA[https://www.growse.com%s]]></loc><lastmod>%s</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>"
+)
+
+func UncompressedSiteMapHandler(c *gin.Context) {
+	SiteMapHandler(c, false)
+}
+
+func CompressedSiteMapHandler(c *gin.Context) {
+	SiteMapHandler(c, true)
+}
+
+func SiteMapHandler(c *gin.Context, compressed bool) {
+	cacheKey := fmt.Sprintf("sitemap-%v", compressed)
+	cachedBytes, ok := memoryCache.Get(cacheKey)
+	mimeType := "text/xml"
+	if compressed {
+		mimeType = "application/x-gzip"
+	}
+	if ok {
+		c.Data(200, mimeType, cachedBytes)
+		return
+	}
+	log.Printf("Cache MISS: %v", cacheKey)
+	rows, err := db.Query("Select id, datestamp,shorttitle,title from articles where published=true order by datestamp desc;")
+	if err != nil {
+		InternalError(err)
+		c.String(500, "Internal Error")
+		return
+	}
+	defer rows.Close()
+
+	buf := bufPool.Get()
+	defer bufPool.Put(buf)
+	buf.WriteString(sitemapHeader)
+	for rows.Next() {
+		var article Article
+		rows.Scan(&article.Id, &article.Timestamp, &article.Slug, &article.Title)
+		buf.WriteString(fmt.Sprintf(sitemapUrl, article.GetAbsoluteUrl(), article.Timestamp.Format("2006-01-02T15:04:05Z")))
+	}
+
+	buf.WriteString(sitemapFooter)
+	var pageBytes []byte
+	if compressed {
+		compressedBuf := bufPool.Get()
+		zip := gzip.NewWriter(compressedBuf)
+
+		_, err = zip.Write(buf.Bytes())
+		zip.Close()
+		if err != nil {
+			InternalError(err)
+			c.String(500, "Internal Error")
+			return
+		}
+		pageBytes = compressedBuf.Bytes()
+	} else {
+		pageBytes = buf.Bytes()
+	}
+	memoryCache.Set(cacheKey, pageBytes, time.Now().Add(configuration.DefaultCacheExpiry))
+	c.Data(200, mimeType, pageBytes)
 
 }

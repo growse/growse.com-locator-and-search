@@ -19,3 +19,8 @@ deployment:
     branch: golang
     commands:
       - ./deploy_prod.sh
+
+general:
+  branches:
+    only:
+      - golang

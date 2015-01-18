@@ -1,0 +1,16 @@
+machine:
+  environment:
+    GOOS: linux
+    GOARCH: amd64
+
+test:
+  override:
+    - cd src/growse-web-go/; go test -v
+  post:
+    - cd src/growse-web-go/; go build
+
+deployment:
+  production:
+    branch: golang
+    commands:
+      - ./deploy_prod.sh

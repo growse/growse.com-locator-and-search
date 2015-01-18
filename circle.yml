@@ -3,6 +3,10 @@ machine:
     GOOS: linux
     GOARCH: amd64
 
+dependencies:
+  override:
+    - go get
+
 test:
   override:
     - cd src/growse-web-go/; go test -v

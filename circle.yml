@@ -2,6 +2,11 @@ machine:
   environment:
     GOOS: linux
     GOARCH: amd64
+    GOPATH: $HOME/www.growse.com
+
+dependencies:
+  override:
+    - cd src/growse-web-go/; go get
 
 test:
   override:

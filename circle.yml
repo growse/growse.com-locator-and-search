@@ -5,7 +5,7 @@ machine:
 
 dependencies:
   override:
-    - go get
+    - cd src/growse-web-go/; go get
 
 test:
   override:

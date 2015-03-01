@@ -299,7 +299,26 @@ func ArticleHandler(c *gin.Context) {
 		c.String(500, "Internal Error")
 	}
 
-	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "CurrentYear": time.Now().Year(), "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation, "Production": configuration.Production, "DisqusUrl": template.JS(fmt.Sprintf("var disqus_url = 'https://www.growse.com%s';", article.GetAbsoluteUrl()))}
+	totaldistance, err := GetTotalDistance()
+
+	if err != nil {
+		InternalError(err)
+		c.String(500, "Internal Error")
+		return
+	}
+
+	obj := gin.H{
+		"Index":         index,
+		"Title":         article.Title,
+		"Months":        months,
+		"Article":       article,
+		"CurrentYear":   time.Now().Year(),
+		"Stylesheet":    stylesheetfilename,
+		"Javascript":    javascriptfilename,
+		"LastLocation":  lastlocation,
+		"TotalDistance": totaldistance,
+		"Production":    configuration.Production,
+		"DisqusUrl":     template.JS(fmt.Sprintf("var disqus_url = 'https://www.growse.com%s';", article.GetAbsoluteUrl()))}
 
 	buf := bufPool.Get()
 	buf.Reset()
@@ -340,6 +359,14 @@ func LatestArticleHandler(c *gin.Context) {
 		c.String(500, "Internal Error")
 	}
 
+	totaldistance, err := GetTotalDistance()
+
+	if err != nil {
+		InternalError(err)
+		c.String(500, "Internal Error")
+		return
+	}
+
 	index, months, err := LoadArticleIndex()
 	if err != nil {
 		InternalError(err)
@@ -347,7 +374,17 @@ func LatestArticleHandler(c *gin.Context) {
 		return
 	}
 
-	obj := gin.H{"Index": index, "Title": article.Title, "Months": months, "Article": article, "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "LastLocation": lastlocation, "Production": configuration.Production, "DisqusUrl": template.JS(fmt.Sprintf("var disqus_url = 'https://www.growse.com%s';", article.GetAbsoluteUrl()))}
+	obj := gin.H{
+		"Index":         index,
+		"Title":         article.Title,
+		"Months":        months,
+		"Article":       article,
+		"Stylesheet":    stylesheetfilename,
+		"Javascript":    javascriptfilename,
+		"LastLocation":  lastlocation,
+		"TotalDistance": totaldistance,
+		"Production":    configuration.Production,
+		"DisqusUrl":     template.JS(fmt.Sprintf("var disqus_url = 'https://www.growse.com%s';", article.GetAbsoluteUrl()))}
 
 	buf := bufPool.Get()
 	defer bufPool.Put(buf)

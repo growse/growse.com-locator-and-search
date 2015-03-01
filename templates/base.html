@@ -73,7 +73,7 @@ jQuery = $.ready = $;
         <div id="location">
             <p>Last seen floating around near <a
                     href="http://maps.google.com/?q={{ .LastLocation.Latitude }},{{ .LastLocation.Longitude }}">
-                {{ .LastLocation.Name }}</a>
+                {{ .LastLocation.Name }}</a>. {{ RenderFloat "#,###.##" .TotalDistance }} miles this year.
             </p>
         </div>
     </header>

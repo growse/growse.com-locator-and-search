@@ -252,15 +252,10 @@ func main() {
 	authorized := router.Group("/auth/")
 	authorized.Use(AuthRequired())
 	{
-		authorized.GET("hithere", func(c *gin.Context) {
-			redirect, err := c.Get("redirecturl")
-			if err == nil && redirect != nil {
-				c.Redirect(302, redirect.(string))
-			} else {
-				c.String(200, "Hi")
-			}
-		})
-		authorized.GET("articles", AdminArticleHandler)
+		authorized.GET("articles/", AdminArticleHandler)
+        authorized.PUT("articles/", AdminNewArticleHandler)
+        authorized.POST("articles/:id/", AdminUpdateArticleHandler)
+        authorized.DELETE("articles/:id/", AdminDeleteArticleHandler)
 	}
 	router.GET("/oauth2callback", OauthCallback)
 

@@ -1,9 +1,15 @@
 {{template "header" .}}
-<div id="content" class="nonav">
-
+<div id="content" class="nonav admin">
+    <h1>All the things</h1>
+    <p><a href="javascript:$('#newarticle').toggle()" id="newbtn">New</a></p>
+    <form id="newarticle" class="hide">
+        <p><label for="title">Title: <input type="text" id="title"/></label></p>
+        <p><label for="title">Content: <textarea type="text" id="markdown"></textarea></label></p>
+        <p><button>hi</button></p>
+    </form>
     <ul>
         {{ range .Articles}}
-        <li>{{.Title}}</li>
+        <li>{{.Title}} - <a href="javascript:editArticle({{.Id}});">Edit</a> <a href="javascript:deleteArticle({{.Id}});">Delete</a></li>
         {{else}}
         <li>No Articles Found</li>
         {{end}}

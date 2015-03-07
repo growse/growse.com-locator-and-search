@@ -52,6 +52,7 @@ type Configuration struct {
 	Domain             string
 	ClientID           string
 	ClientSecret       string
+	Port               int
 	DefaultCacheExpiry time.Duration
 }
 
@@ -120,6 +121,9 @@ func main() {
 	if configuration.CookieSeed == "" {
 		configuration.CookieSeed = "Wibble"
 	}
+	if configuration.Port <= 0 {
+		configuration.Port = 8000
+	}
 	oAuthConf = &oauth2.Config{
 		ClientID:     configuration.ClientID,
 		ClientSecret: configuration.ClientSecret,
@@ -128,7 +132,7 @@ func main() {
 		Endpoint:     google.Endpoint,
 	}
 
-	gun = mailgun.NewMailgun("valid-mailgun-domain", "private-mailgun-key", "public-mailgun-key")
+	gun = mailgun.NewMailgun("growse.com", configuration.MailgunKey, "")
 
 	//Initialize the template output buffer pool
 	bufPool = bpool.NewBufferPool(16)
@@ -255,6 +259,7 @@ func main() {
 				c.String(200, "Hi")
 			}
 		})
+		authorized.GET("articles", AdminArticleHandler)
 	}
 	router.GET("/oauth2callback", OauthCallback)
 
@@ -271,5 +276,6 @@ func main() {
 	router.POST("/search/", SearchPostHandler)
 	router.POST("/locator/", LocatorHandler)
 	router.GET("/search/:searchterm/", SearchHandler)
-	router.Run(":8080")
+	log.Printf("Listening on port %d", configuration.Port)
+	router.Run(fmt.Sprintf(":%d", configuration.Port))
 }

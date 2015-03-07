@@ -14,16 +14,18 @@ func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cookie, err := c.Request.Cookie("auth")
 		ok := false
-		log.Printf("Cookie: %v", cookie)
-		log.Println(err)
+		log.Printf("Supplied auth cookie: %v", cookie)
 		if err == nil && cookie != nil {
 			_, ok = validateCookie(cookie, configuration.CookieSeed)
 		}
-		log.Printf("OK: %v", ok)
+		log.Printf("Cookie valid?: %v", ok)
 		if err != nil || !ok {
 			url := oAuthConf.AuthCodeURL(c.Request.URL.String())
-			c.Set("redirecturl", url)
+			c.Redirect(302, url)
+			c.Abort()
+			return
 		}
+		c.Next()
 	}
 }
 
@@ -73,8 +75,13 @@ func OauthCallback(c *gin.Context) {
 		}
 		log.Printf("Setting cookie: %v\n", cookie)
 		http.SetCookie(c.Writer, cookie)
-		c.JSON(200, "Success "+state)
+
+		if state != "" {
+			c.Redirect(302, state)
+		} else {
+			c.String(200, "Success")
+		}
 	} else {
-		c.JSON(500, string(responsebytes))
+		c.JSON(401, string(responsebytes))
 	}
 }

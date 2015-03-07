@@ -31,7 +31,11 @@ var renderFloatPrecisionRounders = [10]float64{
 	0.0000000005,
 }
 
-func RenderFloat(format string, n float64) string {
+func RenderFloat(format string, m interface{}) string {
+	n, ok := m.(float64)
+	if !ok {
+		return "NaN"
+	}
 	// Special cases:
 	// NaN = "NaN"
 	// +Inf = "+Infinity"

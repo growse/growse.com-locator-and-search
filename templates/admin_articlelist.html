@@ -1,0 +1,12 @@
+{{template "header" .}}
+<div id="content" class="nonav">
+
+    <ul>
+        {{ range .Articles}}
+        <li>{{.Title}}</li>
+        {{else}}
+        YAAAY
+        {{end}}
+    </ul>
+</div>
+{{template "footer" .}}

@@ -49,6 +49,7 @@ type Configuration struct {
 	MailgunKey         string
 	Production         bool
 	CookieSeed         string
+    OAuth2CallbackUrl   string
 	Domain             string
 	ClientID           string
 	ClientSecret       string
@@ -127,7 +128,7 @@ func main() {
 	oAuthConf = &oauth2.Config{
 		ClientID:     configuration.ClientID,
 		ClientSecret: configuration.ClientSecret,
-		RedirectURL:  "http://localhost:8080/oauth2callback",
+		RedirectURL:  configuration.OAuth2CallbackUrl,
 		Scopes:       []string{"openid", "email"},
 		Endpoint:     google.Endpoint,
 	}

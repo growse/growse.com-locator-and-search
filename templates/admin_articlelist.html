@@ -3,9 +3,10 @@
     <h1>All the things</h1>
     <p><a href="javascript:$('#newarticle').toggle()" id="newbtn">New</a></p>
     <form id="newarticle" class="hide">
+        <input type="hidden" id="id">
         <p><label for="title">Title: <input type="text" id="title"/></label></p>
         <p><label for="title">Content: <textarea type="text" id="markdown"></textarea></label></p>
-        <p><button>hi</button></p>
+        <p><button>Update</button></p>
     </form>
     <ul>
         {{ range .Articles}}

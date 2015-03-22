@@ -13,6 +13,7 @@ $default-prefixes: webkit moz ms o;
 
 $background-hl-color: #333;
 $background-color: #222;
+$font-color: #aaa;
 
 $primary-highlight-color: #f90;
 $secondary-highlight-color: #57d;
@@ -67,7 +68,7 @@ html {
     font-size: 16px;
     font-size: 1.0rem;
     font-family: $bodyfont;
-    color: #aaa;
+    color: $font-color;
     padding: 0;
     margin: 0;
     height: 100%;
@@ -209,11 +210,24 @@ html {
           }
           ul {
             padding:0;
-          li {
-            list-style: none;
-            margin: 0;
-            padding: 0;
+            li {
+              list-style: none;
+              margin: 0;
+              padding: 0;
+            }
           }
+          #newarticle {
+            textarea {
+              width: 40rem;
+              height: 40rem;
+              background-color: $background-color;
+              border: 1px solid $background-hl-color;
+              font-family: $formfont;
+              color: $font-color
+            }
+            input[type="text"] {
+              width: 40rem;
+            }
           }
         }
         &.nonav {
@@ -288,14 +302,14 @@ html {
                   font-weight: normal;
                   font-family: $datefont;
                   text-align: center;
-                  color: #aaa;
+                  color: $font-color;
                   text-transform: uppercase;
                   line-height: 1.5;
                   margin: 0;
                   padding: 0;
                   border-radius: 5px;
                   span {
-                    color: #aaa;
+                    color: $font-color;
                     background: #444;
                     font-size: 1.2rem;
                     line-height: 1.2;
@@ -308,7 +322,7 @@ html {
                     font-size: 0.85rem;
                     line-height: 15px;
                     background: $background-hl-color;
-                    color: #aaa;
+                    color: $font-color;
                     padding: 3px 0;
                     font-weight: normal;
                   }
@@ -395,7 +409,7 @@ html {
       input {
         margin: 0;
         padding: 2px;
-        color: #aaa;
+        color: $font-color;
         font-size: 0.8rem;
         border: 1px solid #666;
         font-family: $formfont;
@@ -460,13 +474,13 @@ html {
       }
 
       .axis text, .axislabel {
-        fill: #aaa;
+        fill: $font-color;
         font-family: sans-serif;
         font-size: 11px;
       }
 
       .nano > .nano-pane {
-        background: #333;
+        background: $background-hl-color;
         -webkit-border-radius: 0;
         border-radius: 0;
       }

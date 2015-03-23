@@ -65,7 +65,15 @@ var growse = {
     },
     projection: null,
     mapFeature: null,
-
+    submitArticle: function(id, title, content, published) {
+        $.ajax({
+            url:'/auth/articles/',
+            type: 'PUT',
+            success: function(response) {
+                alert(response);
+            }
+        });
+    },
     drawMap: function(elemId, mapfile) {
         $('select[name=year]').on('change', function() {
             console.log($(this).val());

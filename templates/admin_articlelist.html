@@ -6,7 +6,7 @@
         <input type="hidden" id="id">
         <p><label for="title">Title: <input type="text" id="title"/></label></p>
         <p><label for="title">Content: <textarea type="text" id="markdown"></textarea></label></p>
-        <p><button>Update</button></p>
+        <p><input type="submit" value="Update"/></p>
     </form>
     <ul>
         {{ range .Articles}}
@@ -16,4 +16,12 @@
         {{end}}
     </ul>
 </div>
+<script type="text/javascript">
+    $(function(){
+        $("#newarticle").bind('submit',function(){
+            growse.submitArticle($('#newarticle>#id').val(),$('#newarticle>#title').val(),$('#newarticle>#markdown').val(),true);
+            return false;
+        });
+    });
+</script>
 {{template "footer" .}}

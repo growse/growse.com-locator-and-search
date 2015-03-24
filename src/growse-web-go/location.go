@@ -52,7 +52,7 @@ type GeoName struct {
 
 func GetLastLoction() (*Location, error) {
 	var location Location
-	err := db.QueryRow("select geocoding, latitude,longitude,timestamp from locations where geocoding like '%geonames%' order by timestamp desc limit 1").Scan(&location.Geocoding, &location.Latitude, &location.Longitude, &location.Timestamp)
+	err := db.QueryRow("select geocoding, latitude,longitude,timestamp from locations where geocoding ? 'geonames' order by timestamp desc limit 1").Scan(&location.Geocoding, &location.Latitude, &location.Longitude, &location.Timestamp)
 
 	return &location, err
 }

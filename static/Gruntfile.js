@@ -40,7 +40,7 @@ module.exports = function (grunt) {
             },
             assets: {
                 files: [{
-                    src: ['js/www.js', 'js/where.js', 'js/admin.js', 'css/www.css']
+                    src: ['js/www.js', 'css/www.css']
                 }]
             }
         },

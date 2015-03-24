@@ -42,6 +42,7 @@ type Configuration struct {
     DbName             string
     DbPassword         string
     DbHost             string
+    DatabaseMigrationsPath string
     TemplatePath       string
     StaticPath         string
     CpuProfile         string
@@ -155,6 +156,7 @@ func main() {
 
     connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", configuration.DbHost, configuration.DbUser, configuration.DbName, configuration.DbPassword)
     db, err = sql.Open("postgres", connectionString)
+    DoDatabaseMigrations()
     defer db.Close()
     if err != nil {
         log.Fatal(err)

@@ -1,15 +1,6 @@
 hljs.initHighlightingOnLoad();
 
 $(function () {
-    var showdown = new Showdown.converter();
-    //Admin new article form
-    //$("#newarticle").bind('submit', function () {
-    //    growse.submitNewArticle($('#newarticle>#id').val(), $('#newarticle>#title').val(), $('#newarticle>#markdown').val(), true);
-    //    return false;
-    //});
-    $("#newarticle #markdown").bind('input propertychange', function () {
-        $("#newarticle #preview").html(showdown.makeHtml($(this).val()));
-    });
     if ($('.here').length > 0) {
         var percentagedown = ($('.here').position().top / $(window).height()) * 100;
         if (percentagedown > 50) {

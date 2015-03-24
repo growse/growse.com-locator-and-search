@@ -24,4 +24,18 @@
         {{end}}
     </ul>
 </div>
+<script type="text/javascript" src="/static/js/admin.js"></script>
+<script type="text/javascript">
+    $(function () {
+        var showdown = new Showdown.converter();
+        //Admin new article form
+        //$("#newarticle").bind('submit', function () {
+        //    growse.submitNewArticle($('#newarticle>#id').val(), $('#newarticle>#title').val(), $('#newarticle>#markdown').val(), true);
+        //    return false;
+        //});
+        $("#newarticle #markdown").bind('input propertychange', function () {
+            $("#newarticle #preview").html(showdown.makeHtml($(this).val()));
+        });
+    });
+</script>
 {{template "footer" .}}

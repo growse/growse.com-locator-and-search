@@ -19,3 +19,4 @@ src/github.com
 src/gopkg*
 *.iml
 out
+static/js/*.map

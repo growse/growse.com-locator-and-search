@@ -1,5 +1,4 @@
-module.exports = function(grunt) {
-
+module.exports = function (grunt) {
     grunt.initConfig({
         jshint: {
             files: ['Gruntfile.js', 'js/scripts.js'],
@@ -22,14 +21,14 @@ module.exports = function(grunt) {
         uglify: {
             target: {
                 files: {
-                    'js/www.js': ['js/jquery-2.1.3.min.js', 'js/jquery.timeago.js', 'js/jquery.nanoscroller.min.js', 'js/d3.js', 'js/highlight.pack.js', 'js/scripts.js', 'js/topojson.v1.min.js']
+                    'js/www.js': ['js/jquery-2.1.3.min.js', 'js/jquery.timeago.js', 'js/jquery.nanoscroller.min.js', 'js/d3.js', 'js/highlight.pack.js', 'js/scripts.js', 'js/topojson.v1.min.js', 'js/showdown.js']
                 }
             },
             options: {
                 mangle: false,
                 compress: false,
                 beautify: false,
-                sourceMap: true,
+                sourceMap: true
             }
         },
         rev: {
@@ -46,7 +45,7 @@ module.exports = function(grunt) {
         sass: {
             target: {
                 files: {
-                    'css/style.css': 'css/style.scss',
+                    'css/style.css': 'css/style.scss'
                 }
             }
         },
@@ -74,7 +73,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-sass');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-clean');
-
 
     grunt.registerTask('default', ['jshint', 'uglify', 'sass', 'cssmin', 'clean', 'rev']);
 

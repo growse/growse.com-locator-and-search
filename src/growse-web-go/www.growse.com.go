@@ -49,12 +49,13 @@ type Configuration struct {
 	MailgunKey         string
 	Production         bool
 	CookieSeed         string
-    OAuth2CallbackUrl   string
+	OAuth2CallbackUrl  string
 	Domain             string
 	ClientID           string
 	ClientSecret       string
 	Port               int
 	DefaultCacheExpiry time.Duration
+	SkipAuthentication bool
 }
 
 type ArticleMonth struct {
@@ -253,9 +254,9 @@ func main() {
 	authorized.Use(AuthRequired())
 	{
 		authorized.GET("articles/", AdminArticleHandler)
-        authorized.PUT("articles/", AdminNewArticleHandler)
-        authorized.POST("articles/:id/", AdminUpdateArticleHandler)
-        authorized.DELETE("articles/:id/", AdminDeleteArticleHandler)
+		authorized.POST("articles/", AdminNewArticleHandler)
+		authorized.PUT("articles/:id/", AdminUpdateArticleHandler)
+		authorized.DELETE("articles/:id/", AdminDeleteArticleHandler)
 	}
 	router.GET("/oauth2callback", OauthCallback)
 

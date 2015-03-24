@@ -1,27 +1,27 @@
 {{template "header" .}}
 <div id="content" class="nonav admin">
     <h1>All the things</h1>
-    <p><a href="javascript:$('#newarticle').toggle()" id="newbtn">New</a></p>
-    <form id="newarticle" class="hide">
-        <input type="hidden" id="id">
-        <p><label for="title">Title: <input type="text" id="title"/></label></p>
-        <p><label for="title">Content: <textarea type="text" id="markdown"></textarea></label></p>
-        <p><input type="submit" value="Update"/></p>
-    </form>
+
+    <p><a href="javascript:$('#newarticlemodal').show(); $('#newarticle #title').focus();" id="newbtn">New</a></p>
+
+    <div id="newarticlemodal" class="modal hide">
+        <form id="newarticle" method="post" action="">
+            <div id="preview"></div>
+            <div><input type="text" id="title" name="title" placeholder="Title" required=""/></div>
+
+            <div><textarea type="text" id="markdown" name="markdown" placeholder="Markdown" required=""></textarea>
+            </div>
+
+            <p><input type="submit" value="Update"/></p>
+        </form>
+    </div>
     <ul>
         {{ range .Articles}}
-        <li>{{.Title}} - <a href="javascript:editArticle({{.Id}});">Edit</a> <a href="javascript:deleteArticle({{.Id}});">Delete</a></li>
+        <li>{{.Title}} - <a href="javascript:editArticle({{.Id}});">Edit</a> <a
+                href="javascript:deleteArticle({{.Id}});">Delete</a></li>
         {{else}}
         <li>No Articles Found</li>
         {{end}}
     </ul>
 </div>
-<script type="text/javascript">
-    $(function(){
-        $("#newarticle").bind('submit',function(){
-            growse.submitArticle($('#newarticle>#id').val(),$('#newarticle>#title').val(),$('#newarticle>#markdown').val(),true);
-            return false;
-        });
-    });
-</script>
 {{template "footer" .}}

@@ -1,6 +1,15 @@
 hljs.initHighlightingOnLoad();
 
-$(function() {
+$(function () {
+    var showdown = new Showdown.converter();
+    //Admin new article form
+    //$("#newarticle").bind('submit', function () {
+    //    growse.submitNewArticle($('#newarticle>#id').val(), $('#newarticle>#title').val(), $('#newarticle>#markdown').val(), true);
+    //    return false;
+    //});
+    $("#newarticle #markdown").bind('input propertychange', function () {
+        $("#newarticle #preview").html(showdown.makeHtml($(this).val()));
+    });
     if ($('.here').length > 0) {
         var percentagedown = ($('.here').position().top / $(window).height()) * 100;
         if (percentagedown > 50) {
@@ -13,7 +22,7 @@ $(function() {
         }
     }
     $('time.timeago').timeago();
-    $('button.svgsave').on('click', function() {
+    $('button.svgsave').on('click', function () {
         var html = d3.select("svg")
             .attr("version", 1.1)
             .attr("xmlns", "http://www.w3.org/2000/svg")
@@ -30,7 +39,7 @@ $(function() {
 
         var image = new Image();
         image.src = imgsrc;
-        image.onload = function() {
+        image.onload = function () {
             context.drawImage(image, 0, 0);
 
             var canvasdata = canvas.toDataURL("image/png");
@@ -53,7 +62,7 @@ var growse = {
         svg: null,
         path: null,
         zoom: null,
-        move: function() {
+        move: function () {
             var g = growse.map.svg.select('.mapgroup');
             var t = d3.event.translate;
             var s = d3.event.scale;
@@ -65,17 +74,8 @@ var growse = {
     },
     projection: null,
     mapFeature: null,
-    submitArticle: function(id, title, content, published) {
-        $.ajax({
-            url:'/auth/articles/',
-            type: 'PUT',
-            success: function(response) {
-                alert(response);
-            }
-        });
-    },
-    drawMap: function(elemId, mapfile) {
-        $('select[name=year]').on('change', function() {
+    drawMap: function (elemId, mapfile) {
+        $('select[name=year]').on('change', function () {
             console.log($(this).val());
             growse.drawRoute($(this).val());
         });
@@ -99,7 +99,7 @@ var growse = {
             .attr("height", growse.map.height)
             .call(growse.map.zoom);
 
-        d3.json(mapfile, function(error, world) {
+        d3.json(mapfile, function (error, world) {
             var g = growse.map.svg.append('g').attr('class', 'mapgroup');
             g.append("path")
                 .datum(topojson.feature(world, world.objects.land))
@@ -114,10 +114,10 @@ var growse = {
         d3.select(self.frameElement).style("width", growse.map.width + "px");
 
     },
-    drawRoute: function(year) {
+    drawRoute: function (year) {
         var g = growse.map.svg.select(".mapgroup");
         d3.selectAll(".route").remove();
-        d3.json("/where/linestring/" + year + "/", function(error, mypath) {
+        d3.json("/where/linestring/" + year + "/", function (error, mypath) {
             //Add the path
             g.append("g")
                 .attr("class", "route")
@@ -132,16 +132,16 @@ var growse = {
                 .style("stroke-width", "1px");
 
             /*
-            var targetPath = d3.selectAll('.route')[0][0];
-            var pathNode = d3.select(targetPath).selectAll('path').node();
-            var pathLength = pathNode.getTotalLength();
-            d3.select('.route')
-                .style('stroke-dasharray', pathLength)
-                .style('stroke-dashoffset', 0)
-                .style('-webkit-animation', "flarble 60s linear forwards");*/
+             var targetPath = d3.selectAll('.route')[0][0];
+             var pathNode = d3.select(targetPath).selectAll('path').node();
+             var pathLength = pathNode.getTotalLength();
+             d3.select('.route')
+             .style('stroke-dasharray', pathLength)
+             .style('stroke-dashoffset', 0)
+             .style('-webkit-animation', "flarble 60s linear forwards");*/
         });
     },
-    drawLineChart: function(elemId, data, width, height, xAxisTitle, yAxisTitle) {
+    drawLineChart: function (elemId, data, width, height, xAxisTitle, yAxisTitle) {
         var xpadding = 45;
         var ypadding = 15;
         if (!data) {
@@ -152,20 +152,20 @@ var growse = {
         var y = d3.scale.linear().range([height - (ypadding * 2), ypadding]);
         var line = d3.svg.line()
             .interpolate("basis")
-            .x(function(d) {
+            .x(function (d) {
                 return x(d.date);
             })
-            .y(function(d) {
+            .y(function (d) {
                 return y(d.val);
             });
-        data.forEach(function(d) {
+        data.forEach(function (d) {
             d.date = new Date(d[0] * 1000);
             d.val = d[1];
         });
-        x.domain(d3.extent(data, function(d) {
+        x.domain(d3.extent(data, function (d) {
             return d.date;
         }));
-        y.domain(d3.extent(data, function(d) {
+        y.domain(d3.extent(data, function (d) {
             return d.val;
         }));
         var e = d3.select(elemId);
@@ -197,7 +197,7 @@ var growse = {
         }
 
     },
-    drawColumnChart: function(elemId, data, width, height, xAxisTitle, yAxisTitle) {
+    drawColumnChart: function (elemId, data, width, height, xAxisTitle, yAxisTitle) {
         var xpadding = 45;
         var ypadding = 15;
         if (!data) {
@@ -205,15 +205,15 @@ var growse = {
         }
         var x = d3.scale.ordinal().rangeRoundBands([xpadding, width - (xpadding * 2)]);
         var y = d3.scale.linear().range([height - (ypadding * 2), ypadding]);
-        data.forEach(function(d) {
+        data.forEach(function (d) {
             d.date = d[0];
             d.val = d[1];
         });
 
-        x.domain(data.map(function(d) {
+        x.domain(data.map(function (d) {
             return d.date;
         }));
-        y.domain(d3.extent(data, function(d) {
+        y.domain(d3.extent(data, function (d) {
             return d.val;
         }));
         var e = d3.select(elemId);
@@ -227,16 +227,16 @@ var growse = {
             .append('rect')
             .attr('class', 'chartbar')
             .attr('fill', '#57d')
-            .attr("width", function() {
+            .attr("width", function () {
                 return 0.8 * x.rangeBand();
             })
-            .attr("height", function(d) {
+            .attr("height", function (d) {
                 return (height - (2 * ypadding) - y(d.val)) + "px";
             })
-            .attr('x', function(d) {
+            .attr('x', function (d) {
                 return (0.1 * x.rangeBand() + x(d.date)) + "px";
 
-            }).attr('y', function(d) {
+            }).attr('y', function (d) {
                 return y(d.val);
             });
 
@@ -265,5 +265,25 @@ var growse = {
                 .attr('class', 'axislabel')
                 .text(xAxisTitle);
         }
+    },
+    submitNewArticle: function (title, content, published) {
+        $.ajax({
+            url: '/auth/articles/',
+            type: 'POST',
+            data: {title: title, content: content, published: published},
+            success: function (response) {
+                alert(response);
+            }
+        });
+    },
+    updateExistingArticle: function (id, title, content, published) {
+        $.ajax({
+            url: '/auth/articles/' + id + '/',
+            type: 'PUT',
+            data: {title: title, content: content, published: published},
+            success: function (response) {
+                alert(response);
+            }
+        });
     }
 };

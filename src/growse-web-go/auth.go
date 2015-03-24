@@ -12,20 +12,25 @@ import (
 
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		cookie, err := c.Request.Cookie("auth")
-		ok := false
-		log.Printf("Supplied auth cookie: %v", cookie)
-		if err == nil && cookie != nil {
-			_, ok = validateCookie(cookie, configuration.CookieSeed)
+		if configuration.SkipAuthentication {
+			log.Print("WARNING: skipping auth due to configuration.SkipAuthentication=true")
+			c.Next()
+		} else {
+			cookie, err := c.Request.Cookie("auth")
+			ok := false
+			log.Printf("Supplied auth cookie: %v", cookie)
+			if err == nil && cookie != nil {
+				_, ok = validateCookie(cookie, configuration.CookieSeed)
+			}
+			log.Printf("Cookie valid?: %v", ok)
+			if err != nil || !ok {
+				url := oAuthConf.AuthCodeURL(c.Request.URL.String())
+				c.Redirect(302, url)
+				c.Abort()
+				return
+			}
+			c.Next()
 		}
-		log.Printf("Cookie valid?: %v", ok)
-		if err != nil || !ok {
-			url := oAuthConf.AuthCodeURL(c.Request.URL.String())
-			c.Redirect(302, url)
-			c.Abort()
-			return
-		}
-		c.Next()
 	}
 }
 

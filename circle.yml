@@ -11,8 +11,8 @@ dependencies:
 test:
   override:
     - cd src/growse-web-go/; go test -v
+    - cd src/growse-web-go/; go build; ./growse-web-go -templateTestPath=../../templates
   post:
-    - cd src/growse-web-go/; go build
     - cp src/growse-web-go/growse-web-go $CIRCLE_ARTIFACTS/
 
 deployment:

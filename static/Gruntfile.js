@@ -21,7 +21,9 @@ module.exports = function (grunt) {
         uglify: {
             target: {
                 files: {
-                    'js/www.js': ['js/jquery-2.1.3.min.js', 'js/jquery.timeago.js', 'js/jquery.nanoscroller.min.js', 'js/d3.js', 'js/highlight.pack.js', 'js/scripts.js', 'js/topojson.v1.min.js', 'js/showdown.js']
+                    'js/www.js': ['js/jquery-2.1.3.min.js', 'js/jquery.timeago.js', 'js/jquery.nanoscroller.min.js', 'js/highlight.pack.js', 'js/scripts.js'],
+                    'js/where.js': ['js/d3.js', 'js/topojson.v1.min.js'],
+                    'js/admin.js': ['js/showdown.js']
                 }
             },
             options: {
@@ -38,7 +40,7 @@ module.exports = function (grunt) {
             },
             assets: {
                 files: [{
-                    src: ['js/www.js', 'css/www.css']
+                    src: ['js/www.js', 'js/where.js', 'js/admin.js', 'css/www.css']
                 }]
             }
         },
@@ -61,7 +63,9 @@ module.exports = function (grunt) {
                 'css/*.www.css'
             ],
             js: [
-                'js/*.www.js'
+                'js/*.www.js',
+                'js/*.admin.js',
+                'js/*.where.js'
             ]
         }
     });

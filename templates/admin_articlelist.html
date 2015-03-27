@@ -5,11 +5,12 @@
     <p><a href="javascript:$('#newarticlemodal').show(); $('#newarticle #title').focus();" id="newbtn">New</a></p>
 
     <div id="newarticlemodal" class="modal hide">
-        <form id="newarticle" method="post" action="">
+        <form id="newarticle" method="post" action="" onsubmit="needExitConfirmation=false;">
             <div id="preview"></div>
             <div><input type="text" id="title" name="title" placeholder="Title" required=""/></div>
 
-            <div class="expand"><textarea type="text" id="markdown" name="markdown" placeholder="Markdown" required=""></textarea>
+            <div class="expand"><textarea type="text" id="markdown" name="markdown" placeholder="Markdown"
+                                          required=""></textarea>
             </div>
 
             <p><input type="submit" value="Update"/></p>
@@ -26,8 +27,17 @@
 </div>
 <script type="text/javascript" src="/static/js/admin.js"></script>
 <script type="text/javascript">
-    var oldPreviewContent = ""
+    var oldPreviewContent = "";
+    var needExitConfirmation = true;
     $(function () {
+
+        window.onbeforeunload = confirmExit;
+        function confirmExit() {
+            if (needExitConfirmation) {
+                return "You have attempted to leave this page.  If you have made any changes to the fields without clicking the Save button, your changes will be lost.  Are you sure you want to exit this page?";
+            }
+        }
+
         //Admin new article form
         //$("#newarticle").bind('submit', function () {
         //    growse.submitNewArticle($('#newarticle>#id').val(), $('#newarticle>#title').val(), $('#newarticle>#markdown').val(), true);

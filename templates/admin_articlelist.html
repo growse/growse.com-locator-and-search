@@ -9,7 +9,7 @@
             <div id="preview"></div>
             <div><input type="text" id="title" name="title" placeholder="Title" required=""/></div>
 
-            <div><textarea type="text" id="markdown" name="markdown" placeholder="Markdown" required=""></textarea>
+            <div class="expand"><textarea type="text" id="markdown" name="markdown" placeholder="Markdown" required=""></textarea>
             </div>
 
             <p><input type="submit" value="Update"/></p>
@@ -26,16 +26,25 @@
 </div>
 <script type="text/javascript" src="/static/js/admin.js"></script>
 <script type="text/javascript">
+    var oldPreviewContent = ""
     $(function () {
-        var showdown = new Showdown.converter();
         //Admin new article form
         //$("#newarticle").bind('submit', function () {
         //    growse.submitNewArticle($('#newarticle>#id').val(), $('#newarticle>#title').val(), $('#newarticle>#markdown').val(), true);
         //    return false;
         //});
-        $("#newarticle #markdown").bind('input propertychange', function () {
-            $("#newarticle #preview").html(showdown.makeHtml($(this).val()));
-        });
+        setInterval(function () {
+            var current = $("#newarticle #markdown").val();
+            if (current != oldPreviewContent) {
+                previewMarkdown(current);
+                oldPreviewContent = current;
+            }
+        }, 2000);
+
     });
-</script>
-{{template "footer" .}}
+    function previewMarkdown(content) {
+        $.post('/auth/preview/', {markdown: content}, function (response) {
+            $("#newarticle #preview").html(response);
+        });
+    }
+</script>{{template "footer" .}}

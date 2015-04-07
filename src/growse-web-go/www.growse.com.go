@@ -267,6 +267,7 @@ func main() {
         authorized.POST("articles/", AdminNewArticleHandler)
         authorized.PUT("articles/:id/", AdminUpdateArticleHandler)
         authorized.DELETE("articles/:id/", AdminDeleteArticleHandler)
+        authorized.POST("preview/", MarkdownPreviewHandler)
     }
     router.GET("/oauth2callback", OauthCallback)
 

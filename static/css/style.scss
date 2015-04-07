@@ -210,6 +210,7 @@ html {
       }
       #content {
         &.admin {
+          height: 100%;
           .hide {
             display: none;
           }
@@ -232,27 +233,37 @@ html {
               background: $background-color;
               margin: 2rem;
               padding: 1rem;
-              height: 80%;
-              textarea {
-                padding: 0.5rem;
-                width: 45%;
-                height: 90%;
-                box-sizing: border-box;
-                background-color: $background-color;
-                border: 1px solid $background-hl-color;
-                font-family: $formfont;
-                color: $font-color
+              height: 100%;
+              div.expand {
+                height: 80%;
+                padding: 0;
+                margin: 0;
+                textarea {
+                  padding: 0.5rem;
+                  width: 49%;
+                  height: 100%;
+                  box-sizing: border-box;
+                  background-color: $background-color;
+                  border: 1px solid $background-hl-color;
+                  font-family: $formfont;
+                  color: $font-color;
+                }
               }
               div#preview {
                 border: 1px solid $background-hl-color;
                 float: right;
                 display: block;
-                width: 45%;
-                height: 100%;
+                width: 49%;
+                height: 90%;
               }
-              input[type="text"] {
-                padding: 0.5rem;
-                width: 45%;
+              div {
+                padding: 0;
+                margin: 0;
+                input[type="text"] {
+                  box-sizing: border-box;
+                  padding: 0.5rem;
+                  width: 49%;
+                }
               }
             }
           }

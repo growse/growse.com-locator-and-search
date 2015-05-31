@@ -3,7 +3,7 @@ machine:
     GOOS: linux
     GOARCH: amd64
     GOPATH: $HOME/www.growse.com
-    GOBIN: $HOME/www.growse.com/bin
+    GOBIN: $HOME/www.growse.com
 
 dependencies:
   override:
@@ -12,9 +12,9 @@ dependencies:
 test:
   override:
     - go test -v
-    - ./growse-web-go -templateTestPath=templates
+    - ./www.growse.com -templateTestPath=templates
   post:
-    - cp growse-web-go $CIRCLE_ARTIFACTS/
+    - cp www.growse.com $CIRCLE_ARTIFACTS/
 
 deployment:
   production:

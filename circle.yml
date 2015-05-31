@@ -6,20 +6,20 @@ machine:
 
 dependencies:
   override:
-    - cd src/growse-web-go/; go get
+    - go get
 
 test:
   override:
-    - cd src/growse-web-go/; go test -v
-    - cd src/growse-web-go/; go build; ./growse-web-go -templateTestPath=../../templates
+    - go test -v
+    - ./growse-web-go -templateTestPath=templates
   post:
-    - cp src/growse-web-go/growse-web-go $CIRCLE_ARTIFACTS/
+    - cp growse-web-go $CIRCLE_ARTIFACTS/
 
 deployment:
   production:
     branch: golang
     commands:
-      - ./deploy_prod.sh
+      - ./deployment/deploy_prod.sh
 
 general:
   branches:

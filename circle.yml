@@ -2,7 +2,6 @@ machine:
   environment:
     GOOS: linux
     GOARCH: amd64
-    GOPATH: $HOME
 
 dependencies:
   override:

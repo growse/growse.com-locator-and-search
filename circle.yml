@@ -2,6 +2,8 @@ machine:
   environment:
     GOOS: linux
     GOARCH: amd64
+    GOPATH: $HOME/www.growse.com
+    GOBIN: $HOME/www.growse.com/bin
 
 dependencies:
   override:

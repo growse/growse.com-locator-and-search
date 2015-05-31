@@ -6,7 +6,7 @@ machine:
 
 dependencies:
   override:
-    - go get
+    - cd $HOME/www.growse.com; go get
 
 test:
   override:

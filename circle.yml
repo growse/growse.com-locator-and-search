@@ -2,11 +2,11 @@ machine:
   environment:
     GOOS: linux
     GOARCH: amd64
-    GOPATH: $HOME/www.growse.com
+    GOPATH: $HOME
 
 dependencies:
   override:
-    - cd $HOME/www.growse.com; go get
+    - go get
 
 test:
   override:

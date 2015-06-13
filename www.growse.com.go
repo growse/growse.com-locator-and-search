@@ -84,12 +84,12 @@ func InternalError(err error) {
 	debug.PrintStack()
 	if configuration.Production {
 		m := mailgun.NewMessage("Sender <blogbot@growse.com>", "ERROR: www.growse.com", fmt.Sprintf("%v\n%v", err, string(debug.Stack())), "sysadmin@growse.com")
-		fmt.Printf("Emailing stack: %s\n", m)
+		log.Printf("Emailing stack: %s\n", m)
 		response, id, _ := gun.Send(m)
-		fmt.Printf("Response ID: %s\n", id)
-		fmt.Printf("Message from server: %s\n", response)
+		log.Printf("Response ID: %s\n", id)
+		log.Printf("Message from server: %s\n", response)
 	} else {
-		fmt.Print("Non production, not sending\n")
+		log.Print("Non production, not sending\n")
 	}
 }
 

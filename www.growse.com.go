@@ -167,8 +167,8 @@ func main() {
 	}
 
 	//Get the router
-	router := gin.Default()
 	gin.SetMode(gin.ReleaseMode)
+	router := gin.Default()
 
 	//Load the templates. Don't use gin for this, because we want to render to a buffer later
 	LoadTemplates()
@@ -262,39 +262,7 @@ func main() {
 		}
 	}()
 
-	//Ugly hack to deal with the fact that httprouter can't cope with both /static/ and /:year existing
-	//All years will begin with 2. So this sort of helps. Kinda.
-	authorized := router.Group("/auth/")
-	authorized.Use(AuthRequired())
-	{
-		authorized.GET("articles/", AdminArticleHandler)
-		authorized.POST("articles/", AdminNewArticleHandler)
-		authorized.PUT("articles/:id/", AdminUpdateArticleHandler)
-		authorized.DELETE("articles/:id/", AdminDeleteArticleHandler)
-		authorized.POST("preview/", MarkdownPreviewHandler)
-		router.GET("where/", WhereHandler)
-		router.GET("where/linestring/:year/", WhereLineStringHandler)
-	}
-	router.GET("/oauth2callback", OauthCallback)
-
-	router.GET("/2:year/:month/", MonthHandler)
-	router.GET("/2:year/:month/:day/:slug/", ArticleHandler)
-	router.GET("/rss/", RSSHandler)
-	router.GET("/", LatestArticleHandler)
-	router.GET("/robots.txt", RobotsHandler)
-
-	//Redirects
-	router.GET("/where/", func(c *gin.Context) { c.Redirect(301, "/auth/where/") })
-	router.GET("/news/rss/", func(c *gin.Context) { c.Redirect(301, "/rss/") })
-
-	//Sitemap
-	router.GET("/sitemap.xml", UncompressedSiteMapHandler)
-	router.GET("/sitemap.xml.gz", CompressedSiteMapHandler)
-
-	router.POST("/search/", SearchPostHandler)
-	router.POST("/locator/", LocatorHandler)
-	router.GET("/search/:searchterm/", SearchHandler)
-
+	BuildRoutes(router)
 	log.Printf("Listening on port %d", configuration.Port)
 	router.Run(fmt.Sprintf(":%d", configuration.Port))
 }

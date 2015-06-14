@@ -108,7 +108,7 @@ var growse = {
     drawRoute: function (year) {
         var g = growse.map.svg.select(".mapgroup");
         d3.selectAll(".route").remove();
-        d3.json("/where/linestring/" + year + "/", function (error, mypath) {
+        d3.json("linestring/" + year + "/", function (error, mypath) {
             //Add the path
             g.append("g")
                 .attr("class", "route")

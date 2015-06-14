@@ -12,8 +12,8 @@ func BuildRoutes(router *gin.Engine) {
 		authorized.PUT("articles/:id/", AdminUpdateArticleHandler)
 		authorized.DELETE("articles/:id/", AdminDeleteArticleHandler)
 		authorized.POST("preview/", MarkdownPreviewHandler)
-		router.GET("where/", WhereHandler)
-		router.GET("where/linestring/:year/", WhereLineStringHandler)
+		authorized.GET("where/", WhereHandler)
+		authorized.GET("where/linestring/:year/", WhereLineStringHandler)
 	}
 	router.GET("/oauth2callback", OauthCallback)
 
@@ -25,6 +25,7 @@ func BuildRoutes(router *gin.Engine) {
 
 	//Redirects
 	router.GET("/news/rss/", func(c *gin.Context) { c.Redirect(301, "/rss/") })
+	router.GET("/where/", func(c *gin.Context) { c.Redirect(301, "/auth/where/") })
 
 	//Sitemap
 	router.GET("/sitemap.xml", UncompressedSiteMapHandler)

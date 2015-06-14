@@ -29,11 +29,11 @@ var (
 	db                 *sql.DB
 	stylesheetfilename string
 	javascriptfilename string
-	configuration      Configuration
-	gun                mailgun.Mailgun
+	configuration Configuration
+	gun mailgun.Mailgun
 	templates          *template.Template
 	bufPool            *bpool.BufferPool
-	memoryCache        cmap.ConcurrentMap
+	memoryCache cmap.ConcurrentMap
 	oAuthConf          *oauth2.Config
 )
 
@@ -272,8 +272,8 @@ func main() {
 		authorized.PUT("articles/:id/", AdminUpdateArticleHandler)
 		authorized.DELETE("articles/:id/", AdminDeleteArticleHandler)
 		authorized.POST("preview/", MarkdownPreviewHandler)
-		router.GET("/where/", WhereHandler)
-		router.GET("/where/linestring/:year/", WhereLineStringHandler)
+		router.GET("where/", WhereHandler)
+		router.GET("where/linestring/:year/", WhereLineStringHandler)
 	}
 	router.GET("/oauth2callback", OauthCallback)
 

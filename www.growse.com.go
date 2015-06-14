@@ -98,6 +98,7 @@ func main() {
 	configFile := flag.String("configFile", "config.json", "File path to the JSON configuration")
 	templateTestPath := flag.String("templateTestPath", "", "Path to test the templates on")
 	flag.Parse()
+	log.SetFlags(log.LstdFlags|log.Lmicroseconds)
 
 	if *templateTestPath != "" {
 		configuration.TemplatePath = *templateTestPath

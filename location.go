@@ -21,29 +21,13 @@ type Location struct {
 	DeviceTimestamp      time.Time
 	DeviceTimestampAsInt int64   `form:"time" binding:"required"`
 	Accuracy             float32 `form:"acc" binding:"required"`
-	TimeDelta            time.Duration
 	Distance             float64
 	GSMType              string `form:"gsmtype" binding:"required"`
 	WifiSSID             string `form:"wifissid" binding:"required"`
 }
 
 type GeoLocation struct {
-	/*Distance    string
-	CountryId   string*/
 	Name string
-	/*CountryCode string
-	GeonameId   int
-	ToponymName string
-	Fcode       string
-	FclName     string
-	FcodeName   string
-	CountryName string
-	Lat         string
-	Long        string
-	AdminName1  string
-	Fcl         string
-	AdminCode1  string
-	Population  int*/
 }
 
 type GeoName struct {
@@ -52,14 +36,14 @@ type GeoName struct {
 
 func GetLastLoction() (*Location, error) {
 	var location Location
-	err := db.QueryRow("select geocoding, latitude,longitude,timestamp from locations where geocoding ? 'geonames' order by timestamp desc limit 1").Scan(&location.Geocoding, &location.Latitude, &location.Longitude, &location.Timestamp)
+	err := db.QueryRow("select geocoding, latitude,longitude,devicetimestamp from locations where geocoding ? 'geonames' order by devicetimestamp desc limit 1").Scan(&location.Geocoding, &location.Latitude, &location.Longitude, &location.Timestamp)
 
 	return &location, err
 }
 
 func GetAverageSpeed() (float64, error) {
 	var speed float64
-	err := db.QueryRow("select 2.23693629*avg(distance/(timedelta/1000000000::float)) from locations where extract(year from devicetimestamp at time zone 'UTC') = date_part('year', now() at time zone 'UTC');").Scan(&speed)
+	err := db.QueryRow("select 2.23693629*avg(speed) from (select distance/(extract(epoch from (devicetimestamp - lag(devicetimestamp) over (order by devicetimestamp asc)))::float) as speed from locations where extract(year from devicetimestamp at time zone 'UTC') = date_part('year', now() at time zone 'UTC')) a;").Scan(&speed)
 	if err != nil {
 		return 0, err
 	}
@@ -164,11 +148,35 @@ func LocatorHandler(c *gin.Context) {
 	locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt/1000, 1000000*(locator.DeviceTimestampAsInt%1000))
 	locator.GetGeocoding()
 	locator.GetRelativeSpeedDistance()
-	_, err := db.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,gsmtype,wifissid,geocoding,distance,timedelta) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)", time.Now(), &locator.DeviceTimestamp, &locator.Latitude, &locator.Longitude, &locator.Accuracy, &locator.GSMType, &locator.WifiSSID, &locator.Geocoding, &locator.Distance, &locator.TimeDelta)
-
+	tx, err := db.Begin()
 	if err != nil {
 		InternalError(err)
 		c.String(500, "Internal Error")
+	}
+
+	if locator.Geocoding != "" {
+		_, err = tx.Exec("Update locations set geocoding=null")
+		if err != nil {
+			tx.Rollback()
+			InternalError(err)
+			c.String(500, "Internal Error")
+			return
+		}
+	}
+	_, err = tx.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,gsmtype,wifissid,geocoding,distance) values ($1,$2,$3,$4,$5,$6,$7,$8,$9)", time.Now(), &locator.DeviceTimestamp, &locator.Latitude, &locator.Longitude, &locator.Accuracy, &locator.GSMType, &locator.WifiSSID, &locator.Geocoding, &locator.Distance)
+
+	if err != nil {
+		tx.Rollback()
+		InternalError(err)
+		c.String(500, "Internal Error")
+		return
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		InternalError(err)
+		c.String(500, "Internal Error")
+		return
 	}
 	c.String(200, "Yay")
 }
@@ -181,8 +189,6 @@ func (loc *Location) GetRelativeSpeedDistance() {
 	} else {
 		loc.Distance = 6378100 * DistanceOnUnitSphere(loc.Latitude, loc.Longitude, prev.Latitude, prev.Longitude)
 	}
-	loc.TimeDelta = loc.DeviceTimestamp.Sub(prev.DeviceTimestamp)
-
 }
 
 func (loc *Location) GetGeocoding() {

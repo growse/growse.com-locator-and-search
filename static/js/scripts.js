@@ -1,6 +1,12 @@
 hljs.initHighlightingOnLoad();
 
 $(function () {
+    // Year expanding functionality
+    $("li.year>a").click(function () {
+        $(this).parent().next().slideToggle(100);
+        return false;
+    });
+    //Scroll the left nav to the right point.
     if ($('.here').length > 0) {
         var percentagedown = ($('.here').position().top / $(window).height()) * 100;
         if (percentagedown > 50) {

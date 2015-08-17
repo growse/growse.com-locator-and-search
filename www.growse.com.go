@@ -29,11 +29,11 @@ var (
 	db                 *sql.DB
 	stylesheetfilename string
 	javascriptfilename string
-	configuration Configuration
-	gun mailgun.Mailgun
+	configuration      Configuration
+	gun                mailgun.Mailgun
 	templates          *template.Template
 	bufPool            *bpool.BufferPool
-	memoryCache cmap.ConcurrentMap
+	memoryCache        cmap.ConcurrentMap
 	oAuthConf          *oauth2.Config
 )
 
@@ -98,7 +98,7 @@ func main() {
 	configFile := flag.String("configFile", "config.json", "File path to the JSON configuration")
 	templateTestPath := flag.String("templateTestPath", "", "Path to test the templates on")
 	flag.Parse()
-	log.SetFlags(log.LstdFlags|log.Lmicroseconds)
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 
 	if *templateTestPath != "" {
 		configuration.TemplatePath = *templateTestPath

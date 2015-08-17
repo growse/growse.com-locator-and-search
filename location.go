@@ -2,29 +2,29 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"math"
-
 	"github.com/gin-gonic/gin"
 	"github.com/kpawlik/geojson"
 	"io/ioutil"
 	"log"
+	"math"
 	"net/http"
 	"time"
 )
 
 type Location struct {
-	Latitude             float64 `form:"lat" binding:"required"`
-	Longitude            float64 `form:"long" binding:"required"`
-	Geocoding            string
-	Timestamp            time.Time
-	DeviceTimestamp      time.Time
-	DeviceTimestampAsInt int64   `form:"time" binding:"required"`
-	Accuracy             float32 `form:"acc" binding:"required"`
-	Distance             float64
-	GSMType              string `form:"gsmtype" binding:"required"`
-	WifiSSID             string `form:"wifissid" binding:"required"`
-	DeviceID             string `form:"deviceid" binding:"required"`
+	Latitude        float64 `json:"lat" binding:"required"`
+	Longitude       float64 `json:"long" binding:"required"`
+	Geocoding       string
+	Timestamp       time.Time
+	DeviceTimestamp time.Time
+	DeviceTimestampAsInt int64 `json:"time" binding:"required"`
+	Accuracy float32 `json:"acc" binding:"required"`
+	Distance float64
+	GSMType  string `json:"gsmtype" binding:"required"`
+	WifiSSID string `json:"wifissid" binding:"required"`
+	DeviceID string `json:"deviceid" binding:"required"`
 }
 
 type GeoLocation struct {
@@ -144,12 +144,29 @@ func WhereHandler(c *gin.Context) {
 
 func LocatorHandler(c *gin.Context) {
 	locators := []Location{}
+
 	c.Bind(&locators)
 	for _, locator := range locators {
-		tx, err := db.Begin()
+
 		locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt/1000, 1000000*(locator.DeviceTimestampAsInt%1000))
 		locator.GetGeocoding()
 		locator.GetRelativeSpeedDistance()
+		log.Printf("Time: %v",locator.DeviceTimestamp)
+		tx, err := db.Begin()
+		if err != nil {
+			InternalError(err)
+			c.String(500, "Internal Error")
+		}
+
+		if locator.Geocoding != "" {
+			_, err = tx.Exec("Update locations set geocoding=null")
+			if err != nil {
+				tx.Rollback()
+				InternalError(err)
+				c.String(500, "Internal Error")
+				return
+			}
+		}
 		_, err = tx.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,gsmtype,wifissid,geocoding,distance) values ($1,$2,$3,$4,$5,$6,$7,$8,$9)", time.Now(), &locator.DeviceTimestamp, &locator.Latitude, &locator.Longitude, &locator.Accuracy, &locator.GSMType, &locator.WifiSSID, &locator.Geocoding, &locator.Distance)
 		if err != nil {
 			tx.Rollback()
@@ -170,7 +187,12 @@ func LocatorHandler(c *gin.Context) {
 
 func (loc *Location) GetRelativeSpeedDistance() {
 	prev := Location{}
-	db.QueryRow("select devicetimestamp,latitude,longitude from locations order by id desc limit 1").Scan(&prev.DeviceTimestamp, &prev.Latitude, &prev.Longitude)
+	err := db.QueryRow("select devicetimestamp,latitude,longitude from locations order by devicetimestamp desc limit 1").Scan(&prev.DeviceTimestamp, &prev.Latitude, &prev.Longitude)
+	if err != nil {
+		log.Printf("Error found getting previous point. Setting distance to 0: %v", err)
+		loc.Distance = 0
+		return
+	}
 	if prev.Latitude == loc.Latitude && prev.Longitude == loc.Longitude {
 		loc.Distance = 0
 	} else {
@@ -179,6 +201,10 @@ func (loc *Location) GetRelativeSpeedDistance() {
 }
 
 func (loc *Location) GetGeocoding() {
+	if configuration.GeocodeApiURL == "" {
+		InternalError(errors.New("Geocoding API should not be blank"))
+		return
+	}
 	geocodingUrl := fmt.Sprintf(configuration.GeocodeApiURL, loc.Latitude, loc.Longitude)
 	response, err := http.Get(geocodingUrl)
 	if err != nil {
@@ -217,7 +243,7 @@ func DistanceOnUnitSphere(lat1 float64, long1 float64, lat2 float64, long2 float
 	// distance = rho * arc length
 
 	cos := (math.Sin(phi1)*math.Sin(phi2)*math.Cos(theta1-theta2) +
-	math.Cos(phi1)*math.Cos(phi2))
+		math.Cos(phi1)*math.Cos(phi2))
 
 	cos = math.Max(math.Min(cos, 1.0), -1.0)
 

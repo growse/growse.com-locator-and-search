@@ -25,25 +25,11 @@ type Location struct {
 	Distance             float64
 	GSMType              string `form:"gsmtype" binding:"required"`
 	WifiSSID             string `form:"wifissid" binding:"required"`
+	DeviceID			 string `form:"deviceid" binding:"required"`
 }
 
 type GeoLocation struct {
-	/*Distance    string
-	CountryId   string*/
 	Name string
-	/*CountryCode string
-	GeonameId   int
-	ToponymName string
-	Fcode       string
-	FclName     string
-	FcodeName   string
-	CountryName string
-	Lat         string
-	Long        string
-	AdminName1  string
-	Fcl         string
-	AdminCode1  string
-	Population  int*/
 }
 
 type GeoName struct {
@@ -158,17 +144,18 @@ func WhereHandler(c *gin.Context) {
 }
 
 func LocatorHandler(c *gin.Context) {
-	locator := Location{}
-	c.Bind(&locator)
-
-	locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt/1000, 1000000*(locator.DeviceTimestampAsInt%1000))
-	locator.GetGeocoding()
-	locator.GetRelativeSpeedDistance()
-	_, err := db.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,gsmtype,wifissid,geocoding,distance,timedelta) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)", time.Now(), &locator.DeviceTimestamp, &locator.Latitude, &locator.Longitude, &locator.Accuracy, &locator.GSMType, &locator.WifiSSID, &locator.Geocoding, &locator.Distance, &locator.TimeDelta)
-
-	if err != nil {
-		InternalError(err)
-		c.String(500, "Internal Error")
+	locators := []Location{}
+	c.Bind(&locators)
+	for _, locator := range locators {
+		locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt/1000, 1000000*(locator.DeviceTimestampAsInt%1000))
+		locator.GetGeocoding()
+		locator.GetRelativeSpeedDistance()
+		_, err := db.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,gsmtype,wifissid,geocoding,distance,timedelta) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)", time.Now(), &locator.DeviceTimestamp, &locator.Latitude, &locator.Longitude, &locator.Accuracy, &locator.GSMType, &locator.WifiSSID, &locator.Geocoding, &locator.Distance, &locator.TimeDelta)
+		if err != nil {
+			InternalError(err)
+			c.String(500, "Internal Error")
+			return
+		}
 	}
 	c.String(200, "Yay")
 }
@@ -224,7 +211,7 @@ func DistanceOnUnitSphere(lat1 float64, long1 float64, lat2 float64, long2 float
 	// distance = rho * arc length
 
 	cos := (math.Sin(phi1)*math.Sin(phi2)*math.Cos(theta1-theta2) +
-		math.Cos(phi1)*math.Cos(phi2))
+	math.Cos(phi1)*math.Cos(phi2))
 
 	cos = math.Max(math.Min(cos, 1.0), -1.0)
 

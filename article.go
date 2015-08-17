@@ -304,8 +304,7 @@ func ArticleHandler(c *gin.Context) {
 
 	lastlocation, err := GetLastLoction()
 	if err != nil {
-		InternalError(err)
-		c.String(500, "Internal Error")
+		lastlocation = nil;
 	}
 
 	totaldistance, err := GetTotalDistance()
@@ -497,7 +496,7 @@ func RSSHandler(c *gin.Context) {
 const (
 	sitemapHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">"
 	sitemapFooter = "</urlset>"
-	sitemapUrl    = "<url><loc><![CDATA[https://www.growse.com%s]]></loc><lastmod>%s</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>"
+	sitemapUrl = "<url><loc><![CDATA[https://www.growse.com%s]]></loc><lastmod>%s</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>"
 )
 
 func UncompressedSiteMapHandler(c *gin.Context) {

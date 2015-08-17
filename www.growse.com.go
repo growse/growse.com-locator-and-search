@@ -29,11 +29,11 @@ var (
 	db                 *sql.DB
 	stylesheetfilename string
 	javascriptfilename string
-	configuration      Configuration
-	gun                mailgun.Mailgun
+	configuration Configuration
+	gun mailgun.Mailgun
 	templates          *template.Template
 	bufPool            *bpool.BufferPool
-	memoryCache        cmap.ConcurrentMap
+	memoryCache cmap.ConcurrentMap
 	oAuthConf          *oauth2.Config
 )
 
@@ -84,9 +84,12 @@ func InternalError(err error) {
 	debug.PrintStack()
 	if configuration.Production {
 		m := mailgun.NewMessage("Sender <blogbot@growse.com>", "ERROR: www.growse.com", fmt.Sprintf("%v\n%v", err, string(debug.Stack())), "sysadmin@growse.com")
+		log.Printf("Emailing stack: %s\n", m)
 		response, id, _ := gun.Send(m)
-		fmt.Printf("Response ID: %s\n", id)
-		fmt.Printf("Message from server: %s\n", response)
+		log.Printf("Response ID: %s\n", id)
+		log.Printf("Message from server: %s\n", response)
+	} else {
+		log.Print("Non production, not sending\n")
 	}
 }
 
@@ -95,6 +98,7 @@ func main() {
 	configFile := flag.String("configFile", "config.json", "File path to the JSON configuration")
 	templateTestPath := flag.String("templateTestPath", "", "Path to test the templates on")
 	flag.Parse()
+	log.SetFlags(log.LstdFlags|log.Lmicroseconds)
 
 	if *templateTestPath != "" {
 		configuration.TemplatePath = *templateTestPath
@@ -164,8 +168,8 @@ func main() {
 	}
 
 	//Get the router
-	router := gin.Default()
 	gin.SetMode(gin.ReleaseMode)
+	router := gin.Default()
 
 	//Load the templates. Don't use gin for this, because we want to render to a buffer later
 	LoadTemplates()
@@ -259,32 +263,7 @@ func main() {
 		}
 	}()
 
-	//Ugly hack to deal with the fact that httprouter can't cope with both /static/ and /:year existing
-	//All years will begin with 2. So this sort of helps. Kinda.
-	authorized := router.Group("/auth/")
-	authorized.Use(AuthRequired())
-	{
-		authorized.GET("articles/", AdminArticleHandler)
-		authorized.POST("articles/", AdminNewArticleHandler)
-		authorized.PUT("articles/:id/", AdminUpdateArticleHandler)
-		authorized.DELETE("articles/:id/", AdminDeleteArticleHandler)
-		authorized.POST("preview/", MarkdownPreviewHandler)
-	}
-	router.GET("/oauth2callback", OauthCallback)
-
-	router.GET("/2:year/:month/", MonthHandler)
-	router.GET("/2:year/:month/:day/:slug/", ArticleHandler)
-	router.GET("/rss/", RSSHandler)
-	router.GET("/where/", WhereHandler)
-	router.GET("/where/linestring/:year/", WhereLineStringHandler)
-	router.GET("/", LatestArticleHandler)
-	router.GET("/robots.txt", RobotsHandler)
-	router.GET("/news/rss/", func(c *gin.Context) { c.Redirect(301, "/rss/") })
-	router.GET("/sitemap.xml", UncompressedSiteMapHandler)
-	router.GET("/sitemap.xml.gz", CompressedSiteMapHandler)
-	router.POST("/search/", SearchPostHandler)
-	router.POST("/locator/", LocatorHandler)
-	router.GET("/search/:searchterm/", SearchHandler)
+	BuildRoutes(router)
 	log.Printf("Listening on port %d", configuration.Port)
 	router.Run(fmt.Sprintf(":%d", configuration.Port))
 }

@@ -1,6 +1,12 @@
 hljs.initHighlightingOnLoad();
 
 $(function () {
+    // Year expanding functionality
+    $("li.year>a").click(function () {
+        $(this).parent().next().slideToggle(100);
+        return false;
+    });
+    //Scroll the left nav to the right point.
     if ($('.here').length > 0) {
         var percentagedown = ($('.here').position().top / $(window).height()) * 100;
         if (percentagedown > 50) {
@@ -108,7 +114,7 @@ var growse = {
     drawRoute: function (year) {
         var g = growse.map.svg.select(".mapgroup");
         d3.selectAll(".route").remove();
-        d3.json("/where/linestring/" + year + "/", function (error, mypath) {
+        d3.json("linestring/" + year + "/", function (error, mypath) {
             //Add the path
             g.append("g")
                 .attr("class", "route")

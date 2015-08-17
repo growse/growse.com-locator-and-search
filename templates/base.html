@@ -57,7 +57,7 @@ jQuery = $.ready = $;
             </ul>
             {{end}}
             <li class="year">
-                <a href="javascript:$('ul#{{$element.Year}}').slideToggle(100);">{{$element.Year}}</a>
+                <a href="#">{{$element.Year}}</a>
             </li>
             <ul id="{{$element.Year}}" class="hide">
                 {{end}}
@@ -71,10 +71,12 @@ jQuery = $.ready = $;
         </div>
         {{end}}
         <div id="location">
+            {{if .LastLocation}}
             <p>Last seen floating around near <a
                     href="http://maps.google.com/?q={{ printf "%.2f" .LastLocation.Latitude }},{{ printf "%.2f" .LastLocation.Longitude }}">
                 {{ .LastLocation.Name }}</a>. {{ RenderFloat "#,###.##" .TotalDistance }} miles this year.
             </p>
+            {{end}}
         </div>
     </header>
     {{if .Index}}

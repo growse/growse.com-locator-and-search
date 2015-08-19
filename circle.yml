@@ -8,7 +8,6 @@ machine:
 dependencies:
   override:
     - go get
-    - go get -u all
 
 test:
   override:

@@ -145,7 +145,7 @@ func WhereHandler(c *gin.Context) {
 func LocatorHandler(c *gin.Context) {
 	locators := []Location{}
 
-	err := c.Bind(&locators)
+	err := c.BindJSON(&locators)
 	if err != nil {
 		c.String(400, fmt.Sprintf("%v", err))
 		return

@@ -14,17 +14,17 @@ import (
 )
 
 type Location struct {
-	Latitude        float64 `json:"lat" binding:"required"`
-	Longitude       float64 `json:"long" binding:"required"`
-	Geocoding       string
-	Timestamp       time.Time
-	DeviceTimestamp time.Time
-	DeviceTimestampAsInt int64 `json:"time" binding:"required"`
-	Accuracy float32 `json:"acc" binding:"required"`
-	Distance float64
-	GSMType  string `json:"gsmtype" binding:"required"`
-	WifiSSID string `json:"wifissid" binding:"required"`
-	DeviceID string `json:"deviceid" binding:"required"`
+	Latitude             float64 `json:"lat" binding:"required"`
+	Longitude            float64 `json:"long" binding:"required"`
+	Geocoding            string
+	Timestamp            time.Time
+	DeviceTimestamp      time.Time
+	DeviceTimestampAsInt int64   `json:"time" binding:"required"`
+	Accuracy             float32 `json:"acc" binding:"required"`
+	Distance             float64
+	GSMType              string `json:"gsmtype" binding:"required"`
+	WifiSSID             string `json:"wifissid" binding:"required"`
+	DeviceID             string `json:"deviceid" binding:"required"`
 }
 
 type GeoLocation struct {
@@ -145,13 +145,17 @@ func WhereHandler(c *gin.Context) {
 func LocatorHandler(c *gin.Context) {
 	locators := []Location{}
 
-	c.Bind(&locators)
+	err := c.Bind(&locators)
+	if err != nil {
+		c.String(400, fmt.Sprintf("%v", err))
+		return
+	}
 	for _, locator := range locators {
 
 		locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt/1000, 1000000*(locator.DeviceTimestampAsInt%1000))
 		locator.GetGeocoding()
 		locator.GetRelativeSpeedDistance()
-		log.Printf("Time: %v",locator.DeviceTimestamp)
+		log.Printf("Time: %v", locator.DeviceTimestamp)
 		tx, err := db.Begin()
 		if err != nil {
 			InternalError(err)
@@ -171,14 +175,14 @@ func LocatorHandler(c *gin.Context) {
 		if err != nil {
 			tx.Rollback()
 			InternalError(err)
-			c.String(500, "Internal Error")
+			c.String(500, "Database Error")
 			return
 		}
 
 		err = tx.Commit()
 		if err != nil {
 			InternalError(err)
-			c.String(500, "Internal Error")
+			c.String(500, "Database txn Error")
 			return
 		}
 	}

@@ -4,7 +4,7 @@
         <header>
             <h1>Where I've Been</h1>
         </header>
-        <p>This year, I've averaged a huge <strong>{{printf "%.2f" .Avgspeed }}mph</strong> after covering
+        <p>This year, I've averaged a huge <strong>{{RenderFloat "#,###.##" .Avgspeed }}mph</strong> after covering
             <strong>{{ RenderFloat "#,###.##" .Totaldistance }} miles</strong>.</p>
 
         <p>Last device ping:

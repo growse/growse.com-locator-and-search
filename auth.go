@@ -12,7 +12,7 @@ import (
 
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if configuration.SkipAuthentication {
+		if !configuration.Production {
 			log.Print("WARNING: skipping auth due to configuration.SkipAuthentication=true")
 			c.Next()
 		} else {

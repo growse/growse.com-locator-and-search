@@ -1,0 +1,14 @@
+{
+    "cpuProfile": "pprof.cpu",
+    "dbHost": "/tmp",
+    "dbName": "www_growse_com",
+    "dbPassword": "",
+    "dbUser": "andrew",
+    "databaseMigrationsPath": "databasemigrations",
+    "defaultCacheExpiry": 600000000000,
+    "geocodeApiUrl": "",
+    "port": 8080,
+    "production": false,
+    "staticPath": "static",
+    "templatePath": "templates"
+}

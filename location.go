@@ -1,11 +1,13 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/kpawlik/geojson"
+	"github.com/lib/pq"
 	"io/ioutil"
 	"log"
 	"math"
@@ -13,6 +15,9 @@ import (
 	"time"
 )
 
+/*
+This should be some sort of thing that's sent from the phone
+*/
 type Location struct {
 	Latitude             float64 `json:"lat" binding:"required"`
 	Longitude            float64 `json:"long" binding:"required"`
@@ -42,6 +47,9 @@ func GetLastLoction() (*Location, error) {
 	return &location, err
 }
 
+/*
+Definately returns mph. Hence 2.236blahblah
+*/
 func GetAverageSpeed() (float64, error) {
 	var speed float64
 	err := db.QueryRow("select 2.23693629*avg(speed) from (select distance/(extract(epoch from (devicetimestamp - lag(devicetimestamp) over (order by devicetimestamp asc)))::float) as speed from locations where extract(year from devicetimestamp at time zone 'UTC') = date_part('year', now() at time zone 'UTC')) a;").Scan(&speed)
@@ -51,6 +59,9 @@ func GetAverageSpeed() (float64, error) {
 	return speed, nil
 }
 
+/*
+In miles.
+*/
 func GetTotalDistance() (float64, error) {
 	var distance float64
 	err := db.QueryRow("select 0.000621371192*sum(distance) from locations where extract(year from devicetimestamp at time zone 'UTC') = date_part('year', now() at time zone 'UTC');").Scan(&distance)
@@ -62,7 +73,7 @@ func GetTotalDistance() (float64, error) {
 
 func GetLineStringAsJSON(year string) (string, error) {
 	lineString := geojson.NewLineString(nil)
-	rows, err := db.Query("select longitude,latitude from locations where extract (year from devicetimestamp at time zone 'UTC')=$1 order by devicetimestamp asc", year)
+	rows, err := db.Query("select longitude,latitude,distance from locations where extract (year from devicetimestamp at time zone 'UTC')=$1 order by devicetimestamp asc", year)
 	if err != nil {
 		return "", err
 	}
@@ -70,9 +81,13 @@ func GetLineStringAsJSON(year string) (string, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var coords geojson.Coordinate
-		rows.Scan(&coords[0], &coords[1])
-		lineString.AddCoordinates(coords)
+		var distance float32
+		rows.Scan(&coords[0], &coords[1], &distance)
+		if distance > 0 { // We only want to add points where something's actually moved significantly
+			lineString.AddCoordinates(coords)
+		}
 	}
+	// Dump the stuff into some sort of geojson thingie
 	feature := geojson.NewFeature(lineString, nil, nil)
 	featureCollection := geojson.NewFeatureCollection([]*geojson.Feature{feature})
 	json, err := geojson.Marshal(featureCollection)
@@ -82,6 +97,9 @@ func GetLineStringAsJSON(year string) (string, error) {
 	return json, nil
 }
 
+/*
+Extract a sane name from the geocoding object
+*/
 func (location *Location) Name() string {
 	var msg GeoName
 	err := json.Unmarshal([]byte(location.Geocoding), &msg)
@@ -97,7 +115,6 @@ func (location *Location) Name() string {
 }
 
 /* HTTP handlers */
-
 func WhereLineStringHandler(c *gin.Context) {
 	linestring, err := GetLineStringAsJSON(c.Params.ByName("year"))
 	if err != nil {
@@ -111,22 +128,16 @@ func WhereHandler(c *gin.Context) {
 	avgspeed, err := GetAverageSpeed()
 	if err != nil {
 		InternalError(err)
-		c.String(500, "Internal Error")
-		return
 	}
 
 	totaldistance, err := GetTotalDistance()
 	if err != nil {
 		InternalError(err)
-		c.String(500, "Internal Error")
-		return
 	}
 
 	lastlocation, err := GetLastLoction()
 	if err != nil {
 		InternalError(err)
-		c.String(500, "Internal Error")
-		return
 	}
 	obj := gin.H{"Title": "Where", "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "Avgspeed": avgspeed, "Totaldistance": totaldistance, "LastLocation": lastlocation}
 	buf := bufPool.Get()
@@ -142,6 +153,9 @@ func WhereHandler(c *gin.Context) {
 	}
 }
 
+/*
+Receive POST from phone. This should be an application/json containing an array of points.
+*/
 func LocatorHandler(c *gin.Context) {
 	locators := []Location{}
 
@@ -150,48 +164,69 @@ func LocatorHandler(c *gin.Context) {
 		c.String(400, fmt.Sprintf("%v", err))
 		return
 	}
-	for _, locator := range locators {
 
+	newLocation := false
+	for _, locator := range locators {
 		locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt/1000, 1000000*(locator.DeviceTimestampAsInt%1000))
-		locator.GetGeocoding()
-		locator.GetRelativeSpeedDistance()
-		log.Printf("Time: %v", locator.DeviceTimestamp)
-		tx, err := db.Begin()
+
 		if err != nil {
 			InternalError(err)
 			c.String(500, "Internal Error")
 		}
+		locator.GetRelativeSpeedDistance(db)
 
-		if locator.Geocoding != "" {
-			_, err = tx.Exec("Update locations set geocoding=null")
-			if err != nil {
-				tx.Rollback()
-				InternalError(err)
-				c.String(500, "Internal Error")
-				return
-			}
-		}
-		_, err = tx.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,gsmtype,wifissid,geocoding,distance) values ($1,$2,$3,$4,$5,$6,$7,$8,$9)", time.Now(), &locator.DeviceTimestamp, &locator.Latitude, &locator.Longitude, &locator.Accuracy, &locator.GSMType, &locator.WifiSSID, &locator.Geocoding, &locator.Distance)
-		if err != nil {
-			tx.Rollback()
-			InternalError(err)
+		_, err = db.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,gsmtype,wifissid,distance) values ($1,$2,$3,$4,$5,$6,$7,$8)", time.Now(), &locator.DeviceTimestamp, &locator.Latitude, &locator.Longitude, &locator.Accuracy, &locator.GSMType, &locator.WifiSSID, &locator.Distance)
+
+		switch i := err.(type) {
+		case nil:
+			newLocation = true
+			continue
+		case *pq.Error:
+			log.Printf("Managed to get a duplicate timestamp: %v", locator)
+		default:
+			log.Printf("%T", err)
+			InternalError(i)
 			c.String(500, "Database Error")
 			return
 		}
 
-		err = tx.Commit()
+	}
+	//Now to update the geocoding from the latest locator
+	if newLocation {
+		var location Location
+		var id int
+		err = db.QueryRow("select id,latitude,longitude from locations order by devicetimestamp desc limit 1").Scan(&id, &location.Latitude, &location.Longitude)
 		if err != nil {
 			InternalError(err)
-			c.String(500, "Database txn Error")
-			return
+		}
+		tx, err := db.Begin()
+		if err != nil {
+			InternalError(err)
+		}
+		location.GetGeocoding()
+		if location.Geocoding != "" {
+			_, err = tx.Exec("Update locations set geocoding=null")
+			if err != nil {
+				tx.Rollback()
+				InternalError(err)
+			}
+			_, err = tx.Exec("update locations set geocoding=$1 where id=$2", location.Geocoding, id)
+			if err != nil {
+				tx.Rollback()
+				InternalError(err)
+			}
+			err = tx.Commit()
+			if err != nil {
+				InternalError(err)
+			}
 		}
 	}
 	c.String(200, "Yay")
 }
 
-func (loc *Location) GetRelativeSpeedDistance() {
+func (loc *Location) GetRelativeSpeedDistance(thisDb *sql.DB) {
 	prev := Location{}
-	err := db.QueryRow("select devicetimestamp,latitude,longitude from locations order by devicetimestamp desc limit 1").Scan(&prev.DeviceTimestamp, &prev.Latitude, &prev.Longitude)
+	err := thisDb.QueryRow("select devicetimestamp,latitude,longitude from locations where devicetimestamp<$1 order by devicetimestamp desc limit 1", loc.DeviceTimestamp).Scan(&prev.DeviceTimestamp, &prev.Latitude, &prev.Longitude)
 	if err != nil {
 		log.Printf("Error found getting previous point. Setting distance to 0: %v", err)
 		loc.Distance = 0

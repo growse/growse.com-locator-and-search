@@ -1,7 +1,6 @@
 *.pyc
 static/css/*.css
 *.prof
-*.json
 build
 local_settings.py
 .idea

@@ -154,6 +154,10 @@ html {
             font-weight: 300;
             line-height: 1.0rem;
           }
+          p {
+            font-size: 0.7rem;
+            text-align: center;
+          }
           fieldset {
             border: 0;
             input {
@@ -204,8 +208,10 @@ html {
           }
         }
         #location {
-          font-family: $sansfont;
-          font-size: 0.5rem;
+          p {
+            font-family: $sansfont;
+            font-size: 0.5rem;
+          }
         }
       }
       #content {

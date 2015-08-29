@@ -56,7 +56,6 @@ type Configuration struct {
 	ClientSecret           string
 	Port                   int
 	DefaultCacheExpiry     time.Duration
-	SkipAuthentication     bool
 }
 
 type ArticleMonth struct {

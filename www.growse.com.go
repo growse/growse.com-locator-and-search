@@ -96,6 +96,7 @@ func main() {
 	//Flags
 	configFile := flag.String("configFile", "config.json", "File path to the JSON configuration")
 	templateTestPath := flag.String("templateTestPath", "", "Path to test the templates on")
+	kalmanFiltering := flag.Bool("kalmanFilter",false,"Enable kalman to populate the database with kalman-filtered locations")
 	flag.Parse()
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 
@@ -115,6 +116,7 @@ func main() {
 	decoder := json.NewDecoder(file)
 
 	err = decoder.Decode(&configuration)
+
 	if err != nil {
 		log.Fatalf("Unable to parse configuration file: %v", err)
 	}
@@ -160,6 +162,12 @@ func main() {
 
 	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", configuration.DbHost, configuration.DbUser, configuration.DbName, configuration.DbPassword)
 	db, err = sql.Open("postgres", connectionString)
+
+	if *kalmanFiltering {
+		DoKalmanFiltering(db)
+		return
+	}
+
 	DoDatabaseMigrations()
 	defer db.Close()
 	if err != nil {

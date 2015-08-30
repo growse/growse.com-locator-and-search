@@ -83,7 +83,7 @@ func GetLineStringAsJSON(year string) (string, error) {
 		var coords geojson.Coordinate
 		var distance float32
 		rows.Scan(&coords[0], &coords[1], &distance)
-		if distance > 0 { // We only want to add points where something's actually moved significantly
+		if distance > 100 { // We only want to add points where something's actually moved significantly, this is in metres
 			lineString.AddCoordinates(coords)
 		}
 	}

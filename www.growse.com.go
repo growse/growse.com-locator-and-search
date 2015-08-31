@@ -23,6 +23,7 @@ import (
 	"runtime/pprof"
 	"strings"
 	"time"
+	"mime"
 )
 
 var (
@@ -93,6 +94,8 @@ func InternalError(err error) {
 }
 
 func main() {
+	//On a mac, javascript isn't served utf8. Oddly
+	mime.AddExtensionType(".js","application/javascript; charset=utf8")
 	//Flags
 	configFile := flag.String("configFile", "config.json", "File path to the JSON configuration")
 	templateTestPath := flag.String("templateTestPath", "", "Path to test the templates on")
@@ -180,6 +183,7 @@ func main() {
 
 	//Load the templates. Don't use gin for this, because we want to render to a buffer later
 	LoadTemplates()
+
 	//Static is over here
 	router.Static("/static/", configuration.StaticPath)
 

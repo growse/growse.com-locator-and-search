@@ -2,11 +2,13 @@
 <div id="content" class="nonav admin">
     <h1>All the things</h1>
 
-    <p><a href="javascript:$('#newarticlemodal').show(); $('#newarticle #title').focus();" id="newbtn">New</a></p>
+    <p><a href="javascript:growse.newArticle();" id="newbtn">New</a></p>
 
     <div id="newarticlemodal" class="modal hide">
-        <form id="newarticle" method="post" action="" onsubmit="needExitConfirmation=false;">
+        <form id="newarticle" method="post" action="">
             <div id="preview"></div>
+            <input type="hidden" id="articleid" name="id" value=""/>
+
             <div><input type="text" id="title" name="title" placeholder="Title" required=""/></div>
 
             <div class="expand"><textarea type="text" id="markdown" name="markdown" placeholder="Markdown"
@@ -18,22 +20,31 @@
     </div>
     <ul>
         {{ range .Articles}}
-        <li>{{.Title}} - <a href="javascript:editArticle({{.Id}});">Edit</a> <a
-                href="javascript:deleteArticle({{.Id}});">Delete</a></li>
+        <li id="article-{{.Id}}"><span class="title">{{.Title}}</span> - <a href="javascript:growse.editArticle({{.Id}});">Edit</a> <a
+                href="javascript:growse.deleteArticle({{.Id}});">Delete</a></li>
         {{else}}
         <li>No Articles Found</li>
         {{end}}
     </ul>
 </div>
-<script type="text/javascript" src="/static/js/admin.js"></script>
+<!--<script type="text/javascript" src="/static/js/admin.js"></script>-->
 <script type="text/javascript">
     var oldPreviewContent = "";
-    var needExitConfirmation = true;
+    var needsConfirm = true;
     $(function () {
-
+        $("#newarticle").on('submit', function (e) {
+            console.log($("#articleid").val());
+            if ($("#articleid").val() != "") {
+                growse.updateExistingArticle($("#articleid").val(), $("#title").val(), $("#markdown").val(), true);
+                return false;
+            } else {
+                needsConfirm = false;
+                return true;
+            }
+        });
         window.onbeforeunload = confirmExit;
         function confirmExit() {
-            if (needExitConfirmation) {
+            if ($("#markdown").val().length > 0 && needsConfirm) {
                 return "You have attempted to leave this page.  If you have made any changes to the fields without clicking the Save button, your changes will be lost.  Are you sure you want to exit this page?";
             }
         }

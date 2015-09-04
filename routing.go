@@ -11,6 +11,7 @@ func BuildRoutes(router *gin.Engine) {
 		authorized.GET("articles/", AdminArticleHandler)
 		authorized.POST("articles/", AdminNewArticleHandler)
 		authorized.PUT("articles/:id/", AdminUpdateArticleHandler)
+		authorized.GET("articles/:id/", AdminGetArticleHandler)
 		authorized.DELETE("articles/:id/", AdminDeleteArticleHandler)
 		authorized.POST("preview/", MarkdownPreviewHandler)
 		authorized.GET("where/", WhereHandler)

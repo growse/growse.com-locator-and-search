@@ -43,6 +43,21 @@ func AdminArticleHandler(c *gin.Context) {
 	}
 }
 
+func AdminGetArticleHandler(c *gin.Context) {
+	type ArticleJustMarkdown struct {
+		Id       int    `json:"id"`
+		Title    string `json:"title"`
+		Markdown string `json:"markdown"`
+	}
+	var article ArticleJustMarkdown
+	err := db.QueryRow("select id,title,markdown from articles where id=$1", c.Params.ByName("id")).Scan(&article.Id, &article.Title, &article.Markdown)
+	if err != nil {
+		c.AbortWithStatus(404)
+		return
+	}
+	c.JSON(200, article)
+}
+
 func AdminNewArticleHandler(c *gin.Context) {
 	type NewArticleForm struct {
 		Title    string `form:"title" binding:"required"`
@@ -65,10 +80,35 @@ func AdminNewArticleHandler(c *gin.Context) {
 	c.Redirect(302, "/auth/articles/")
 }
 func AdminUpdateArticleHandler(c *gin.Context) {
-	c.Redirect(302, "/auth/articles/")
+	type UpdateArticleForm struct {
+		Title    string `form:"title" binding:"required"`
+		Markdown string `form:"markdown" binding:"required"`
+	}
+	var form UpdateArticleForm
+	c.Bind(&form)
+
+	id := c.Params.ByName("id")
+	log.Printf("Title: %s", form.Title)
+	slug := slugify(form.Title)
+	log.Printf("Slug: %s", slug)
+	searchtext := StripTags(string(blackfriday.MarkdownCommon(([]byte)(form.Markdown))))
+	log.Printf("markdown: %s", form.Markdown)
+	log.Printf("searchtext: %s", searchtext)
+
+	_, err := db.Exec("update articles set title=$1,shorttitle=$2,markdown=$3,searchtext=$4, published=$5 where id=$6", form.Title, slug, form.Markdown, searchtext, true, id)
+	if err != nil {
+		log.Printf("Error writing to db: %v", err)
+	}
+	c.String(200, "")
 }
 func AdminDeleteArticleHandler(c *gin.Context) {
-	c.Redirect(302, "/auth/articles/")
+	_, err := db.Exec("delete from articles where id=$1", c.Params.ByName("id"))
+	if err != nil {
+		log.Printf("Error writing to db: %v", err)
+		c.AbortWithStatus(500)
+		return
+	}
+	c.String(200, "")
 }
 
 func slugify(title string) (slug string) {

@@ -50,6 +50,11 @@ $(function () {
             a.click();
         };
     });
+    $(document).keyup(function (e) {
+        if (e.keyCode == 27) { // escape key maps to keycode `27`
+            growse.clearForm();
+        }
+    });
 });
 
 var growse = {
@@ -263,6 +268,20 @@ var growse = {
                 .text(xAxisTitle);
         }
     },
+    newArticle: function () {
+        $('#newarticlemodal').show();
+        $('#newarticle #title').focus();
+    },
+    editArticle: function (id) {
+        $('#newarticlemodal').show();
+        $('#newarticle #title').focus();
+        growse.getExistingArticle(id);
+    },
+    deleteArticle: function (id) {
+        if (confirm("Delete this article?")) {
+            growse.deleteExistingArticle(id);
+        }
+    },
     submitNewArticle: function (title, content, published) {
         $.ajax({
             url: '/auth/articles/',
@@ -273,14 +292,37 @@ var growse = {
             }
         });
     },
-    updateExistingArticle: function (id, title, content, published) {
+    updateExistingArticle: function (id, title, markdown, published) {
         $.ajax({
             url: '/auth/articles/' + id + '/',
             type: 'PUT',
-            data: {title: title, content: content, published: published},
-            success: function (response) {
-                alert(response);
+            data: {title: title, markdown: markdown, published: published},
+            success: function () {
+                growse.clearForm();
+                $("#article-" + id +" >span.title").text(title);
             }
         });
+    },
+    deleteExistingArticle: function (id) {
+        $.ajax({
+            url: '/auth/articles/' + id + '/',
+            type: 'DELETE',
+            success: function () {
+                location.reload();
+            }
+        });
+    },
+    getExistingArticle: function (id) {
+        $.getJSON('/auth/articles/' + id + '/', function (response) {
+            $('#markdown').val(response.markdown);
+            $('#title').val(response.title);
+            $('#articleid').val(response.id);
+        });
+    },
+    clearForm: function () {
+        $('#markdown').val("");
+        $('#title').val("");
+        $('#articleid').val("");
+        $('#newarticlemodal').hide();
     }
 };

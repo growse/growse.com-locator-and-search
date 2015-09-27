@@ -168,11 +168,6 @@ func LocatorHandler(c *gin.Context) {
 	newLocation := false
 	for _, locator := range locators {
 		locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt/1000, 1000000*(locator.DeviceTimestampAsInt%1000))
-
-		if err != nil {
-			InternalError(err)
-			c.String(500, "Internal Error")
-		}
 		locator.GetRelativeSpeedDistance(db)
 
 		_, err = db.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,gsmtype,wifissid,distance) values ($1,$2,$3,$4,$5,$6,$7,$8)", time.Now(), &locator.DeviceTimestamp, &locator.Latitude, &locator.Longitude, &locator.Accuracy, &locator.GSMType, &locator.WifiSSID, &locator.Distance)

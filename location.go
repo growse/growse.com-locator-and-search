@@ -243,7 +243,7 @@ func (loc *Location) GetGeocoding() {
 	geocodingUrl := fmt.Sprintf(configuration.GeocodeApiURL, loc.Latitude, loc.Longitude)
 	response, err := http.Get(geocodingUrl)
 	if err != nil {
-		InternalError(err)
+		log.Printf("Error getting geolocation from API: %v", err)
 		return
 	}
 	defer response.Body.Close()

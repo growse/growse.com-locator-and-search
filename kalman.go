@@ -5,6 +5,7 @@ import (
 	"log"
 	"math"
 	"time"
+	"github.com/gin-gonic/gin"
 )
 
 type KalmanLocation struct {
@@ -20,9 +21,23 @@ type KalmanLocation struct {
 	KalmanDistance  float64
 }
 
+
+func KalmanHandler(c *gin.Context) {
+	c.String(200, "Yay")
+}
+
+func RecalculateKalmanHandler(c *gin.Context) {
+	DoKalmanFiltering(db)
+	c.Redirect(302, "/auth/where/kalman")
+}
+
+
+/*
+Commit the kalman data for the given location back to the database
+ */
 func (kalmanLocation KalmanLocation) Persist(tx *sql.Tx) {
 	log.Printf("Persisting: %v", kalmanLocation)
-	_, err := tx.Exec("update locations set klat=$1, klong=$2, kaccuracy=$3, kdistance=$4 where id=$5", kalmanLocation.KalmanLatitude, kalmanLocation.Longitude, kalmanLocation.KalmanAccuracy, kalmanLocation.KalmanDistance, kalmanLocation.Id)
+	_, err := tx.Exec("update locations set kalman_latitude=$1, kalman_longitude=$2, kalman_accuracy=$3, kalman_distance=$4 where id=$5", kalmanLocation.KalmanLatitude, kalmanLocation.Longitude, kalmanLocation.KalmanAccuracy, kalmanLocation.KalmanDistance, kalmanLocation.Id)
 	if err != nil {
 		log.Fatalf("Fatal persisting location: %v: %v", kalmanLocation, err)
 	}

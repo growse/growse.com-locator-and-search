@@ -1,0 +1,1 @@
+alter table locations add kalman_latitude float, kalman_longitude float,kalman_distance float, kalman_accuracy float;

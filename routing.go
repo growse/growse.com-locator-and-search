@@ -15,6 +15,8 @@ func BuildRoutes(router *gin.Engine) {
 		authorized.DELETE("articles/:id/", AdminDeleteArticleHandler)
 		authorized.POST("preview/", MarkdownPreviewHandler)
 		authorized.GET("where/", WhereHandler)
+		authorized.GET("where/kalman/", KalmanHandler)
+		authorized.POST("where/kalman/", RecalculateKalmanHandler)
 		authorized.GET("where/linestring/:year/", WhereLineStringHandler)
 	}
 	router.GET("/oauth2callback", OauthCallback)

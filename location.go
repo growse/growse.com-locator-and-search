@@ -12,6 +12,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -71,9 +72,15 @@ func GetTotalDistance() (float64, error) {
 	return distance, nil
 }
 
-func GetLineStringAsJSON(year string) (string, error) {
+func GetLineStringAsJSON(year string, filtered bool) (string, error) {
 	lineString := geojson.NewLineString(nil)
-	rows, err := db.Query("select longitude,latitude,distance from locations where extract (year from devicetimestamp at time zone 'UTC')=$1 order by devicetimestamp asc", year)
+	var sqlStatement string
+	if filtered {
+		sqlStatement = "select kalmanlongitude,kalmanlatitude,kalmandistance from locations where extract (year from devicetimestamp at time zone 'UTC')=$1 and kalmanaccuracy<(select percentile_disc(0.9) within group (order by kalmanaccuracy) from locations where date_part('year',devicetimestamp)=$1) order by devicetimestamp asc"
+	} else {
+		sqlStatement = "select longitude,latitude,distance from locations where extract (year from devicetimestamp at time zone 'UTC')=$1 and accuracy<(select percentile_disc(0.9) within group (order by accuracy) from locations where date_part('year',devicetimestamp)=$1) order by devicetimestamp asc"
+	}
+	rows, err := db.Query(sqlStatement, year)
 	if err != nil {
 		return "", err
 	}
@@ -116,12 +123,41 @@ func (location *Location) Name() string {
 
 /* HTTP handlers */
 func WhereLineStringHandler(c *gin.Context) {
-	linestring, err := GetLineStringAsJSON(c.Params.ByName("year"))
+	filtered, _ := strconv.ParseBool(c.Params.ByName("filtered"))
+	linestring, err := GetLineStringAsJSON(c.Params.ByName("year"), filtered)
 	if err != nil {
 		InternalError(err)
 		c.String(500, "Internal Error")
 	}
 	c.Data(200, "application/json", []byte(linestring))
+}
+func WhereLineStringHandlerNonFiltered(c *gin.Context) {
+	linestring, err := GetLineStringAsJSON(c.Params.ByName("year"), false)
+	if err != nil {
+		InternalError(err)
+		c.String(500, "Internal Error")
+	}
+	c.Data(200, "application/json", []byte(linestring))
+}
+
+func OSMWhereHandler(c *gin.Context) {
+	filtered, err := strconv.ParseBool(c.Params.ByName("filtered"))
+	if err != nil {
+		filtered = false
+	}
+	year := c.Params.ByName("year")
+	obj := gin.H{"Year": year, "Filtered": filtered}
+	buf := bufPool.Get()
+	defer bufPool.Put(buf)
+
+	err = templates.ExecuteTemplate(buf, "osm.html", obj)
+	pageBytes := buf.Bytes()
+	if err == nil {
+		c.Data(200, "text/html", pageBytes)
+	} else {
+		InternalError(err)
+		c.String(500, "Internal Error")
+	}
 }
 
 func WhereHandler(c *gin.Context) {
@@ -167,7 +203,7 @@ func LocatorHandler(c *gin.Context) {
 
 	newLocation := false
 	for _, locator := range locators {
-		locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt / 1000, 1000000 * (locator.DeviceTimestampAsInt % 1000))
+		locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt/1000, 1000000*(locator.DeviceTimestampAsInt%1000))
 		locator.GetRelativeSpeedDistance(db)
 
 		_, err = db.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,gsmtype,wifissid,distance) values ($1,$2,$3,$4,$5,$6,$7,$8)", time.Now(), &locator.DeviceTimestamp, &locator.Latitude, &locator.Longitude, &locator.Accuracy, &locator.GSMType, &locator.WifiSSID, &locator.Distance)
@@ -277,8 +313,8 @@ func DistanceOnUnitSphere(lat1 float64, long1 float64, lat2 float64, long2 float
 	// sin phi sin phi' cos(theta-theta') + cos phi cos phi'
 	// distance = rho * arc length
 
-	cos := (math.Sin(phi1) * math.Sin(phi2) * math.Cos(theta1 - theta2) +
-	math.Cos(phi1) * math.Cos(phi2))
+	cos := (math.Sin(phi1)*math.Sin(phi2)*math.Cos(theta1-theta2) +
+		math.Cos(phi1)*math.Cos(phi2))
 
 	cos = math.Max(math.Min(cos, 1.0), -1.0)
 

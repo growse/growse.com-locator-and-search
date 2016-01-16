@@ -19,3 +19,4 @@ src/gopkg*
 *.iml
 out
 static/js/*.map
+pprof.cpu

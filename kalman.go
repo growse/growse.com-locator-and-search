@@ -2,10 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"github.com/gin-gonic/gin"
 	"log"
 	"math"
 	"time"
-	"github.com/gin-gonic/gin"
 )
 
 type KalmanLocation struct {
@@ -21,7 +21,6 @@ type KalmanLocation struct {
 	KalmanDistance  float64
 }
 
-
 func KalmanHandler(c *gin.Context) {
 	c.String(200, "Yay")
 }
@@ -31,13 +30,12 @@ func RecalculateKalmanHandler(c *gin.Context) {
 	c.Redirect(302, "/auth/where/kalman")
 }
 
-
 /*
 Commit the kalman data for the given location back to the database
- */
+*/
 func (kalmanLocation KalmanLocation) Persist(tx *sql.Tx) {
 	log.Printf("Persisting: %v", kalmanLocation)
-	_, err := tx.Exec("update locations set kalman_latitude=$1, kalman_longitude=$2, kalman_accuracy=$3, kalman_distance=$4 where id=$5", kalmanLocation.KalmanLatitude, kalmanLocation.Longitude, kalmanLocation.KalmanAccuracy, kalmanLocation.KalmanDistance, kalmanLocation.Id)
+	_, err := tx.Exec("update locations set kalmanlatitude=$1, kalmanlongitude=$2, kalmanaccuracy=$3, kalmandistance=$4 where id=$5", kalmanLocation.KalmanLatitude, kalmanLocation.Longitude, kalmanLocation.KalmanAccuracy, kalmanLocation.KalmanDistance, kalmanLocation.Id)
 	if err != nil {
 		log.Fatalf("Fatal persisting location: %v: %v", kalmanLocation, err)
 	}
@@ -45,7 +43,7 @@ func (kalmanLocation KalmanLocation) Persist(tx *sql.Tx) {
 
 /*
 Kind of taken from http://stackoverflow.com/questions/1134579/smooth-gps-data
- */
+*/
 func DoKalmanFiltering(db *sql.DB) {
 	tx, err := db.Begin()
 	if err != nil {

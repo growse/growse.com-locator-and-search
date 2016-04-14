@@ -44,6 +44,16 @@ module.exports = function (grunt) {
                 }]
             }
         },
+        compress: {
+            assets: {
+                options: {
+                    archive: 'assets.tgz'
+                },
+                files: [
+                    {src: ['js/*.www.js','css/*.www.css'], dest: '.'}
+                ]
+            }
+        },
         sass: {
             target: {
                 files: {
@@ -77,7 +87,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-sass');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-compress');
 
-    grunt.registerTask('default', ['jshint', 'uglify', 'sass', 'cssmin', 'clean', 'rev']);
+    grunt.registerTask('default', ['jshint', 'uglify', 'sass', 'cssmin', 'clean', 'rev', 'compress']);
 
 };

@@ -16,6 +16,8 @@ test:
   post:
     - cp www.growse.com $CIRCLE_ARTIFACTS/
     - cd static && npm install && grunt
+    - cp assets.tgz $CIRCLE_ARTIFACTS/
+    - cd ..
 
 deployment:
   production:

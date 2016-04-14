@@ -15,6 +15,7 @@ test:
     - ./www.growse.com -templateTestPath=templates
   post:
     - cp www.growse.com $CIRCLE_ARTIFACTS/
+    - cd static && npm install && grunt
 
 deployment:
   production:

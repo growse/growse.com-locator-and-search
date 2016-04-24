@@ -50,7 +50,7 @@ module.exports = function (grunt) {
                     archive: 'assets.tgz'
                 },
                 files: [
-                    {src: ['js/*.www.js','css/*.www.css'], dest: '.'}
+                    {src: ['fonts/*','js/*.www.js','css/*.www.css'], dest: '.'}
                 ]
             }
         },

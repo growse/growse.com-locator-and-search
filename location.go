@@ -263,6 +263,8 @@ func UpdateLatestLocationWithGeocoding(workChan <-chan bool) {
 				err = tx.Commit()
 				if err != nil {
 					InternalError(err)
+				} else {
+					log.Print("Geocoding complete")
 				}
 			}
 		} else {

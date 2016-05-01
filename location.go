@@ -90,7 +90,8 @@ func GetLineStringAsJSON(year string, filtered bool) (string, error) {
 		var coords geojson.Coordinate
 		var distance float32
 		rows.Scan(&coords[0], &coords[1], &distance)
-		if distance > 100 { // We only want to add points where something's actually moved significantly, this is in metres
+		if distance > 100 {
+			// We only want to add points where something's actually moved significantly, this is in metres
 			lineString.AddCoordinates(coords)
 		}
 	}
@@ -192,6 +193,7 @@ func WhereHandler(c *gin.Context) {
 /*
 Receive POST from phone. This should be an application/json containing an array of points.
 */
+
 func LocatorHandler(c *gin.Context) {
 	locators := []Location{}
 
@@ -203,7 +205,7 @@ func LocatorHandler(c *gin.Context) {
 
 	newLocation := false
 	for _, locator := range locators {
-		locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt/1000, 1000000*(locator.DeviceTimestampAsInt%1000))
+		locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt / 1000, 1000000 * (locator.DeviceTimestampAsInt % 1000))
 		locator.GetRelativeSpeedDistance(db)
 
 		_, err = db.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,gsmtype,wifissid,distance) values ($1,$2,$3,$4,$5,$6,$7,$8)", time.Now(), &locator.DeviceTimestamp, &locator.Latitude, &locator.Longitude, &locator.Accuracy, &locator.GSMType, &locator.WifiSSID, &locator.Distance)
@@ -224,36 +226,51 @@ func LocatorHandler(c *gin.Context) {
 	}
 	//Now to update the geocoding from the latest locator
 	if newLocation {
-		var location Location
-		var id int
-		err = db.QueryRow("select id,latitude,longitude from locations order by devicetimestamp desc limit 1").Scan(&id, &location.Latitude, &location.Longitude)
-		if err != nil {
-			InternalError(err)
-		}
-		tx, err := db.Begin()
-		if err != nil {
-			InternalError(err)
-		}
-		location.GetGeocoding()
-		if location.Geocoding != "" {
-			_, err = tx.Exec("Update locations set geocoding=null")
-			if err != nil {
-				tx.Rollback()
-				InternalError(err)
-			}
-			_, err = tx.Exec("update locations set geocoding=$1 where id=$2", location.Geocoding, id)
-			if err != nil {
-				log.Printf("Location that caused fail is: %s", location.Geocoding)
-				tx.Rollback()
-				InternalError(err)
-			}
-			err = tx.Commit()
-			if err != nil {
-				InternalError(err)
-			}
-		}
+		GeocodingWorkQueue <- true
 	}
 	c.String(200, "Yay")
+}
+
+func UpdateLatestLocationWithGeocoding(workChan <-chan bool) {
+	log.Print("Starting geocoding goroutine")
+	for {
+		_, more := <-workChan
+		if (more) {
+			log.Print("Updating latest geocoding")
+			var location Location
+			var id int
+			err := db.QueryRow("select id,latitude,longitude from locations order by devicetimestamp desc limit 1").Scan(&id, &location.Latitude, &location.Longitude)
+			if err != nil {
+				InternalError(err)
+			}
+			tx, err := db.Begin()
+			if err != nil {
+				InternalError(err)
+			}
+			location.GetGeocoding()
+			if location.Geocoding != "" {
+				_, err = tx.Exec("Update locations set geocoding=null")
+				if err != nil {
+					tx.Rollback()
+					InternalError(err)
+				}
+				_, err = tx.Exec("update locations set geocoding=$1 where id=$2", location.Geocoding, id)
+				if err != nil {
+					log.Printf("Location that caused fail is: %s", location.Geocoding)
+					tx.Rollback()
+					InternalError(err)
+				}
+				err = tx.Commit()
+				if err != nil {
+					InternalError(err)
+				}
+			}
+		} else {
+			log.Print("Got signal, quitting geocoding goroutine.")
+			return
+		}
+
+	}
 }
 
 func (loc *Location) GetRelativeSpeedDistance(thisDb *sql.DB) {
@@ -313,8 +330,8 @@ func DistanceOnUnitSphere(lat1 float64, long1 float64, lat2 float64, long2 float
 	// sin phi sin phi' cos(theta-theta') + cos phi cos phi'
 	// distance = rho * arc length
 
-	cos := (math.Sin(phi1)*math.Sin(phi2)*math.Cos(theta1-theta2) +
-		math.Cos(phi1)*math.Cos(phi2))
+	cos := (math.Sin(phi1) * math.Sin(phi2) * math.Cos(theta1 - theta2) +
+	math.Cos(phi1) * math.Cos(phi2))
 
 	cos = math.Max(math.Min(cos, 1.0), -1.0)
 

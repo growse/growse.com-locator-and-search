@@ -30,12 +30,13 @@ var (
 	db                 *sql.DB
 	stylesheetfilename string
 	javascriptfilename string
-	configuration      Configuration
-	gun                mailgun.Mailgun
+	configuration Configuration
+	gun mailgun.Mailgun
 	templates          *template.Template
 	bufPool            *bpool.BufferPool
-	memoryCache        cmap.ConcurrentMap
+	memoryCache cmap.ConcurrentMap
 	oAuthConf          *oauth2.Config
+	GeocodingWorkQueue chan bool
 )
 
 type Configuration struct {
@@ -153,6 +154,21 @@ func main() {
 	}
 	log.Printf("Cache expiry duration: %fs\n", configuration.DefaultCacheExpiry.Seconds())
 
+	//Catch SIGTERM to stop the profiling
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		for sig := range c {
+			log.Printf("captured %v, stopping profiler and exiting..", sig)
+			pprof.StopCPUProfile()
+			os.Exit(1)
+		}
+	}()
+
+	GeocodingWorkQueue = make(chan bool, 100)
+	defer close(GeocodingWorkQueue)
+	go UpdateLatestLocationWithGeocoding(GeocodingWorkQueue)
+
 	gun = mailgun.NewMailgun("growse.com", configuration.MailgunKey, "")
 
 	//Initialize the template output buffer pool
@@ -225,7 +241,7 @@ func main() {
 			for {
 				select {
 				case event := <-watcher.Events:
-					if event.Op&fsnotify.Create == fsnotify.Create {
+					if event.Op & fsnotify.Create == fsnotify.Create {
 						if strings.HasSuffix(event.Name, ".www.css") {
 							log.Printf("New CSS Detected: %s", path.Base(event.Name))
 							stylesheetfilename = path.Base(event.Name)
@@ -263,17 +279,6 @@ func main() {
 		pprof.StartCPUProfile(f)
 		defer pprof.StopCPUProfile()
 	}
-
-	//Catch SIGTERM to stop the profiling
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	go func() {
-		for sig := range c {
-			log.Printf("captured %v, stopping profiler and exiting..", sig)
-			pprof.StopCPUProfile()
-			os.Exit(1)
-		}
-	}()
 
 	BuildRoutes(router)
 	log.Printf("Listening on port %d", configuration.Port)

@@ -231,6 +231,9 @@ func main() {
 	}
 	if javascriptfilename == "" {
 		log.Fatal("No javascript found in staticpath. Perhaps run Grunt first?")
+	} else {
+		log.Printf("Javascript filename: %s", javascriptfilename)
+		log.Printf("Where Javascript filename: %s", wherejavascriptfilename)
 	}
 
 	//Detect changes to css / js and update those paths.

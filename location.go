@@ -176,7 +176,14 @@ func WhereHandler(c *gin.Context) {
 	if err != nil {
 		InternalError(err)
 	}
-	obj := gin.H{"Title": "Where", "Stylesheet": stylesheetfilename, "Javascript": javascriptfilename, "Avgspeed": avgspeed, "Totaldistance": totaldistance, "LastLocation": lastlocation}
+	obj := gin.H{
+		"Title": "Where",
+		"Stylesheet": stylesheetfilename,
+		"Javascript": javascriptfilename,
+		"WhereJavascript": wherejavascriptfilename,
+		"Avgspeed": avgspeed,
+		"Totaldistance": totaldistance,
+		"LastLocation": lastlocation}
 	buf := bufPool.Get()
 	defer bufPool.Put(buf)
 

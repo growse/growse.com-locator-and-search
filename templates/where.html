@@ -1,15 +1,17 @@
-{{template "header" .}}
+{{ template "header" .}}
 <div id="content" class="nonav">
     <article>
         <header>
             <h1>Where I've Been</h1>
         </header>
-        <p>This year, I've averaged a huge <strong>{{RenderFloat "#,###.##" .Avgspeed }}mph</strong> after covering
+        <p>This year, I've averaged a huge <strong>{{ RenderFloat "#,###.##" .Avgspeed }}mph</strong> after covering
             <strong>{{ RenderFloat "#,###.##" .Totaldistance }} miles</strong>.</p>
 
         <p>Last device ping:
             <strong>
-                <time class="timeago" datetime="{{ .LastLocation.Timestamp.UTC.Format "2006-01-02T15:04:05Z07:00" }}">{{.LastLocation.Timestamp}}</time></strong>.
+                <time class="timeago" datetime="{{ .LastLocation.Timestamp.UTC.Format "2006-01-02T15:04:05Z07:00" }}">
+                    {{.LastLocation.Timestamp}}</time>
+            </strong>.
         </p>
 
         <h2>Map</h2>
@@ -28,7 +30,7 @@
         </div>
     </article>
 </div>
-<script type="text/javascript" src="/static/js/where.js"></script>
+<script type="text/javascript" src="/static/js/{{ .WhereJavascript }}"></script>
 <script type="text/javascript">
     //var speed_data ={{ .Speeds }};
     //var speed_hours_data = {{ .Speed_hours }};
@@ -39,4 +41,4 @@
         growse.drawMap('#map', mapfile);
 
     });
-</script>{{template "footer" .}}
+</script>{{ template "footer" .}}

@@ -30,6 +30,7 @@ var (
 	db                 *sql.DB
 	stylesheetfilename string
 	javascriptfilename string
+	wherejavascriptfilename string
 	configuration Configuration
 	gun mailgun.Mailgun
 	templates          *template.Template
@@ -224,6 +225,8 @@ func main() {
 		if !file.IsDir() && (lastTimeJs.IsZero() || file.ModTime().After(lastTimeJs)) && strings.HasSuffix(file.Name(), ".www.js") {
 			lastTimeJs = file.ModTime()
 			javascriptfilename = file.Name()
+		} else if !file.IsDir() && (lastTimeJs.IsZero() || file.ModTime().After(lastTimeJs)) && strings.HasSuffix(file.Name(), ".where.js") {
+			wherejavascriptfilename = file.Name()
 		}
 	}
 	if javascriptfilename == "" {

@@ -49,7 +49,9 @@ module.exports = function (grunt) {
           archive: 'assets.tgz'
         },
         files: [
-          {src: ['fonts/*', 'js/*.www.js', 'js/*.where.js', 'css/*.www.css'], dest: '.'}
+          {
+            src: ['fonts/*', 'js/*.www.js', 'js/*.where.js', 'css/*.www.css'], dest: '.'
+          }
         ]
       }
     },

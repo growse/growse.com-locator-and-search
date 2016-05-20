@@ -65,7 +65,7 @@ In miles.
 */
 func GetTotalDistance() (float64, error) {
 	var distance float64
-	err := db.QueryRow("select 0.000621371192*sum(distance) from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC')) = $1);",time.Now().UTC().Year()).Scan(&distance)
+	err := db.QueryRow("select 0.000621371192*sum(distance) from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC')) = $1;",time.Now().UTC().Year()).Scan(&distance)
 	if err != nil {
 		return 0, err
 	}

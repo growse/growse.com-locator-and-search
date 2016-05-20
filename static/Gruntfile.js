@@ -50,7 +50,7 @@ module.exports = function (grunt) {
         },
         files: [
           {
-            src: ['fonts/*', 'js/*.www.js', 'js/*.where.js', 'css/*.www.css'], dest: '.'
+            src: ['fonts/*', 'js/*.www.js', 'js/*.where.js', 'js/world-50m.json', 'css/*.www.css'], dest: '.'
           }
         ]
       }

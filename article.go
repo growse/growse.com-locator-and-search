@@ -136,18 +136,18 @@ func SmartTruncateWithHighlight(input string, searchterm string, surroundingWord
 				startIndex = 0
 			}
 		}
-		result = strings.Join(words[startIndex:endIndex+1], " ")
+		result = strings.Join(words[startIndex:endIndex + 1], " ")
 		if startIndex > 0 {
 			result = suffix + result
 		}
-		if endIndex < len(words)-1 {
+		if endIndex < len(words) - 1 {
 			result += suffix
 		}
 	} else {
-		if 2*surroundingWords > len(words)-1 {
+		if 2 * surroundingWords > len(words) - 1 {
 			result = strings.Join(words, " ")
 		} else {
-			result = strings.Join(words[0:2*surroundingWords], " ") + suffix
+			result = strings.Join(words[0:2 * surroundingWords], " ") + suffix
 		}
 	}
 	return result
@@ -285,7 +285,7 @@ func ArticleHandler(c *gin.Context) {
 		c.Data(200, "text/html", cachedBytes)
 		return
 	}
-	log.Printf("Cache MISS: %v", cacheKey)
+	log.Printf("Article cache MISS: %v for request: %v", cacheKey, c.Request)
 
 	//Cache miss, load from DB
 	article, err := GetArticle(year, month, day, slug)
@@ -359,7 +359,7 @@ func LatestArticleHandler(c *gin.Context) {
 		c.Data(200, "text/html", cacheBytes)
 		return
 	}
-	log.Printf("Cache MISS: %v", article.getCacheKey())
+	log.Printf("Latest article cache MISS: %v for request: %v", article.getCacheKey(), c.Request)
 
 	lastlocation, err := GetLastLoction()
 	if err != nil {
@@ -426,7 +426,7 @@ func SearchHandler(c *gin.Context) {
 		c.Data(200, "text/html", page)
 		return
 	}
-	log.Printf("Cache MISS: %v", cacheKey)
+	log.Printf("Search cache MISS: %v for request: %v", cacheKey, c.Request)
 
 	articles, err := SearchArticle(searchterm)
 	if err != nil {
@@ -449,7 +449,7 @@ func SearchHandler(c *gin.Context) {
 	err = templates.ExecuteTemplate(buf, "search.html", obj)
 	pageBytes := buf.Bytes()
 	if err == nil {
-		memoryCache.Set(cacheKey, pageBytes, time.Now().Add(5*time.Minute))
+		memoryCache.Set(cacheKey, pageBytes, time.Now().Add(5 * time.Minute))
 		c.Data(200, "text/html", pageBytes)
 	} else {
 		InternalError(err)
@@ -496,7 +496,7 @@ func RSSHandler(c *gin.Context) {
 const (
 	sitemapHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">"
 	sitemapFooter = "</urlset>"
-	sitemapUrl    = "<url><loc><![CDATA[https://www.growse.com%s]]></loc><lastmod>%s</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>"
+	sitemapUrl = "<url><loc><![CDATA[https://www.growse.com%s]]></loc><lastmod>%s</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>"
 )
 
 func UncompressedSiteMapHandler(c *gin.Context) {
@@ -518,7 +518,7 @@ func SiteMapHandler(c *gin.Context, compressed bool) {
 		c.Data(200, mimeType, cachedBytes)
 		return
 	}
-	log.Printf("Cache MISS: %v", cacheKey)
+	log.Printf("Sitemap handler cache MISS: %v for request: %v", cacheKey, c.Request)
 	rows, err := db.Query("Select id, datestamp,shorttitle,title from articles where published=true order by datestamp desc;")
 	if err != nil {
 		InternalError(err)

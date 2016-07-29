@@ -59,6 +59,7 @@ type Configuration struct {
 	ClientSecret           string
 	Port                   int
 	DefaultCacheExpiry     time.Duration
+	MaxDBOpenConnections   int
 }
 
 type ArticleMonth struct {
@@ -180,14 +181,17 @@ func main() {
 	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", configuration.DbHost, configuration.DbUser, configuration.DbName, configuration.DbPassword)
 	db, err = sql.Open("postgres", connectionString)
 
+	log.Printf("Setting maximum db connections to %d", configuration.MaxDBOpenConnections)
+	db.SetMaxOpenConns(configuration.MaxDBOpenConnections)
+
 	if err != nil {
 		log.Fatal("Error connecting to database: %v", err)
 	} else {
-		log.Printf("Database connected")
+		log.Print("Database connected")
 	}
 
 	if *kalmanFiltering {
-		log.Printf("Doing the Kalman batch processing")
+		log.Print("Doing the Kalman batch processing")
 		DoKalmanFiltering(db)
 		return
 	}

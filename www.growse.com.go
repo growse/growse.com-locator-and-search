@@ -185,7 +185,7 @@ func main() {
 	db.SetMaxOpenConns(configuration.MaxDBOpenConnections)
 
 	if err != nil {
-		log.Fatal("Error connecting to database: %v", err)
+		log.Fatal(err)
 	} else {
 		log.Print("Database connected")
 	}

@@ -9,11 +9,13 @@ dependencies:
   pre:
     - go get github.com/tools/godep
   override:
-    - godep restore
+    - $GOPATH/bin/godep restore
 
 test:
+  pre:
+    - $GOPATH/bin/godep go vet
   override:
-    - godep go test -v
+    - $GOPATH/bin/godep go test -v
     - ./www.growse.com -templateTestPath=templates
   post:
     - cp www.growse.com $CIRCLE_ARTIFACTS/

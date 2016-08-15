@@ -2,22 +2,21 @@ machine:
   environment:
     GOOS: linux
     GOARCH: amd64
-    GOPATH: $HOME/www.growse.com
-    GOBIN: $HOME/www.growse.com
+    PATH: "/usr/local/go/bin:/usr/local/go_workspace/bin:~/.go_workspace/bin:${PATH}"
+    GOPATH: "~/.go_workspace:/usr/local/go_workspace:${HOME}/.go_project"
+    GO15VENDOREXPERIMENT: 1
 
 dependencies:
   pre:
     - go get -u github.com/kardianos/govendor
   override:
-    - mkdir -p $HOME/.go_workspace/src/github.com/$CIRCLE_PROJECT_USERNAME
-    - ln -fs $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_workspace/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-    - cd $HOME/.go_workspace/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && ./govendor sync
+    - ./govendor sync
 
 test:
   pre:
-    - $GOPATH/bin/govendor vet
+    - go vet -v
   override:
-    - $GOPATH/bin/govendor go test -v
+    - go test -v
     - ./www.growse.com -templateTestPath=templates
   post:
     - cp www.growse.com $CIRCLE_ARTIFACTS/

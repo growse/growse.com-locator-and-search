@@ -16,10 +16,11 @@ dependencies:
 
 
 test:
-  pre:
-    - go vet -v
   override:
+    - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+    - go vet -v
     - go test -v
+    - go build -v
     - ./www.growse.com -templateTestPath=templates
   post:
     - cp www.growse.com $CIRCLE_ARTIFACTS/

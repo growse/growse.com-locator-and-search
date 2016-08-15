@@ -27,17 +27,17 @@ import (
 )
 
 var (
-	db                 *sql.DB
-	stylesheetfilename string
-	javascriptfilename string
+	db                      *sql.DB
+	stylesheetfilename      string
+	javascriptfilename      string
 	wherejavascriptfilename string
-	configuration Configuration
-	gun mailgun.Mailgun
-	templates          *template.Template
-	bufPool            *bpool.BufferPool
-	memoryCache cmap.ConcurrentMap
-	oAuthConf          *oauth2.Config
-	GeocodingWorkQueue chan bool
+	configuration           Configuration
+	gun                     mailgun.Mailgun
+	templates               *template.Template
+	bufPool                 *bpool.BufferPool
+	memoryCache             cmap.ConcurrentMap
+	oAuthConf               *oauth2.Config
+	GeocodingWorkQueue      chan bool
 )
 
 type Configuration struct {
@@ -78,7 +78,7 @@ func RobotsHandler(c *gin.Context) {
 }
 
 func LoadTemplates() {
-	log.Printf("Loading templates")
+	log.Print("Loading templates")
 	templateGlob := path.Join(configuration.TemplatePath, "*.html")
 	templates = template.Must(template.New("Yay Templates").Funcs(funcMap).ParseGlob(templateGlob))
 }
@@ -88,7 +88,7 @@ func InternalError(err error) {
 	debug.PrintStack()
 	if configuration.Production {
 		m := mailgun.NewMessage("Sender <blogbot@growse.com>", "ERROR: www.growse.com", fmt.Sprintf("%v\n%v", err, string(debug.Stack())), "sysadmin@growse.com")
-		log.Printf("Emailing stack: %s\n", m)
+		log.Printf("Emailing stack: %v\n", m)
 		response, id, _ := gun.Send(m)
 		log.Printf("Response ID: %s\n", id)
 		log.Printf("Message from server: %s\n", response)
@@ -129,10 +129,10 @@ func main() {
 	}
 
 	if configuration.TemplatePath == "" {
-		log.Fatalf("No template directory supplied")
+		log.Fatal("No template directory supplied")
 	}
 	if configuration.StaticPath == "" {
-		log.Fatalf("No static directory supplied")
+		log.Fatal("No static directory supplied")
 	}
 	if _, err := os.Stat(configuration.TemplatePath); os.IsNotExist(err) {
 		log.Fatalf("No such file or directory: %s", configuration.TemplatePath)
@@ -185,7 +185,7 @@ func main() {
 	db.SetMaxOpenConns(configuration.MaxDBOpenConnections)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error connecting to database: %v", err)
 	} else {
 		log.Print("Database connected")
 	}
@@ -251,7 +251,7 @@ func main() {
 			for {
 				select {
 				case event := <-watcher.Events:
-					if event.Op & fsnotify.Create == fsnotify.Create {
+					if event.Op&fsnotify.Create == fsnotify.Create {
 						if strings.HasSuffix(event.Name, ".www.css") {
 							log.Printf("New CSS Detected: %s", path.Base(event.Name))
 							stylesheetfilename = path.Base(event.Name)

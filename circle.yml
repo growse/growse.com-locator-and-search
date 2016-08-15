@@ -7,15 +7,15 @@ machine:
 
 dependencies:
   pre:
-    - go get github.com/tools/godep
+    - go get -u github.com/kardianos/govendor
   override:
-    - $GOPATH/bin/godep restore
+    - $GOPATH/bin/govendor restore
 
 test:
   pre:
-    - $GOPATH/bin/godep go vet
+    - $GOPATH/bin/govendor vet
   override:
-    - $GOPATH/bin/godep go test -v
+    - $GOPATH/bin/govendor go test -v
     - ./www.growse.com -templateTestPath=templates
   post:
     - cp www.growse.com $CIRCLE_ARTIFACTS/

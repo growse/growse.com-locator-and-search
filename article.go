@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"database/sql"
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/feeds"
@@ -136,18 +137,18 @@ func SmartTruncateWithHighlight(input string, searchterm string, surroundingWord
 				startIndex = 0
 			}
 		}
-		result = strings.Join(words[startIndex:endIndex + 1], " ")
+		result = strings.Join(words[startIndex:endIndex+1], " ")
 		if startIndex > 0 {
 			result = suffix + result
 		}
-		if endIndex < len(words) - 1 {
+		if endIndex < len(words)-1 {
 			result += suffix
 		}
 	} else {
-		if 2 * surroundingWords > len(words) - 1 {
+		if 2*surroundingWords > len(words)-1 {
 			result = strings.Join(words, " ")
 		} else {
-			result = strings.Join(words[0:2 * surroundingWords], " ") + suffix
+			result = strings.Join(words[0:2*surroundingWords], " ") + suffix
 		}
 	}
 	return result
@@ -196,7 +197,7 @@ func GetLatestArticle() (*Article, error) {
 		err := db.QueryRow(`Select id,datestamp,shorttitle,title,markdown from articles where published=true order by datestamp desc limit 1`).Scan(&article.Id, &article.Timestamp, &article.Slug, &article.Title, &article.Markdown)
 		switch {
 		case err == sql.ErrNoRows:
-			return nil, fmt.Errorf("No article found")
+			return nil, errors.New("No article found")
 		case err != nil:
 			return nil, err
 		default:
@@ -449,7 +450,7 @@ func SearchHandler(c *gin.Context) {
 	err = templates.ExecuteTemplate(buf, "search.html", obj)
 	pageBytes := buf.Bytes()
 	if err == nil {
-		memoryCache.Set(cacheKey, pageBytes, time.Now().Add(5 * time.Minute))
+		memoryCache.Set(cacheKey, pageBytes, time.Now().Add(5*time.Minute))
 		c.Data(200, "text/html", pageBytes)
 	} else {
 		InternalError(err)
@@ -496,7 +497,7 @@ func RSSHandler(c *gin.Context) {
 const (
 	sitemapHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">"
 	sitemapFooter = "</urlset>"
-	sitemapUrl = "<url><loc><![CDATA[https://www.growse.com%s]]></loc><lastmod>%s</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>"
+	sitemapUrl    = "<url><loc><![CDATA[https://www.growse.com%s]]></loc><lastmod>%s</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>"
 )
 
 func UncompressedSiteMapHandler(c *gin.Context) {

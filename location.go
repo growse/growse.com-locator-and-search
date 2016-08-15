@@ -53,7 +53,7 @@ Definately returns mph. Hence 2.236blahblah
 */
 func GetAverageSpeed() (float64, error) {
 	var speed float64
-	err := db.QueryRow("select 2.23693629*avg(speed) from (select distance/(extract(epoch from (devicetimestamp - lag(devicetimestamp) over (order by devicetimestamp asc)))::float) as speed from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC')) = $1) a;",time.Now().UTC().Year()).Scan(&speed)
+	err := db.QueryRow("select 2.23693629*avg(speed) from (select distance/(extract(epoch from (devicetimestamp - lag(devicetimestamp) over (order by devicetimestamp asc)))::float) as speed from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC')) = $1) a;", time.Now().UTC().Year()).Scan(&speed)
 	if err != nil {
 		return 0, err
 	}
@@ -65,7 +65,7 @@ In miles.
 */
 func GetTotalDistance() (float64, error) {
 	var distance float64
-	err := db.QueryRow("select 0.000621371192*sum(distance) from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC')) = $1;",time.Now().UTC().Year()).Scan(&distance)
+	err := db.QueryRow("select 0.000621371192*sum(distance) from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC')) = $1;", time.Now().UTC().Year()).Scan(&distance)
 	if err != nil {
 		return 0, err
 	}
@@ -308,7 +308,12 @@ func (loc *Location) GetGeocoding() {
 		log.Printf("Error getting geolocation from API: %v", err)
 		return
 	}
+
 	defer response.Body.Close()
+	if response.StatusCode != 200 {
+		InternalError(errors.New(fmt.Sprintf("invalid response from Geolocation API: %v %v", response.StatusCode, response.Body)))
+		return
+	}
 	body, err := ioutil.ReadAll(response.Body)
 
 	if err != nil {
@@ -340,7 +345,7 @@ func DistanceOnUnitSphere(lat1 float64, long1 float64, lat2 float64, long2 float
 	// distance = rho * arc length
 
 	cos := (math.Sin(phi1) * math.Sin(phi2) * math.Cos(theta1 - theta2) +
-	math.Cos(phi1) * math.Cos(phi2))
+		math.Cos(phi1) * math.Cos(phi2))
 
 	cos = math.Max(math.Min(cos, 1.0), -1.0)
 

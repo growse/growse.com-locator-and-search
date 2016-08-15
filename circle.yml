@@ -17,7 +17,6 @@ dependencies:
 
 test:
   override:
-    - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && go vet -v
     - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && go test -v
     - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && go build -v
     - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && ./www.growse.com -templateTestPath=templates

@@ -6,12 +6,14 @@ machine:
     GOBIN: $HOME/www.growse.com
 
 dependencies:
+  pre:
+    - go get github.com/tools/godep
   override:
-    - go get
+    - godep restore
 
 test:
   override:
-    - go test -v
+    - godep go test -v
     - ./www.growse.com -templateTestPath=templates
   post:
     - cp www.growse.com $CIRCLE_ARTIFACTS/

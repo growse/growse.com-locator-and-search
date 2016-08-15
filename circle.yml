@@ -10,6 +10,7 @@ dependencies:
   pre:
     - go get -u github.com/kardianos/govendor
   override:
+    - ls -lah
     - ./govendor sync
 
 test:

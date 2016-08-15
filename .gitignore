@@ -21,3 +21,5 @@ out
 static/js/*.map
 static/*.tgz
 pprof.cpu
+
+vendor/**/

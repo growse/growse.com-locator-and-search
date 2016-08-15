@@ -9,7 +9,10 @@ dependencies:
   pre:
     - go get -u github.com/kardianos/govendor
   override:
-    - $GOPATH/bin/govendor restore
+    - mkdir -p $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME
+    - ln -fs $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+    - echo 'export GOPATH=$GOPATH:$HOME/.go_project' >> ~/.circlerc
+    - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && $GOPATH/bin/govendor restore
 
 test:
   pre:

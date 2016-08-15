@@ -3,7 +3,7 @@ machine:
     GOOS: linux
     GOARCH: amd64
     PATH: "/usr/local/go/bin:/usr/local/go_workspace/bin:~/.go_workspace/bin:${PATH}"
-    GOPATH: "~/.go_workspace:/usr/local/go_workspace:${HOME}/.go_project"
+    GOPATH: "${HOME}/.go_workspace:/usr/local/go_workspace:${HOME}/.go_project"
     GO15VENDOREXPERIMENT: 1
 
 dependencies:

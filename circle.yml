@@ -9,6 +9,7 @@ machine:
 dependencies:
   pre:
     - go get -u github.com/kardianos/govendor
+    - go get -u github.com/jstemmer/go-junit-report
   override:
     - mkdir -p $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME
     - ln -fs $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
@@ -17,19 +18,19 @@ dependencies:
 
 test:
   override:
-    - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && go test -v
+    - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && go test -cover -v | go-junit-report > $CIRCLE_TEST_REPORTS/report.xml
     - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && go build -v
     - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && ./www.growse.com -templateTestPath=templates
   post:
     - cp www.growse.com $CIRCLE_ARTIFACTS/
-    - cd static && npm install && grunt && cp assets.tgz $CIRCLE_ARTIFACTS/
-    - cd templates && tar -zcvf templates.tgz * && cp templates.tgz $CIRCLE_ARTIFACTS/
-    - cd databasemigrations && tar -zcvf databasemigrations.tgz * && cp databasemigrations.tgz $CIRCLE_ARTIFACTS/
 
 deployment:
   production:
     branch: golang
     commands:
+      - cd static && npm install && grunt && cp assets.tgz $CIRCLE_ARTIFACTS/
+      - cd templates && tar -zcvf templates.tgz * && cp templates.tgz $CIRCLE_ARTIFACTS/
+      - cd databasemigrations && tar -zcvf databasemigrations.tgz * && cp databasemigrations.tgz $CIRCLE_ARTIFACTS/
       - ./deployment/deploy_prod.sh
 
 general:

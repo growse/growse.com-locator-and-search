@@ -44,7 +44,6 @@ type GeoName struct {
 func GetLastLoction() (*Location, error) {
 	var location Location
 	err := db.QueryRow("select geocoding, latitude,longitude,devicetimestamp from locations where geocoding ? 'geonames' order by devicetimestamp desc limit 1").Scan(&location.Geocoding, &location.Latitude, &location.Longitude, &location.Timestamp)
-
 	return &location, err
 }
 
@@ -212,7 +211,7 @@ func LocatorHandler(c *gin.Context) {
 
 	newLocation := false
 	for _, locator := range locators {
-		locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt/1000, 1000000*(locator.DeviceTimestampAsInt%1000))
+		locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt / 1000, 1000000 * (locator.DeviceTimestampAsInt % 1000))
 		locator.GetRelativeSpeedDistance(db)
 
 		_, err = db.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,gsmtype,wifissid,distance) values ($1,$2,$3,$4,$5,$6,$7,$8)", time.Now(), &locator.DeviceTimestamp, &locator.Latitude, &locator.Longitude, &locator.Accuracy, &locator.GSMType, &locator.WifiSSID, &locator.Distance)
@@ -344,8 +343,8 @@ func DistanceOnUnitSphere(lat1 float64, long1 float64, lat2 float64, long2 float
 	// sin phi sin phi' cos(theta-theta') + cos phi cos phi'
 	// distance = rho * arc length
 
-	cos := (math.Sin(phi1)*math.Sin(phi2)*math.Cos(theta1-theta2) +
-		math.Cos(phi1)*math.Cos(phi2))
+	cos := (math.Sin(phi1) * math.Sin(phi2) * math.Cos(theta1 - theta2) +
+		math.Cos(phi1) * math.Cos(phi2))
 
 	cos = math.Max(math.Min(cos, 1.0), -1.0)
 

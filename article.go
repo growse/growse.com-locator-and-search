@@ -362,19 +362,10 @@ func LatestArticleHandler(c *gin.Context) {
 	}
 	log.Printf("Latest article cache MISS: %v for request: %v", article.getCacheKey(), c.Request)
 
-	lastlocation, err := GetLastLoction()
-	if err != nil {
-		InternalError(err)
-		c.String(500, "Internal Error")
-	}
+	lastlocation, _ := GetLastLoction()
 
-	totaldistance, err := GetTotalDistance()
+	totaldistance, _ := GetTotalDistance()
 
-	if err != nil {
-		InternalError(err)
-		c.String(500, "Internal Error")
-		return
-	}
 
 	index, months, err := LoadArticleIndex()
 	if err != nil {

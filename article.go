@@ -54,6 +54,7 @@ func getCacheKey(year int, month int, day int, slug string) string {
 }
 
 func SearchArticle(searchterm string) (*[]Article, error) {
+	defer timeTrack(time.Now(), "SearchArticle")
 	rows, err := db.Query("select id,datestamp,shorttitle,title,searchtext from articles where idxfti @@ plainto_tsquery('english',$1) and published=true order by ts_rank(idxfti,plainto_tsquery('english',$1)) desc", searchterm)
 
 	if err != nil {
@@ -69,6 +70,7 @@ func SearchArticle(searchterm string) (*[]Article, error) {
 }
 
 func GetArticle(year int, month int, day int, slug string) (*Article, error) {
+	defer timeTrack(time.Now(), "GetArticle")
 	var article Article
 	err := db.QueryRow(`Select id,datestamp,shorttitle,title,markdown from articles where published=true and shorttitle=$1 and date_part('year',datestamp at time zone 'UTC')=$2 and date_part('month',datestamp at time zone 'UTC')=$3 and date_part('day',datestamp at time zone 'UTC')=$4 limit 1`, slug, year, month, day).Scan(&article.Id, &article.Timestamp, &article.Slug, &article.Title, &article.Markdown)
 	if err == nil {
@@ -78,6 +80,7 @@ func GetArticle(year int, month int, day int, slug string) (*Article, error) {
 }
 
 func LoadArticleIndex() (*[]Article, *[]ArticleMonth, error) {
+	defer timeTrack(time.Now(), "LoadArticleIndex")
 	var articles []Article
 	rows, err := db.Query("Select id, datestamp,shorttitle,title from articles where published=true order by datestamp desc;")
 	if err != nil {
@@ -194,6 +197,7 @@ func GetLatestArticle() (*Article, error) {
 			return &article, nil
 		}
 	} else {
+		defer timeTrack(time.Now(), "GetLatestArticle")
 		err := db.QueryRow(`Select id,datestamp,shorttitle,title,markdown from articles where published=true order by datestamp desc limit 1`).Scan(&article.Id, &article.Timestamp, &article.Slug, &article.Title, &article.Markdown)
 		switch {
 		case err == sql.ErrNoRows:
@@ -244,6 +248,7 @@ func MonthHandler(c *gin.Context) {
 	if ok {
 		c.Redirect(302, string(resultSlug))
 	} else {
+		defer timeTrack(time.Now(), "GetArticleMonthHandler")
 		var article Article
 		err := db.QueryRow("select id,datestamp, shorttitle,title from articles where date_part('year',datestamp at time zone 'UTC')=$1 and date_part('month',datestamp at time zone 'UTC')=$2 order by datestamp desc limit 1", year, month).Scan(&article.Id, &article.Timestamp, &article.Slug, &article.Title)
 		if err != nil {
@@ -450,6 +455,7 @@ func SearchHandler(c *gin.Context) {
 }
 
 func RSSHandler(c *gin.Context) {
+	defer timeTrack(time.Now(), "RSSHandler")
 	feed := &feeds.Feed{
 		Title:       "growse.com",
 		Link:        &feeds.Link{Href: "https://www.growse.com"},
@@ -510,6 +516,7 @@ func SiteMapHandler(c *gin.Context, compressed bool) {
 		c.Data(200, mimeType, cachedBytes)
 		return
 	}
+	defer timeTrack(time.Now(), "SiteMapHandler")
 	log.Printf("Sitemap handler cache MISS: %v for request: %v", cacheKey, c.Request)
 	rows, err := db.Query("Select id, datestamp,shorttitle,title from articles where published=true order by datestamp desc;")
 	if err != nil {
@@ -548,4 +555,8 @@ func SiteMapHandler(c *gin.Context, compressed bool) {
 	memoryCache.Set(cacheKey, pageBytes, time.Now().Add(configuration.DefaultCacheExpiry))
 	c.Data(200, mimeType, pageBytes)
 
+}
+func timeTrack(start time.Time, name string) {
+	elapsed := time.Since(start)
+	log.Printf("%s took %s", name, elapsed)
 }

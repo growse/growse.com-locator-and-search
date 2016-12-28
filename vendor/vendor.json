@@ -27,6 +27,22 @@
 			"revisionTime": "2016-12-26T12:39:03Z"
 		},
 		{
+			"checksumSHA1": "opuXLaxKgRhnpxjq0a0Fkj39PC0=",
+			"path": "github.com/eclipse/paho.mqtt.golang",
+			"revision": "45f9b18f4864c81d49c3ed01e5faec9eeb05de31",
+			"revisionTime": "2016-06-09T10:02:40Z",
+			"version": "v1.0.0",
+			"versionExact": "v1.0.0"
+		},
+		{
+			"checksumSHA1": "4S2JvfaLl2hOzrRJ0akG3zVPSSk=",
+			"path": "github.com/eclipse/paho.mqtt.golang/packets",
+			"revision": "45f9b18f4864c81d49c3ed01e5faec9eeb05de31",
+			"revisionTime": "2016-06-09T10:02:40Z",
+			"version": "v1.0.0",
+			"versionExact": "v1.0.0"
+		},
+		{
 			"checksumSHA1": "RsNwOto8G8aXIiRrlFn4dtU9q/g=",
 			"path": "github.com/gin-gonic/gin",
 			"revision": "e2212d40c62a98b388a5eb48ecbdcf88534688ba",
@@ -219,6 +235,12 @@
 		{
 			"checksumSHA1": "P9qTIn8a6L6Q9wd1IJBCuhno1Q8=",
 			"path": "golang.org/x/net/trace",
+			"revision": "45e771701b814666a7eb299e6c7a57d0b1799e91",
+			"revisionTime": "2016-12-15T19:42:18Z"
+		},
+		{
+			"checksumSHA1": "7EZyXN0EmZLgGxZxK01IJua4c8o=",
+			"path": "golang.org/x/net/websocket",
 			"revision": "45e771701b814666a7eb299e6c7a57d0b1799e91",
 			"revisionTime": "2016-12-15T19:42:18Z"
 		},

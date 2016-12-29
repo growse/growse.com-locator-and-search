@@ -172,6 +172,8 @@ func main() {
 	defer close(GeocodingWorkQueue)
 	go UpdateLatestLocationWithGeocoding(GeocodingWorkQueue)
 
+	go SubscribeMQTT()
+
 	gun = mailgun.NewMailgun("growse.com", configuration.MailgunKey, "")
 
 	//Initialize the template output buffer pool

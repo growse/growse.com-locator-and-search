@@ -21,7 +21,7 @@ func SubscribeMQTT() error {
 
 	log.Print("Connecting to MQTT")
 	var mqttClientOptions = mqtt.NewClientOptions()
-	mqttClientOptions.AddBroker("tcp://localhost:1833")
+	mqttClientOptions.AddBroker("tcp://localhost:1883")
 	mqttClientOptions.SetClientID("growselocator")
 	mqttClientOptions.SetAutoReconnect(true)
 

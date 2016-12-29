@@ -25,18 +25,22 @@ func SubscribeMQTT() error {
 	mqttClientOptions.SetClientID("growselocator")
 	mqttClientOptions.SetAutoReconnect(true)
 
-	var mqttClient = mqtt.NewClient(mqttClientOptions)
+	mqttClient := mqtt.NewClient(mqttClientOptions)
 
-	var mqttClientToken = mqttClient.Connect()
+	mqttClientToken := mqttClient.Connect()
+	defer mqttClient.Disconnect(250)
 	if mqttClientToken.Wait() && mqttClientToken.Error() != nil {
-
 		log.Printf("Error connecting to mqtt: %v", mqttClientToken.Error())
-		mqttClient.Disconnect(250)
 		return mqttClientToken.Error()
 	}
 	log.Print("Connected")
-	defer mqttClient.Disconnect(250)
-	mqttClient.Subscribe("owntracks/#", 0, handler)
+
+	mqttSubscribeToken := mqttClient.Subscribe("owntracks/#", 0, handler)
+	if mqttSubscribeToken.Wait() && mqttSubscribeToken.Error() != nil {
+		log.Printf("Error connecting to mqtt: %v", mqttSubscribeToken.Error())
+		mqttClient.Disconnect(250)
+		return mqttSubscribeToken.Error()
+	}
 	return nil
 }
 

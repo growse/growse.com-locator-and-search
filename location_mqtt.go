@@ -17,7 +17,7 @@ type MQTTMsg struct {
 	DeviceTimestampAsInt int `json: "tst" binding:"required"`
 }
 
-func SubscribeMQTT() error {
+func SubscribeMQTT(quit <-chan bool) error {
 
 	log.Print("Connecting to MQTT")
 	var mqttClientOptions = mqtt.NewClientOptions()
@@ -41,7 +41,11 @@ func SubscribeMQTT() error {
 		mqttClient.Disconnect(250)
 		return mqttSubscribeToken.Error()
 	}
-	return nil
+	select {
+	case <-quit:
+		log.Print("Closing MQTT")
+		return nil
+	}
 }
 
 var handler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {

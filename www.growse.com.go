@@ -160,19 +160,21 @@ func main() {
 	//Catch SIGINT & SIGTERM to stop the profiling
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+
+	quit := make(chan bool, 1)
+
 	go func() {
 		for sig := range c {
 			log.Printf("captured %v, stopping profiler and exiting..", sig)
 			pprof.StopCPUProfile()
-			os.Exit(1)
+			close(quit)
+			close(GeocodingWorkQueue)
 		}
 	}()
 
 	GeocodingWorkQueue = make(chan bool, 100)
-	defer close(GeocodingWorkQueue)
 	go UpdateLatestLocationWithGeocoding(GeocodingWorkQueue)
-
-	go SubscribeMQTT()
+	go SubscribeMQTT(quit)
 
 	gun = mailgun.NewMailgun("growse.com", configuration.MailgunKey, "")
 

@@ -19,6 +19,7 @@ type MQTTMsg struct {
 
 func SubscribeMQTT(quit <-chan bool) error {
 
+	topic := "owntracks/#"
 	log.Print("Connecting to MQTT")
 	var mqttClientOptions = mqtt.NewClientOptions()
 	mqttClientOptions.AddBroker("tcp://localhost:1883")
@@ -35,7 +36,7 @@ func SubscribeMQTT(quit <-chan bool) error {
 	}
 	log.Print("Connected")
 
-	mqttSubscribeToken := mqttClient.Subscribe("owntracks/#", 0, handler)
+	mqttSubscribeToken := mqttClient.Subscribe(topic, 0, handler)
 	if mqttSubscribeToken.Wait() && mqttSubscribeToken.Error() != nil {
 		log.Printf("Error connecting to mqtt: %v", mqttSubscribeToken.Error())
 		mqttClient.Disconnect(250)
@@ -43,6 +44,11 @@ func SubscribeMQTT(quit <-chan bool) error {
 	}
 	select {
 	case <-quit:
+		log.Print("Unsubscribing")
+		mqttUnsubscribeToken := mqttClient.Unsubscribe(topic)
+		if mqttUnsubscribeToken.Wait() && mqttUnsubscribeToken.Error() != nil {
+			log.Printf("Error unsubscribing from mqtt: %v", mqttUnsubscribeToken.Error())
+		}
 		log.Print("Closing MQTT")
 		return nil
 	}

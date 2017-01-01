@@ -25,6 +25,7 @@ import (
 	"strings"
 	"time"
 	"syscall"
+	"github.com/braintree/manners"
 )
 
 var (
@@ -169,7 +170,9 @@ func main() {
 			pprof.StopCPUProfile()
 			close(quit)
 			close(GeocodingWorkQueue)
+			manners.Close()
 		}
+		log.Print("Quitting signal listener goroutine.")
 	}()
 
 	GeocodingWorkQueue = make(chan bool, 100)
@@ -297,5 +300,5 @@ func main() {
 
 	BuildRoutes(router)
 	log.Printf("Listening on port %d", configuration.Port)
-	router.Run(fmt.Sprintf(":%d", configuration.Port))
+	manners.ListenAndServe(fmt.Sprintf(":%d", configuration.Port), router)
 }

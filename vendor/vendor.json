@@ -27,6 +27,14 @@
 			"revisionTime": "2016-12-26T12:39:03Z"
 		},
 		{
+			"checksumSHA1": "9XOUMZuAM0s03/cTk/PiDVQvK7M=",
+			"path": "github.com/braintree/manners",
+			"revision": "0b5e6b2c2843f4c83c2a40f96980b09cf4af733c",
+			"revisionTime": "2015-05-03T21:25:58Z",
+			"version": "0.4.0",
+			"versionExact": "0.4.0"
+		},
+		{
 			"checksumSHA1": "opuXLaxKgRhnpxjq0a0Fkj39PC0=",
 			"path": "github.com/eclipse/paho.mqtt.golang",
 			"revision": "45f9b18f4864c81d49c3ed01e5faec9eeb05de31",

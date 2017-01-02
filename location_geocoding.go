@@ -35,6 +35,7 @@ func (location *Location) Name() string {
 	err := json.Unmarshal([]byte(location.Geocoding), &geoLocation)
 	if err != nil {
 		log.Printf("Error decoding location object: %v", err)
+		log.Printf("%v", location.Geocoding)
 		return "Unknown"
 	}
 

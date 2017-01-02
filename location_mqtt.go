@@ -66,7 +66,7 @@ func SubscribeMQTT(quit <-chan bool) error {
 }
 
 var handler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	log.Printf("Received mqtt message from %v id %v", msg.Topic(), msg.MessageID())
+	log.Printf("Received mqtt message from %v", msg.Topic())
 	var locator MQTTMsg
 	err := json.Unmarshal([]byte(msg.Payload()), &locator)
 

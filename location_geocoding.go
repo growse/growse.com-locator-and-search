@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"io/ioutil"
+	"time"
 )
 
 /*
@@ -32,7 +33,10 @@ func (loc *Location) GetGeocoding() string {
 		return ""
 	}
 	geocodingUrl := fmt.Sprintf(configuration.GeocodeApiURL, loc.Latitude, loc.Longitude)
+	start := time.Now()
 	response, err := http.Get(geocodingUrl)
+	duration := time.Since(start)
+	log.Printf("Reverse geocoded in %v", duration)
 	if err != nil {
 		log.Printf("Error getting geolocation from API: %v", err)
 		return ""

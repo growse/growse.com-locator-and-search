@@ -62,6 +62,9 @@ type Configuration struct {
 	Port                   int
 	DefaultCacheExpiry     time.Duration
 	MaxDBOpenConnections   int
+	MQTTURL                string
+	MQTTUsername           string
+	MQTTPassword           string
 }
 
 type ArticleMonth struct {

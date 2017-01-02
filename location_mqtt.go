@@ -3,26 +3,37 @@ package main
 import (
 	"github.com/eclipse/paho.mqtt.golang"
 	"log"
+	"encoding/json"
+	"time"
+	"github.com/lib/pq"
 )
 
 type MQTTMsg struct {
-	Type                 string `json: "_type" binding: "required"`
-	TrackerId            string `json: "tid" binding: "required"`
-	Accuracy             int `json: "acc" binding: "required"`
-	Battery              int `json: "batt" binding: "required"`
-	Connection           string `json: "conn" binding: "required"`
-	Doze                 bool `json: "doze" binding: "required"`
-	Latitude             float64 `json: "lat" binding: "required"`
-	Longitude            float64 `json: "lon" binding: "required"`
-	DeviceTimestampAsInt int `json: "tst" binding:"required"`
+	Type                 string `json:"_type" binding:"required"`
+	TrackerId            string `json:"tid"`
+	Accuracy             int `json:"acc"`
+	Battery              int `json:"batt"`
+	Connection           string `json:"conn"`
+	Doze                 bool `json:"doze"`
+	Latitude             float64 `json:"lat"`
+	Longitude            float64 `json:"lon"`
+	DeviceTimestampAsInt int64 `json:"tst" binding:"required"`
+	DeviceTimestamp      time.Time
 }
 
 func SubscribeMQTT(quit <-chan bool) error {
-
 	topic := "owntracks/#"
 	log.Print("Connecting to MQTT")
 	var mqttClientOptions = mqtt.NewClientOptions()
-	mqttClientOptions.AddBroker("tcp://localhost:1883")
+	if (configuration.MQTTURL != "") {
+		mqttClientOptions.AddBroker(configuration.MQTTURL)
+	} else {
+		mqttClientOptions.AddBroker("tcp://localhost:1883")
+	}
+	if configuration.MQTTUsername != "" && configuration.MQTTPassword != "" {
+		mqttClientOptions.SetUsername(configuration.MQTTUsername)
+		mqttClientOptions.SetPassword(configuration.MQTTPassword)
+	}
 	mqttClientOptions.SetClientID("growselocator")
 	mqttClientOptions.SetAutoReconnect(true)
 
@@ -55,6 +66,48 @@ func SubscribeMQTT(quit <-chan bool) error {
 }
 
 var handler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	log.Printf("TOPIC: %s\n", msg.Topic())
-	log.Printf("MSG: %s\n", msg.Payload())
+	log.Printf("Received mqtt message from %v id %v", msg.Topic(), msg.MessageID())
+	var locator MQTTMsg
+	err := json.Unmarshal([]byte(msg.Payload()), &locator)
+
+	if err != nil {
+		log.Printf("Error decoding MQTT message: %v", err)
+		log.Print(msg.Payload())
+		return
+	}
+	if locator.Type != "location" {
+		log.Printf("Received message is of type %v. Skipping", locator.Type)
+		return
+	}
+
+	newLocation := false
+
+	locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt, 0)
+
+	_, err = db.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,doze,batterylevel,connectiontype) " +
+		"values ($1,$2,$3,$4,$5,$6,$7,$8)",
+		time.Now(),
+		&locator.DeviceTimestamp,
+		&locator.Latitude,
+		&locator.Longitude,
+		&locator.Accuracy,
+		&locator.Doze,
+		&locator.Battery,
+		&locator.Connection)
+
+	switch i := err.(type) {
+	case nil:
+		newLocation = true
+		break
+	case *pq.Error:
+		log.Printf("Managed to get a duplicate timestamp: %v", locator)
+	default:
+		log.Printf("%T", err)
+		InternalError(i)
+		return
+	}
+	if newLocation {
+		GeocodingWorkQueue <- true
+	}
+
 }

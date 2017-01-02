@@ -2,16 +2,12 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/kpawlik/geojson"
 	"github.com/lib/pq"
-	"io/ioutil"
 	"log"
 	"math"
-	"net/http"
 	"strconv"
 	"time"
 )
@@ -22,7 +18,6 @@ This should be some sort of thing that's sent from the phone
 type Location struct {
 	Latitude             float64 `json:"lat" binding:"required"`
 	Longitude            float64 `json:"long" binding:"required"`
-	Geocoding            string
 	Timestamp            time.Time
 	DeviceTimestamp      time.Time
 	DeviceTimestampAsInt int64   `json:"time" binding:"required"`
@@ -31,6 +26,7 @@ type Location struct {
 	GSMType              string `json:"gsmtype" binding:"required"`
 	WifiSSID             string `json:"wifissid" binding:"required"`
 	DeviceID             string `json:"deviceid" binding:"required"`
+	Geocoding            string
 }
 
 type GeoLocation struct {
@@ -104,22 +100,6 @@ func GetLineStringAsJSON(year string, filtered bool) (string, error) {
 	return json, nil
 }
 
-/*
-Extract a sane name from the geocoding object
-*/
-func (location *Location) Name() string {
-	var msg GeoName
-	err := json.Unmarshal([]byte(location.Geocoding), &msg)
-	if err != nil {
-		log.Printf("Error decoding location object: %v", err)
-		return "Unknown"
-	}
-	if len(msg.Geonames) > 0 {
-		return msg.Geonames[0].Name
-	}
-	log.Printf("No geonames found in: %v", location.Geocoding)
-	return "Unknown"
-}
 
 /* HTTP handlers */
 func WhereLineStringHandler(c *gin.Context) {
@@ -201,6 +181,8 @@ Receive POST from phone. This should be an application/json containing an array 
 */
 
 func LocatorHandler(c *gin.Context) {
+	c.String(204, "Deprecated")
+	return
 	locators := []Location{}
 
 	err := c.BindJSON(&locators)
@@ -237,50 +219,6 @@ func LocatorHandler(c *gin.Context) {
 	c.String(200, "Yay")
 }
 
-func UpdateLatestLocationWithGeocoding(workChan <-chan bool) {
-	log.Print("Starting geocoding goroutine")
-	for {
-		_, more := <-workChan
-		if more {
-			log.Print("Updating latest geocoding")
-			var location Location
-			var id int
-			err := db.QueryRow("select id,latitude,longitude from locations order by devicetimestamp desc limit 1").Scan(&id, &location.Latitude, &location.Longitude)
-			if err != nil {
-				InternalError(err)
-			}
-			tx, err := db.Begin()
-			if err != nil {
-				InternalError(err)
-			}
-			location.GetGeocoding()
-			if location.Geocoding != "" {
-				_, err = tx.Exec("Update locations set geocoding=null")
-				if err != nil {
-					tx.Rollback()
-					InternalError(err)
-				}
-				_, err = tx.Exec("update locations set geocoding=$1 where id=$2", location.Geocoding, id)
-				if err != nil {
-					log.Printf("Location that caused fail is: %s", location.Geocoding)
-					tx.Rollback()
-					InternalError(err)
-				}
-				err = tx.Commit()
-				if err != nil {
-					InternalError(err)
-				} else {
-					log.Print("Geocoding complete")
-				}
-			}
-		} else {
-			log.Print("Got signal, quitting geocoding goroutine.")
-			return
-		}
-
-	}
-}
-
 func (loc *Location) GetRelativeSpeedDistance(thisDb *sql.DB) {
 	prev := Location{}
 	err := thisDb.QueryRow("select devicetimestamp,latitude,longitude from locations where devicetimestamp<$1 order by devicetimestamp desc limit 1", loc.DeviceTimestamp).Scan(&prev.DeviceTimestamp, &prev.Latitude, &prev.Longitude)
@@ -294,32 +232,6 @@ func (loc *Location) GetRelativeSpeedDistance(thisDb *sql.DB) {
 	} else {
 		loc.Distance = 6378100 * DistanceOnUnitSphere(loc.Latitude, loc.Longitude, prev.Latitude, prev.Longitude)
 	}
-}
-
-func (loc *Location) GetGeocoding() {
-	if configuration.GeocodeApiURL == "" {
-		InternalError(errors.New("Geocoding API should not be blank"))
-		return
-	}
-	geocodingUrl := fmt.Sprintf(configuration.GeocodeApiURL, loc.Latitude, loc.Longitude)
-	response, err := http.Get(geocodingUrl)
-	if err != nil {
-		log.Printf("Error getting geolocation from API: %v", err)
-		return
-	}
-
-	defer response.Body.Close()
-	if response.StatusCode != 200 {
-		InternalError(errors.New(fmt.Sprintf("invalid response from Geolocation API: %v %v", response.StatusCode, response.Body)))
-		return
-	}
-	body, err := ioutil.ReadAll(response.Body)
-
-	if err != nil {
-		InternalError(err)
-		return
-	}
-	loc.Geocoding = string(body)
 }
 
 func DistanceOnUnitSphere(lat1 float64, long1 float64, lat2 float64, long2 float64) float64 {

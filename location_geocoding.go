@@ -10,21 +10,56 @@ import (
 	"time"
 )
 
+type GeoLocation struct {
+	Status  string `json:"status"`
+	Results []GeocodingResult `json:"results"`
+}
+
+type GeocodingResult struct {
+	AddressComponents []GeocodingAddressComponent `json:"address_components"`
+}
+
+type GeocodingAddressComponent struct {
+	LongName  string `json:"long_name"`
+	ShortName string `json:"short_name"`
+	Types     []string `json:"types"`
+}
+
+
 /*
 Extract a sane name from the geocoding object
 */
 func (location *Location) Name() string {
-	var msg GeoName
-	err := json.Unmarshal([]byte(location.Geocoding), &msg)
+	unknownLocation := "Unknown"
+	var geoLocation GeoLocation
+	err := json.Unmarshal([]byte(location.Geocoding), &geoLocation)
 	if err != nil {
 		log.Printf("Error decoding location object: %v", err)
 		return "Unknown"
 	}
-	if len(msg.Geonames) > 0 {
-		return msg.Geonames[0].Name
+
+	if geoLocation.Status != "OK" || len(geoLocation.Results) == 0 {
+		return unknownLocation
 	}
-	log.Printf("No geonames found in: %v", location.Geocoding)
-	return "Unknown"
+
+	var postal_town, locality string
+
+	for _, addresscomponents := range (geoLocation.Results[0].AddressComponents) {
+		if stringSliceContains(addresscomponents.Types, "postal_town") {
+			postal_town = addresscomponents.LongName
+		}
+		if stringSliceContains(addresscomponents.Types, "locality") {
+			locality = addresscomponents.LongName
+		}
+	}
+	if postal_town != "" {
+		return postal_town
+	}
+	if locality != "" {
+		return locality
+	}
+	return unknownLocation
+
 }
 
 func (loc *Location) GetGeocoding() string {

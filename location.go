@@ -29,13 +29,6 @@ type Location struct {
 	Geocoding            string
 }
 
-type GeoLocation struct {
-	Name string
-}
-
-type GeoName struct {
-	Geonames []GeoLocation
-}
 
 func GetLastLoction() (*Location, error) {
 	var location Location

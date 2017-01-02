@@ -84,6 +84,7 @@ var handler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 
 	locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt, 0)
 
+	dozebool := bool(locator.Doze)
 	_, err = db.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,doze,batterylevel,connectiontype) " +
 		"values ($1,$2,$3,$4,$5,$6,$7,$8)",
 		time.Now(),
@@ -91,7 +92,7 @@ var handler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 		&locator.Latitude,
 		&locator.Longitude,
 		&locator.Accuracy,
-		&locator.Doze,
+		&dozebool,
 		&locator.Battery,
 		&locator.Connection)
 

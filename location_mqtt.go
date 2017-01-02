@@ -14,7 +14,7 @@ type MQTTMsg struct {
 	Accuracy             int `json:"acc"`
 	Battery              int `json:"batt"`
 	Connection           string `json:"conn"`
-	Doze                 bool `json:"doze"`
+	Doze                 ConvertibleBoolean `json:"doze"`
 	Latitude             float64 `json:"lat"`
 	Longitude            float64 `json:"lon"`
 	DeviceTimestampAsInt int64 `json:"tst" binding:"required"`

@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-func TestMarshallWorks(t *testing.T) {
-	testMsg := "{\"_type\":\"location\",\"tid\":\"s5\",\"acc\":20,\"batt\":90,\"conn\":\"m\",\"doze\":false,\"lat\":51.7471862,\"lon\":-0.4734345,\"t\":\"u\",\"tst\":1483358150}"
+func TestMQTTMarshallWorks(t *testing.T) {
+	testMsg := "{\"_type\":\"location\",\"tid\":\"s5\",\"acc\":20,\"batt\":90,\"conn\":\"m\",\"doze\":true,\"lat\":51.7471862,\"lon\":-0.4734345,\"t\":\"u\",\"tst\":1483358150}"
 
 	var locator MQTTMsg
 	err := json.Unmarshal([]byte(testMsg), &locator)
@@ -14,6 +14,11 @@ func TestMarshallWorks(t *testing.T) {
 		t.Logf("Error unmarshalling: %v", err)
 		t.Fail()
 	}
+	if (!locator.Doze) {
+		t.Logf("Doze. Expected: 'true'. Actual: %v", locator.Doze)
+		t.Fail()
+	}
+
 	if (locator.Type != "location") {
 		t.Logf("Type. Expected: 'location'. Actual: %v", locator.Type)
 		t.Fail()

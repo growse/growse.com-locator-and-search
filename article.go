@@ -315,12 +315,6 @@ func ArticleHandler(c *gin.Context) {
 
 	totaldistance, err := GetTotalDistance()
 
-	if err != nil {
-		InternalError(err)
-		c.String(500, "Internal Error")
-		return
-	}
-
 	obj := gin.H{
 		"Index":         index,
 		"Title":         article.Title,

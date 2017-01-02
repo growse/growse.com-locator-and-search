@@ -100,9 +100,10 @@ var handler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 		newLocation = true
 		break
 	case *pq.Error:
+		log.Printf("Pg error: %v", err)
 		log.Printf("Managed to get a duplicate timestamp: %v", locator)
 	default:
-		log.Printf("%T", err)
+		log.Printf("%T %v", err, err)
 		InternalError(i)
 		return
 	}

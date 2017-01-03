@@ -1,13 +1,11 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/kpawlik/geojson"
 	"github.com/lib/pq"
 	"log"
-	"math"
 	"strconv"
 	"time"
 )
@@ -187,7 +185,7 @@ func LocatorHandler(c *gin.Context) {
 	newLocation := false
 	for _, locator := range locators {
 		locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt / 1000, 1000000 * (locator.DeviceTimestampAsInt % 1000))
-		locator.GetRelativeSpeedDistance(db)
+		//locator.GetRelativeSpeedDistance(db)
 
 		_, err = db.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,gsmtype,wifissid,distance) values ($1,$2,$3,$4,$5,$6,$7,$8)", time.Now(), &locator.DeviceTimestamp, &locator.Latitude, &locator.Longitude, &locator.Accuracy, &locator.GSMType, &locator.WifiSSID, &locator.Distance)
 
@@ -212,50 +210,3 @@ func LocatorHandler(c *gin.Context) {
 	c.String(200, "Yay")
 }
 
-func (loc *Location) GetRelativeSpeedDistance(thisDb *sql.DB) {
-	prev := Location{}
-	err := thisDb.QueryRow("select devicetimestamp,latitude,longitude from locations where devicetimestamp<$1 order by devicetimestamp desc limit 1", loc.DeviceTimestamp).Scan(&prev.DeviceTimestamp, &prev.Latitude, &prev.Longitude)
-	if err != nil {
-		log.Printf("Error found getting previous point. Setting distance to 0: %v", err)
-		loc.Distance = 0
-		return
-	}
-	if prev.Latitude == loc.Latitude && prev.Longitude == loc.Longitude {
-		loc.Distance = 0
-	} else {
-		loc.Distance = 6378100 * DistanceOnUnitSphere(loc.Latitude, loc.Longitude, prev.Latitude, prev.Longitude)
-	}
-}
-
-func DistanceOnUnitSphere(lat1 float64, long1 float64, lat2 float64, long2 float64) float64 {
-	// Convert latitude and longitude to
-	//spherical coordinates in radians.
-	degrees_to_radians := math.Pi / 180.0
-
-	// phi = 90 - latitude
-	phi1 := (90.0 - lat1) * degrees_to_radians
-	phi2 := (90.0 - lat2) * degrees_to_radians
-
-	// theta = longitude
-	theta1 := long1 * degrees_to_radians
-	theta2 := long2 * degrees_to_radians
-
-	// Compute spherical distance from spherical coordinates.
-
-	// For two locations in spherical coordinates
-	// (1, theta, phi) and (1, theta, phi)
-	// cosine( arc length ) =
-	// sin phi sin phi' cos(theta-theta') + cos phi cos phi'
-	// distance = rho * arc length
-
-	cos := (math.Sin(phi1) * math.Sin(phi2) * math.Cos(theta1 - theta2) +
-		math.Cos(phi1) * math.Cos(phi2))
-
-	cos = math.Max(math.Min(cos, 1.0), -1.0)
-
-	arc := math.Acos(cos)
-
-	// Remember to multiply arc by the radius of the earth
-	// in your favorite set of units to get length.
-	return arc
-}

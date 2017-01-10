@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
+	"gopkg.in/gin-gonic/gin.v1"
 	"github.com/kpawlik/geojson"
 	"github.com/lib/pq"
 	"log"

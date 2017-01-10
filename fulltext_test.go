@@ -1,0 +1,107 @@
+package main
+
+import (
+	"testing"
+	"io/ioutil"
+	"github.com/stretchr/testify/assert"
+	"github.com/blevesearch/bleve"
+	"os"
+)
+
+func TestAddingFilesToIndexAddsTheFilesToTheIndex(t *testing.T) {
+	tempdir, err := ioutil.TempDir("", "testprefix")
+	assert.Nil(t, err)
+	_, err = ioutil.TempFile(tempdir, "testprefix1")
+	assert.Nil(t, err)
+	_, err = ioutil.TempFile(tempdir, "testprefix2")
+	assert.Nil(t, err)
+
+	mapping := bleve.NewIndexMapping()
+	index, err := bleve.New("testIndex", mapping)
+	assert.Nil(t, err)
+
+	err = addFilesToIndex(tempdir, index)
+	assert.Nil(t, err)
+
+	count, err := index.DocCount()
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(2), count)
+
+	os.RemoveAll("testIndex")
+}
+
+func TestAddSingleFileToIndexAddsTheFileToTheIndex(t *testing.T) {
+	tempDir, err := ioutil.TempDir("", "testprefix")
+	assert.Nil(t, err)
+
+	tempFile, err := ioutil.TempFile(tempDir, "testprefix1")
+	assert.Nil(t, err)
+
+	mapping := bleve.NewIndexMapping()
+	index, err := bleve.New("testIndex", mapping)
+	assert.Nil(t, err)
+
+	err = addFileToIndex(tempFile.Name(), index)
+	assert.Nil(t, err)
+	count, err := index.DocCount()
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(1), count)
+
+	os.RemoveAll("testIndex")
+}
+
+func TestSearchingIndexForFileContentReturnsResult(t *testing.T) {
+	content := "content"
+	tempDir, err := ioutil.TempDir("", "testprefix")
+	assert.Nil(t, err)
+
+	tempFile, err := ioutil.TempFile(tempDir, "testprefix1")
+	assert.Nil(t, err)
+
+	ioutil.WriteFile(tempFile.Name(), []byte(content), os.ModePerm)
+
+	mapping := bleve.NewIndexMapping()
+	index, err := bleve.New("testIndex", mapping)
+	assert.Nil(t, err)
+
+	err = addFileToIndex(tempFile.Name(), index)
+	assert.Nil(t, err)
+	count, err := index.DocCount()
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(1), count)
+
+	query := bleve.NewMatchQuery(content)
+	searchRequest := bleve.NewSearchRequest(query)
+	searchResult, err := index.Search(searchRequest)
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(1), searchResult.Total)
+	os.RemoveAll("testIndex")
+}
+
+func TestSearchingIndexForNonFileContentReturnsResult(t *testing.T) {
+	content := "content"
+	tempDir, err := ioutil.TempDir("", "testprefix")
+	assert.Nil(t, err)
+
+	tempFile, err := ioutil.TempFile(tempDir, "testprefix1")
+	assert.Nil(t, err)
+
+	ioutil.WriteFile(tempFile.Name(), []byte(content), os.ModePerm)
+
+	mapping := bleve.NewIndexMapping()
+	index, err := bleve.New("testIndex", mapping)
+	assert.Nil(t, err)
+
+	err = addFileToIndex(tempFile.Name(), index)
+	assert.Nil(t, err)
+	count, err := index.DocCount()
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(1), count)
+
+	query := bleve.NewMatchQuery("not")
+	searchRequest := bleve.NewSearchRequest(query)
+	searchResult, err := index.Search(searchRequest)
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(0), searchResult.Total)
+	os.RemoveAll("testIndex")
+}

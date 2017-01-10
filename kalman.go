@@ -2,7 +2,7 @@ package main
 
 import (
 	"database/sql"
-	"github.com/gin-gonic/gin"
+	"gopkg.in/gin-gonic/gin.v1"
 	"log"
 	"math"
 	"time"

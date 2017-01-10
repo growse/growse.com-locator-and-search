@@ -7,7 +7,7 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
+	"gopkg.in/gin-gonic/gin.v1"
 	"github.com/gorilla/feeds"
 	"github.com/russross/blackfriday"
 	"html/template"

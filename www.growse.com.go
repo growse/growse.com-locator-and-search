@@ -2,10 +2,11 @@ package main
 
 import (
 	"database/sql"
+	"github.com/braintree/manners"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/gin-gonic/gin"
+	"gopkg.in/gin-gonic/gin.v1"
 	"github.com/growse/concurrent-expiring-map"
 	_ "github.com/lib/pq"
 	"github.com/mailgun/mailgun-go"
@@ -25,7 +26,6 @@ import (
 	"strings"
 	"time"
 	"syscall"
-	"github.com/braintree/manners"
 )
 
 var (
@@ -173,6 +173,7 @@ func main() {
 			pprof.StopCPUProfile()
 			close(quit)
 			close(GeocodingWorkQueue)
+			log.Print("Closing manners")
 			manners.Close()
 		}
 		log.Print("Quitting signal listener goroutine.")
@@ -182,12 +183,15 @@ func main() {
 	go UpdateLatestLocationWithGeocoding(GeocodingWorkQueue)
 	go SubscribeMQTT(quit)
 
+	// Initialize fulltext engine
+	BleveInit()
+
 	gun = mailgun.NewMailgun("growse.com", configuration.MailgunKey, "")
 
-	//Initialize the template output buffer pool
+	// Initialize the template output buffer pool
 	bufPool = bpool.NewBufferPool(16)
 
-	//Database time
+	// Database time
 
 	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", configuration.DbHost, configuration.DbUser, configuration.DbName, configuration.DbPassword)
 	db, err = sql.Open("postgres", connectionString)
@@ -280,7 +284,9 @@ func main() {
 						memoryCache.Flush()
 					}
 				case err := <-watcher.Errors:
-					log.Println("error:", err)
+					if err != nil {
+						log.Println("fsnotify error:", err)
+					}
 				}
 			}
 		}()

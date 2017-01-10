@@ -11,5 +11,5 @@ func DoDatabaseMigrations() {
 	if error != nil {
 		log.Fatalf("Errors encountered migrating database: %v", error)
 	}
-	log.Printf("Done")
+	log.Print("Database migration done")
 }

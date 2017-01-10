@@ -1,6 +1,6 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import "gopkg.in/gin-gonic/gin.v1"
 
 func BuildRoutes(router *gin.Engine) {
 	//Ugly hack to deal with the fact that httprouter can't cope with both /static/ and /:year existing
@@ -28,14 +28,20 @@ func BuildRoutes(router *gin.Engine) {
 	router.GET("/robots.txt", RobotsHandler)
 
 	//Redirects
-	router.GET("/news/rss/", func(c *gin.Context) { c.Redirect(301, "/rss/") })
-	router.GET("/where/", func(c *gin.Context) { c.Redirect(301, "/auth/where/") })
+	router.GET("/news/rss/", func(c *gin.Context) {
+		c.Redirect(301, "/rss/")
+	})
+	router.GET("/where/", func(c *gin.Context) {
+		c.Redirect(301, "/auth/where/")
+	})
 
 	//Sitemap
 	router.GET("/sitemap.xml", UncompressedSiteMapHandler)
 	router.GET("/sitemap.xml.gz", CompressedSiteMapHandler)
 
 	router.POST("/search/", SearchPostHandler)
+	router.POST("/blevesearch", BleveSearchQuery)
+	router.POST("/search/index", BleveIndexDocs)
 	router.POST("/locator/", LocatorHandler)
 	router.GET("/search/:searchterm/", SearchHandler)
 

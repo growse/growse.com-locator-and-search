@@ -2,11 +2,10 @@ package main
 
 import (
 	"database/sql"
-	"github.com/braintree/manners"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"gopkg.in/gin-gonic/gin.v1"
+	"github.com/braintree/manners"
 	"github.com/growse/concurrent-expiring-map"
 	_ "github.com/lib/pq"
 	"github.com/mailgun/mailgun-go"
@@ -14,6 +13,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"gopkg.in/fsnotify.v1"
+	"gopkg.in/gin-gonic/gin.v1"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -24,20 +24,20 @@ import (
 	"runtime/debug"
 	"runtime/pprof"
 	"strings"
-	"time"
 	"syscall"
+	"time"
 )
 
 var (
 	db                      *sql.DB
-	stylesheetfilename string
-	javascriptfilename string
+	stylesheetfilename      string
+	javascriptfilename      string
 	wherejavascriptfilename string
-	configuration Configuration
-	gun mailgun.Mailgun
+	configuration           Configuration
+	gun                     mailgun.Mailgun
 	templates               *template.Template
 	bufPool                 *bpool.BufferPool
-	memoryCache cmap.ConcurrentMap
+	memoryCache             cmap.ConcurrentMap
 	oAuthConf               *oauth2.Config
 	GeocodingWorkQueue      chan bool
 )
@@ -184,7 +184,7 @@ func main() {
 	go SubscribeMQTT(quit)
 
 	// Initialize fulltext engine
-	BleveInit()
+	//BleveInit()
 
 	gun = mailgun.NewMailgun("growse.com", configuration.MailgunKey, "")
 
@@ -266,7 +266,7 @@ func main() {
 			for {
 				select {
 				case event := <-watcher.Events:
-					if event.Op & fsnotify.Create == fsnotify.Create {
+					if event.Op&fsnotify.Create == fsnotify.Create {
 						if strings.HasSuffix(event.Name, ".www.css") {
 							log.Printf("New CSS Detected: %s", path.Base(event.Name))
 							stylesheetfilename = path.Base(event.Name)

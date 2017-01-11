@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/blevesearch/bleve"
+	"github.com/blevesearch/bleve/search"
 	"gopkg.in/gin-gonic/gin.v1"
 	"os/exec"
 	"log"
@@ -9,6 +10,7 @@ import (
 	"io/ioutil"
 	"errors"
 	"path"
+	"path/filepath"
 )
 
 var bleveIndex bleve.Index
@@ -99,10 +101,19 @@ func BleveSearchQuery(c *gin.Context) {
 		log.Printf("Error doing search: %v", err)
 		c.String(500, "ERROR")
 	} else {
+		//var searchResult struct {
+		//	title string
+		//	excerpt string
+		//}
 
-		log.Println(searchResults)
-
-		log.Printf("Search results: %v", searchResults.MaxScore)
+		for _, result := range (searchResults.Hits) {
+			actualResult := search.DocumentMatch(*result)
+			log.Printf("ID: %v", actualResult.ID)
+			log.Printf("Locations: %v", actualResult.Locations)
+			log.Printf("Locations: %v %T", actualResult.Locations["Markdown"]["text"],actualResult.Locations["Markdown"]["text"])
+			log.Printf("%v",search.Locations(actualResult.Locations["Markdown"]["text"])[0])
+			log.Printf("Fragments: %v", actualResult.Fragments)
+		}
 		c.JSON(200, gin.H{
 			"timeTaken":searchResults.Took,
 			"totalHits":searchResults.Total,
@@ -111,25 +122,26 @@ func BleveSearchQuery(c *gin.Context) {
 	}
 }
 
-func addFileToIndex(filename string, index bleve.Index) error {
-	if _, err := os.Stat(filename); os.IsNotExist(err) {
+func addFileToIndex(filePath string, index bleve.Index) error {
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return errors.New("File does not exist")
 	}
-	bytes, err := ioutil.ReadFile(filename)
+	bytes, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		log.Printf("Error reading file: %v", err)
 		return err
 	}
-	log.Printf("%v contains %v bytes", filename, len(bytes))
+	log.Printf("%v contains %v bytes", filePath, len(bytes))
 
 	//err = index.Index(filename, string(bytes))
 	data := struct {
-		Name string
+		Markdown string
 	}{
-		Name: string(bytes),
+		Markdown: string(bytes),
 	}
 
 	// index some data
+	_, filename := filepath.Split(filePath)
 	index.Index(filename, data)
 	if err != nil {
 		return err

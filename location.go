@@ -1,11 +1,8 @@
 package main
 
 import (
-	"fmt"
-	"gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 	"github.com/kpawlik/geojson"
-	"github.com/lib/pq"
-	"log"
 	"strconv"
 	"time"
 )
@@ -26,7 +23,6 @@ type Location struct {
 	DeviceID             string `json:"deviceid" binding:"required"`
 	Geocoding            string
 }
-
 
 func GetLastLoction() (*Location, error) {
 	var location Location
@@ -90,7 +86,6 @@ func GetLineStringAsJSON(year string, filtered bool) (string, error) {
 	}
 	return json, nil
 }
-
 
 /* HTTP handlers */
 func WhereLineStringHandler(c *gin.Context) {
@@ -174,39 +169,4 @@ Receive POST from phone. This should be an application/json containing an array 
 func LocatorHandler(c *gin.Context) {
 	c.String(204, "Deprecated")
 	return
-	locators := []Location{}
-
-	err := c.BindJSON(&locators)
-	if err != nil {
-		c.String(400, fmt.Sprintf("%v", err))
-		return
-	}
-
-	newLocation := false
-	for _, locator := range locators {
-		locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt / 1000, 1000000 * (locator.DeviceTimestampAsInt % 1000))
-		//locator.GetRelativeSpeedDistance(db)
-
-		_, err = db.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,gsmtype,wifissid,distance) values ($1,$2,$3,$4,$5,$6,$7,$8)", time.Now(), &locator.DeviceTimestamp, &locator.Latitude, &locator.Longitude, &locator.Accuracy, &locator.GSMType, &locator.WifiSSID, &locator.Distance)
-
-		switch i := err.(type) {
-		case nil:
-			newLocation = true
-			continue
-		case *pq.Error:
-			log.Printf("Managed to get a duplicate timestamp: %v", locator)
-		default:
-			log.Printf("%T", err)
-			InternalError(i)
-			c.String(500, "Database Error")
-			return
-		}
-
-	}
-	//Now to update the geocoding from the latest locator
-	if newLocation {
-		GeocodingWorkQueue <- true
-	}
-	c.String(200, "Yay")
 }
-

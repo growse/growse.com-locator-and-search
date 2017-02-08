@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
 	"io/ioutil"
 	"log"

@@ -1,0 +1,171 @@
+hash: 88f3e8bb71b598f5d7b567b19f88ba8a506e50387a2942acf933797ab6a82f1d
+updated: 2017-02-08T22:56:26.646238196Z
+imports:
+- name: cloud.google.com/go
+  version: 0a668fab0bfe29558cb4026861e3ad7d9e319fb4
+  subpackages:
+  - compute/metadata
+  - internal
+- name: github.com/blevesearch/bleve
+  version: 97393d027342f43b17da2f02c090a4e728ac929f
+  subpackages:
+  - analysis
+  - analysis/analyzers/standard_analyzer
+  - analysis/datetime_parsers/datetime_optional
+  - analysis/datetime_parsers/flexible_go
+  - analysis/language/en
+  - analysis/token_filters/lower_case_filter
+  - analysis/token_filters/porter
+  - analysis/token_filters/stop_tokens_filter
+  - analysis/tokenizers/unicode
+  - document
+  - index
+  - index/store
+  - index/store/boltdb
+  - index/store/gtreap
+  - index/upside_down
+  - numeric_util
+  - registry
+  - search
+  - search/collectors
+  - search/facets
+  - search/highlight
+  - search/highlight/fragment_formatters/html
+  - search/highlight/fragmenters/simple
+  - search/highlight/highlighters/html
+  - search/highlight/highlighters/simple
+  - search/scorers
+  - search/searchers
+- name: github.com/blevesearch/go-porterstemmer
+  version: 23a2c8e5cf1f380f27722c6d2ae8896431dc7d0e
+  repo: https://github.com/blevesearch/go-porterstemmer
+- name: github.com/blevesearch/segment
+  version: db70c57796cc8c310613541dfade3dce627d09c7
+  repo: https://github.com/blevesearch/segment
+- name: github.com/boltdb/bolt
+  version: 144418e1475d8bf7abbdc48583500f1a20c62ea7
+  repo: https://github.com/boltdb/bolt
+- name: github.com/braintree/manners
+  version: 0b5e6b2c2843f4c83c2a40f96980b09cf4af733c
+- name: github.com/eclipse/paho.mqtt.golang
+  version: 45f9b18f4864c81d49c3ed01e5faec9eeb05de31
+  subpackages:
+  - packets
+- name: github.com/fsnotify/fsnotify
+  version: a904159b9206978bb6d53fcc7a769e5cd726c737
+- name: github.com/gin-gonic/gin
+  version: e2212d40c62a98b388a5eb48ecbdcf88534688ba
+  subpackages:
+  - binding
+  - render
+- name: github.com/gocql/gocql
+  version: 4d2d1ac71932f7c4a6c7feb0d654462e4116c58b
+  subpackages:
+  - internal/lru
+  - internal/murmur
+  - internal/streams
+- name: github.com/golang/protobuf
+  version: 655cdfa588ea190e901bc5590e65d5621688847c
+  repo: https://github.com/golang/protobuf
+  subpackages:
+  - proto
+- name: github.com/golang/snappy
+  version: cef980a12b316c5b7e5bb3a8e168eb43ae999a88
+  repo: https://github.com/golang/snappy
+- name: github.com/googleapis/gax-go
+  version: da06d194a00e19ce00d9011a13931c3f6f6887c7
+- name: github.com/gorilla/feeds
+  version: 441264de03a8117ed530ae8e049d8f601a33a099
+- name: github.com/growse/concurrent-expiring-map
+  version: 25cb195ed6aefb0e6aa7fa02388939a907f6ba36
+- name: github.com/hailocab/go-hostpool
+  version: e80d13ce29ede4452c43dea11e79b9bc8a15b478
+- name: github.com/kpawlik/geojson
+  version: 98b60f908b4d322e71116b58c932bc7a6d379da5
+- name: github.com/lib/pq
+  version: 0477eb88c5ca4009cb281f13c90633375b6a9987
+  subpackages:
+  - oid
+- name: github.com/mailgun/mailgun-go
+  version: 369a1fa57ce6fb314e627087b9fff0db5c266c0f
+- name: github.com/manucorporat/sse
+  version: ee05b128a739a0fb76c7ebd3ae4810c1de808d6d
+- name: github.com/mattn/go-isatty
+  version: 30a891c33c7cde7b02a981314b4228ec99380cca
+- name: github.com/oxtoacart/bpool
+  version: 4e1c5567d7c2dd59fa4c7c83d34c2f3528b025d6
+- name: github.com/russross/blackfriday
+  version: 0b647d0506a698cca42caca173e55559b12a69f2
+- name: github.com/shurcooL/sanitized_anchor_name
+  version: 1dba4b3954bc059efc3991ec364f9f9a35f597d2
+- name: github.com/steveyen/gtreap
+  version: 0abe01ef9be25c4aedc174758ec2d917314d6d70
+  repo: https://github.com/steveyen/gtreap
+- name: github.com/tanel/dbmigrate
+  version: f82f2962f891db9d5b17248742b6d9932e7c1b9b
+- name: golang.org/x/net
+  version: e45385e9b226f570b1f086bf287b25d3d4117776
+  repo: https://go.googlesource.com/net
+  subpackages:
+  - context
+  - context/ctxhttp
+  - http2
+  - http2/hpack
+  - internal/timeseries
+  - trace
+  - websocket
+- name: golang.org/x/oauth2
+  version: 4464e7848382e6f39db55097f70e1460bdf944b3
+  subpackages:
+  - google
+  - internal
+  - jws
+  - jwt
+- name: golang.org/x/sys
+  version: 7a6e5648d140666db5d920909e082ca00a87ba2c
+  subpackages:
+  - unix
+- name: google.golang.org/appengine
+  version: 2e4a801b39fc199db615bfca7d0b9f8cd9580599
+  subpackages:
+  - internal
+  - internal/app_identity
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/modules
+  - internal/remote_api
+  - internal/urlfetch
+  - urlfetch
+- name: google.golang.org/grpc
+  version: 9b791e0ea399a912e17e176e5de6e7ac7d8c15ff
+  subpackages:
+  - codes
+  - credentials
+  - grpclog
+  - internal
+  - metadata
+  - naming
+  - peer
+  - stats
+  - tap
+  - transport
+- name: gopkg.in/go-playground/validator.v8
+  version: c193cecd124b5cc722d7ee5538e945bdb3348435
+- name: gopkg.in/inf.v0
+  version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
+- name: gopkg.in/yaml.v2
+  version: a3f3340b5840cee44f372bddb5880fcbc419b46a
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: 792786c7400a136282c1664665ae0a8db921c6c2
+  subpackages:
+  - difflib
+- name: github.com/stretchr/testify
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
+  subpackages:
+  - assert

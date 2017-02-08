@@ -11,9 +11,12 @@ dependencies:
     - go get -u github.com/kardianos/govendor
     - go get -u github.com/jstemmer/go-junit-report
   override:
+    - sudo add-apt-repository ppa:masterminds/glide -y
+    - sudo apt-get update
+    - sudo apt-get install glide -y
     - mkdir -p $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME
     - ln -fs $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-    - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && govendor sync
+    - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && glide install
 
 
 test:

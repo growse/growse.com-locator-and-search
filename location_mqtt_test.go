@@ -14,16 +14,16 @@ func TestMQTTMarshallWorks(t *testing.T) {
 		t.Logf("Error unmarshalling: %v", err)
 		t.Fail()
 	}
-	if (!locator.Doze) {
+	if !locator.Doze {
 		t.Logf("Doze. Expected: 'true'. Actual: %v", locator.Doze)
 		t.Fail()
 	}
 
-	if (locator.Type != "location") {
+	if locator.Type != "location" {
 		t.Logf("Type. Expected: 'location'. Actual: %v", locator.Type)
 		t.Fail()
 	}
-	if (locator.Accuracy != 20) {
+	if locator.Accuracy != 20 {
 		t.Logf("Accuracy. Expected: 20. Actual: %v", locator.Accuracy)
 		t.Fail()
 	}

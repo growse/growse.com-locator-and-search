@@ -25,3 +25,4 @@ static/*.tgz
 pprof.cpu
 
 vendor/**/
+vendor/

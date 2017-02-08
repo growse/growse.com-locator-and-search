@@ -1,14 +1,14 @@
 package main
 
 import (
+	"errors"
 	"github.com/blevesearch/bleve"
 	"github.com/blevesearch/bleve/search"
-	"gopkg.in/gin-gonic/gin.v1"
-	"os/exec"
+	"github.com/gin-gonic/gin"
+	"io/ioutil"
 	"log"
 	"os"
-	"io/ioutil"
-	"errors"
+	"os/exec"
 	"path"
 	"path/filepath"
 )
@@ -21,7 +21,7 @@ var blevePath = "growse.com.bleve"
 func BleveInit() {
 	updateGitRepo(remoteGit, repoLocation, "jekyll")
 	openIndex(blevePath)
-	addFilesToIndex(repoLocation + "/_posts", bleveIndex)
+	addFilesToIndex(repoLocation+"/_posts", bleveIndex)
 }
 
 func openIndex(path string) {
@@ -67,7 +67,7 @@ func addFilesToIndex(sourceLocation string, index bleve.Index) error {
 	if err != nil {
 		return err
 	}
-	for _, file := range (fileinfos) {
+	for _, file := range fileinfos {
 		if !file.IsDir() {
 			fullFileName := path.Join(sourceLocation, file.Name())
 			log.Printf("Indexing file %v", fullFileName)
@@ -106,18 +106,18 @@ func BleveSearchQuery(c *gin.Context) {
 		//	excerpt string
 		//}
 
-		for _, result := range (searchResults.Hits) {
+		for _, result := range searchResults.Hits {
 			actualResult := search.DocumentMatch(*result)
 			log.Printf("ID: %v", actualResult.ID)
 			log.Printf("Locations: %v", actualResult.Locations)
-			log.Printf("Locations: %v %T", actualResult.Locations["Markdown"]["text"],actualResult.Locations["Markdown"]["text"])
-			log.Printf("%v",search.Locations(actualResult.Locations["Markdown"]["text"])[0])
+			log.Printf("Locations: %v %T", actualResult.Locations["Markdown"]["text"], actualResult.Locations["Markdown"]["text"])
+			log.Printf("%v", search.Locations(actualResult.Locations["Markdown"]["text"])[0])
 			log.Printf("Fragments: %v", actualResult.Fragments)
 		}
 		c.JSON(200, gin.H{
-			"timeTaken":searchResults.Took,
-			"totalHits":searchResults.Total,
-			"sdf":searchResults.Hits,
+			"timeTaken": searchResults.Took,
+			"totalHits": searchResults.Total,
+			"sdf":       searchResults.Hits,
 		})
 	}
 }

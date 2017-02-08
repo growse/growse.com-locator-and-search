@@ -1,0 +1,28 @@
+package: github.com/growse/www.growse.com
+import:
+- package: github.com/blevesearch/bleve
+  version: ^0.5.0
+- package: github.com/braintree/manners
+  version: ^0.4.0
+- package: github.com/eclipse/paho.mqtt.golang
+  version: ^1.0.0
+- package: github.com/gin-gonic/gin
+  version: ^1.1.4
+- package: github.com/gorilla/feeds
+- package: github.com/growse/concurrent-expiring-map
+- package: github.com/kpawlik/geojson
+- package: github.com/lib/pq
+- package: github.com/mailgun/mailgun-go
+  version: ^1.0.2
+- package: github.com/oxtoacart/bpool
+- package: github.com/russross/blackfriday
+  version: ^1.4.0
+- package: github.com/tanel/dbmigrate
+- package: golang.org/x/oauth2
+  subpackages:
+  - google
+testImport:
+- package: github.com/stretchr/testify
+  version: ^1.1.4
+  subpackages:
+  - assert

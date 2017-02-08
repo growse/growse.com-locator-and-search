@@ -1,11 +1,11 @@
 package main
 
 import (
-	"testing"
-	"io/ioutil"
-	"github.com/stretchr/testify/assert"
 	"github.com/blevesearch/bleve"
+	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"os"
+	"testing"
 )
 
 func TestAddingFilesToIndexAddsTheFilesToTheIndex(t *testing.T) {

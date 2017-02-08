@@ -7,7 +7,7 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
-	"gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/feeds"
 	"github.com/russross/blackfriday"
 	"html/template"
@@ -364,7 +364,6 @@ func LatestArticleHandler(c *gin.Context) {
 	lastlocation, _ := GetLastLoction()
 
 	totaldistance, _ := GetTotalDistance()
-
 
 	index, months, err := LoadArticleIndex()
 	if err != nil {

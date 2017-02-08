@@ -1,6 +1,6 @@
 package main
 
-import "gopkg.in/gin-gonic/gin.v1"
+import "github.com/gin-gonic/gin"
 
 func BuildRoutes(router *gin.Engine) {
 	//Ugly hack to deal with the fact that httprouter can't cope with both /static/ and /:year existing

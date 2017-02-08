@@ -2,16 +2,16 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"errors"
 	"fmt"
-	"net/http"
 	"io/ioutil"
+	"log"
+	"net/http"
 	"time"
 )
 
 type GeoLocation struct {
-	Status  string `json:"status"`
+	Status  string            `json:"status"`
 	Results []GeocodingResult `json:"results"`
 }
 
@@ -20,11 +20,10 @@ type GeocodingResult struct {
 }
 
 type GeocodingAddressComponent struct {
-	LongName  string `json:"long_name"`
-	ShortName string `json:"short_name"`
+	LongName  string   `json:"long_name"`
+	ShortName string   `json:"short_name"`
 	Types     []string `json:"types"`
 }
-
 
 /*
 Extract a sane name from the geocoding object
@@ -45,7 +44,7 @@ func (location *Location) Name() string {
 
 	var postal_town, locality string
 
-	for _, addresscomponents := range (geoLocation.Results[0].AddressComponents) {
+	for _, addresscomponents := range geoLocation.Results[0].AddressComponents {
 		if stringSliceContains(addresscomponents.Types, "postal_town") {
 			postal_town = addresscomponents.LongName
 		}

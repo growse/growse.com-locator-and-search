@@ -1,25 +1,25 @@
 package main
 
 import (
-	"github.com/eclipse/paho.mqtt.golang"
-	"log"
-	"encoding/json"
-	"time"
-	"github.com/lib/pq"
-	"math"
 	"database/sql"
+	"encoding/json"
+	"github.com/eclipse/paho.mqtt.golang"
+	"github.com/lib/pq"
+	"log"
+	"math"
+	"time"
 )
 
 type MQTTMsg struct {
-	Type                 string `json:"_type" binding:"required"`
-	TrackerId            string `json:"tid"`
-	Accuracy             int `json:"acc"`
-	Battery              int `json:"batt"`
-	Connection           string `json:"conn"`
+	Type                 string             `json:"_type" binding:"required"`
+	TrackerId            string             `json:"tid"`
+	Accuracy             int                `json:"acc"`
+	Battery              int                `json:"batt"`
+	Connection           string             `json:"conn"`
 	Doze                 ConvertibleBoolean `json:"doze"`
-	Latitude             float64 `json:"lat"`
-	Longitude            float64 `json:"lon"`
-	DeviceTimestampAsInt int64 `json:"tst" binding:"required"`
+	Latitude             float64            `json:"lat"`
+	Longitude            float64            `json:"lon"`
+	DeviceTimestampAsInt int64              `json:"tst" binding:"required"`
 	DeviceTimestamp      time.Time
 	Distance             float64
 }
@@ -28,7 +28,7 @@ func SubscribeMQTT(quit <-chan bool) error {
 	topic := "owntracks/#"
 	log.Print("Connecting to MQTT")
 	var mqttClientOptions = mqtt.NewClientOptions()
-	if (configuration.MQTTURL != "") {
+	if configuration.MQTTURL != "" {
 		mqttClientOptions.AddBroker(configuration.MQTTURL)
 	} else {
 		mqttClientOptions.AddBroker("tcp://localhost:1883")
@@ -104,8 +104,8 @@ func DistanceOnUnitSphere(lat1 float64, long1 float64, lat2 float64, long2 float
 	// sin phi sin phi' cos(theta-theta') + cos phi cos phi'
 	// distance = rho * arc length
 
-	cos := (math.Sin(phi1) * math.Sin(phi2) * math.Cos(theta1 - theta2) +
-		math.Cos(phi1) * math.Cos(phi2))
+	cos := (math.Sin(phi1)*math.Sin(phi2)*math.Cos(theta1-theta2) +
+		math.Cos(phi1)*math.Cos(phi2))
 
 	cos = math.Max(math.Min(cos, 1.0), -1.0)
 
@@ -136,7 +136,7 @@ var handler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt, 0)
 	locator.GetRelativeDistance(db)
 	dozebool := bool(locator.Doze)
-	_, err = db.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,doze,batterylevel,connectiontype,distance) " +
+	_, err = db.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,doze,batterylevel,connectiontype,distance) "+
 		"values ($1,$2,$3,$4,$5,$6,$7,$8,$9)",
 		time.Now(),
 		&locator.DeviceTimestamp,

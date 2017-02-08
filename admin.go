@@ -1,9 +1,9 @@
 package main
 
 import (
-	"log"
-	"gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 	"github.com/russross/blackfriday"
+	"log"
 	"regexp"
 	"strings"
 )

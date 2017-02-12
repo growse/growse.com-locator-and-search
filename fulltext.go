@@ -1,39 +1,36 @@
 package main
 
 import (
+	"bytes"
 	"errors"
+	"fmt"
 	"github.com/blevesearch/bleve"
-	"github.com/blevesearch/bleve/search"
 	"github.com/gin-gonic/gin"
+	"github.com/mschoch/blackfriday-text"
+	"github.com/russross/blackfriday"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
+	"strings"
+	_ "github.com/blevesearch/bleve/search/highlight/highlighters/simple"
 )
 
 var bleveIndex bleve.Index
-var repoLocation = "/var/tmp/growse.com-jekyll-git"
-var remoteGit = "https://github.com/growse/www.growse.com.git"
-var blevePath = "growse.com.bleve"
 
-func BleveInit() {
-	updateGitRepo(remoteGit, repoLocation, "jekyll")
-	openIndex(blevePath)
-	addFilesToIndex(repoLocation+"/_posts", bleveIndex)
+func BleveInit(remoteGit string, repoLocation string) {
+	if (remoteGit != "" && repoLocation != "") {
+		updateGitRepo(remoteGit, repoLocation, "jekyll")
+		openIndex()
+		addFilesToIndex(repoLocation + "/_posts", bleveIndex)
+	}
 }
 
-func openIndex(path string) {
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		log.Printf("%v doesn't exist, creating new index", path)
-		mapping := bleve.NewIndexMapping()
-		bleveIndex, _ = bleve.New(path, mapping)
-	} else {
-		log.Printf("%v already exists. opening", path)
-		bleveIndex, _ = bleve.Open(path)
-	}
+func openIndex() {
+	indexMapping := bleve.NewIndexMapping()
+	bleveIndex, _ = bleve.NewMemOnly(indexMapping)
 }
 
 func updateGitRepo(remoteLocation string, localLocation string, tag string) error {
@@ -84,40 +81,50 @@ func BleveIndexDocs(c *gin.Context) {
 	c.String(204, "Accepted")
 }
 
-func BleveSearchQuery(c *gin.Context) {
+var escapeChars = "\\+-=&|><!(){}[]^\"~*?:/ "
 
+func escape(term string) string {
+	escapedTerm := term
+	for _, char := range escapeChars {
+		escapedTerm = strings.Replace(escapedTerm, string(char), `\` + string(char), -1)
+	}
+	return escapedTerm
+}
+
+func BleveSearchQuery(c *gin.Context) {
+	if (bleveIndex == nil) {
+		c.String(503, "Search not defined")
+		return
+	}
 	var searchForm struct {
 		SearchTerm string `form:"a" binding:"required"`
 	}
 	c.Bind(&searchForm)
 	log.Printf("Searching for %v", searchForm.SearchTerm)
-	docCount, _ := bleveIndex.DocCount()
-	log.Printf("Number of docs: %v", docCount)
-	query := bleve.NewMatchQuery(searchForm.SearchTerm)
+
+	queryString := ""
+	for _, term := range strings.Split(searchForm.SearchTerm, " ") {
+		escapedTerm := escape(term)
+		log.Printf("Escaped search term: %s", escapedTerm)
+		queryString += fmt.Sprintf("Body:%s Title:%s^5 ", escapedTerm, escapedTerm)
+	}
+	log.Print(queryString)
+
+	query := bleve.NewQueryStringQuery(queryString)
 	searchRequest := bleve.NewSearchRequest(query)
+	searchRequest.Fields = []string{"Title"}
+
+	searchRequest.Highlight = bleve.NewHighlight()
 	searchResults, err := bleveIndex.Search(searchRequest)
 
 	if err != nil {
 		log.Printf("Error doing search: %v", err)
 		c.String(500, "ERROR")
 	} else {
-		//var searchResult struct {
-		//	title string
-		//	excerpt string
-		//}
-
-		for _, result := range searchResults.Hits {
-			actualResult := search.DocumentMatch(*result)
-			log.Printf("ID: %v", actualResult.ID)
-			log.Printf("Locations: %v", actualResult.Locations)
-			log.Printf("Locations: %v %T", actualResult.Locations["Markdown"]["text"], actualResult.Locations["Markdown"]["text"])
-			log.Printf("%v", search.Locations(actualResult.Locations["Markdown"]["text"])[0])
-			log.Printf("Fragments: %v", actualResult.Fragments)
-		}
 		c.JSON(200, gin.H{
 			"timeTaken": searchResults.Took,
 			"totalHits": searchResults.Total,
-			"sdf":       searchResults.Hits,
+			"hits":      searchResults.Hits,
 		})
 	}
 }
@@ -126,23 +133,42 @@ func addFileToIndex(filePath string, index bleve.Index) error {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return errors.New("File does not exist")
 	}
-	bytes, err := ioutil.ReadFile(filePath)
+	contentBytes, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		log.Printf("Error reading file: %v", err)
 		return err
 	}
-	log.Printf("%v contains %v bytes", filePath, len(bytes))
+	log.Printf("%v contains %v bytes", filePath, len(contentBytes))
+	numberOfDelimiters := 0
+	title := ""
+	var body bytes.Buffer
+	for _, line := range strings.Split(string(contentBytes), "\n") {
+		if line == "---" {
+			numberOfDelimiters += 1
+		} else {
+			if numberOfDelimiters < 2 {
+				if strings.HasPrefix(line, "title:") {
+					title = strings.Trim(strings.SplitN(line, ":", 2)[1], " \"")
+				}
+			} else {
+				body.WriteString(line)
+			}
+		}
+	}
+	renderer := blackfridaytext.TextRenderer()
+	textBytes := blackfriday.Markdown(body.Bytes(), renderer, 0)
 
-	//err = index.Index(filename, string(bytes))
 	data := struct {
-		Markdown string
+		Body  string
+		Title string
 	}{
-		Markdown: string(bytes),
+		Title: title,
+		Body:  string(textBytes),
 	}
 
 	// index some data
 	_, filename := filepath.Split(filePath)
-	index.Index(filename, data)
+	err = index.Index(filename, data)
 	if err != nil {
 		return err
 	}

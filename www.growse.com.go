@@ -30,14 +30,14 @@ import (
 
 var (
 	db                      *sql.DB
-	stylesheetfilename      string
-	javascriptfilename      string
+	stylesheetfilename string
+	javascriptfilename string
 	wherejavascriptfilename string
-	configuration           Configuration
-	gun                     mailgun.Mailgun
+	configuration Configuration
+	gun mailgun.Mailgun
 	templates               *template.Template
 	bufPool                 *bpool.BufferPool
-	memoryCache             cmap.ConcurrentMap
+	memoryCache cmap.ConcurrentMap
 	oAuthConf               *oauth2.Config
 	GeocodingWorkQueue      chan bool
 )
@@ -65,6 +65,8 @@ type Configuration struct {
 	MQTTURL                string
 	MQTTUsername           string
 	MQTTPassword           string
+	SearchIndexRemoteGit   string
+	SearchIndexLocalDir    string
 }
 
 type ArticleMonth struct {
@@ -184,7 +186,7 @@ func main() {
 	go SubscribeMQTT(quit)
 
 	// Initialize fulltext engine
-	//BleveInit()
+	BleveInit(configuration.SearchIndexRemoteGit, configuration.SearchIndexLocalDir)
 
 	gun = mailgun.NewMailgun("growse.com", configuration.MailgunKey, "")
 
@@ -266,7 +268,7 @@ func main() {
 			for {
 				select {
 				case event := <-watcher.Events:
-					if event.Op&fsnotify.Create == fsnotify.Create {
+					if event.Op & fsnotify.Create == fsnotify.Create {
 						if strings.HasSuffix(event.Name, ".www.css") {
 							log.Printf("New CSS Detected: %s", path.Base(event.Name))
 							stylesheetfilename = path.Base(event.Name)

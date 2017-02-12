@@ -1,8 +1,8 @@
-hash: 88f3e8bb71b598f5d7b567b19f88ba8a506e50387a2942acf933797ab6a82f1d
-updated: 2017-02-08T22:56:26.646238196Z
+hash: 5f490ff77ba4e6d1f56113d3b925b671189fb3205a541f9e2023b010305766d4
+updated: 2017-02-12T15:10:37.419632174Z
 imports:
 - name: cloud.google.com/go
-  version: 0a668fab0bfe29558cb4026861e3ad7d9e319fb4
+  version: 513b07bb7468fa6d8c59519f35b66456bce959b5
   subpackages:
   - compute/metadata
   - internal
@@ -59,7 +59,7 @@ imports:
   - binding
   - render
 - name: github.com/gocql/gocql
-  version: 4d2d1ac71932f7c4a6c7feb0d654462e4116c58b
+  version: 9d95e30efacdf21ede20d750573676f86d1b2261
   subpackages:
   - internal/lru
   - internal/murmur
@@ -91,7 +91,9 @@ imports:
 - name: github.com/manucorporat/sse
   version: ee05b128a739a0fb76c7ebd3ae4810c1de808d6d
 - name: github.com/mattn/go-isatty
-  version: 30a891c33c7cde7b02a981314b4228ec99380cca
+  version: 281032e84ae07510239465db46bf442aa44b953a
+- name: github.com/mschoch/blackfriday-text
+  version: f4ea365e801b9d91b76da776f785a80e5ddf9a36
 - name: github.com/oxtoacart/bpool
   version: 4e1c5567d7c2dd59fa4c7c83d34c2f3528b025d6
 - name: github.com/russross/blackfriday
@@ -115,14 +117,14 @@ imports:
   - trace
   - websocket
 - name: golang.org/x/oauth2
-  version: 4464e7848382e6f39db55097f70e1460bdf944b3
+  version: de0725b330ab43c1a3d6c84d961cf01183783f1e
   subpackages:
   - google
   - internal
   - jws
   - jwt
 - name: golang.org/x/sys
-  version: 7a6e5648d140666db5d920909e082ca00a87ba2c
+  version: aaabbdc969c3935a2a7f61efac801e7163c73a2a
   subpackages:
   - unix
 - name: google.golang.org/appengine
@@ -138,7 +140,7 @@ imports:
   - internal/urlfetch
   - urlfetch
 - name: google.golang.org/grpc
-  version: 9b791e0ea399a912e17e176e5de6e7ac7d8c15ff
+  version: 4acc9108c18937815db3306a66990869d22aa980
   subpackages:
   - codes
   - credentials

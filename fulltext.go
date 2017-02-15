@@ -25,6 +25,8 @@ func BleveInit(remoteGit string, repoLocation string) {
 		updateGitRepo(remoteGit, repoLocation, "jekyll")
 		openIndex()
 		addFilesToIndex(repoLocation + "/_posts", bleveIndex)
+	} else {
+		log.Print("No SearchIndex parameters supplied, skipping")
 	}
 }
 
@@ -34,6 +36,8 @@ func openIndex() {
 }
 
 func updateGitRepo(remoteLocation string, localLocation string, tag string) error {
+	log.SetPrefix("bleve")
+	log.Printf("cloning %s to %s", remoteLocation, localLocation)
 	if _, err := os.Stat(localLocation); os.IsNotExist(err) {
 		cmd := exec.Command("git", "clone", remoteLocation, localLocation)
 		err := cmd.Run()

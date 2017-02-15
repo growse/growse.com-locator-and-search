@@ -36,7 +36,6 @@ func openIndex() {
 }
 
 func updateGitRepo(remoteLocation string, localLocation string, tag string) error {
-	log.SetPrefix("bleve")
 	log.Printf("cloning %s to %s", remoteLocation, localLocation)
 	if _, err := os.Stat(localLocation); os.IsNotExist(err) {
 		cmd := exec.Command("git", "clone", remoteLocation, localLocation)

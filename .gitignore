@@ -26,3 +26,5 @@ pprof.cpu
 
 vendor/**/
 vendor/
+!/static/css/nanoscroller.css
+!/static/css/solarizeddark.css

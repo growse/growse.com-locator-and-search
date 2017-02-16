@@ -181,9 +181,6 @@ func main() {
 		log.Print("Quitting signal listener goroutine.")
 	}()
 
-	GeocodingWorkQueue = make(chan bool, 100)
-	go UpdateLatestLocationWithGeocoding(GeocodingWorkQueue)
-	go SubscribeMQTT(quit)
 
 	// Initialize fulltext engine
 	BleveInit(configuration.SearchIndexRemoteGit, configuration.SearchIndexLocalDir)
@@ -206,6 +203,10 @@ func main() {
 	} else {
 		log.Print("Database connected")
 	}
+
+	GeocodingWorkQueue = make(chan bool, 100)
+	go UpdateLatestLocationWithGeocoding(GeocodingWorkQueue)
+	go SubscribeMQTT(quit)
 
 	if *kalmanFiltering {
 		log.Print("Doing the Kalman batch processing")

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/blevesearch/bleve"
+	_ "github.com/blevesearch/bleve/search/highlight/highlighters/simple"
 	"github.com/gin-gonic/gin"
 	"github.com/mschoch/blackfriday-text"
 	"github.com/russross/blackfriday"
@@ -15,16 +16,15 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-	_ "github.com/blevesearch/bleve/search/highlight/highlighters/simple"
 )
 
 var bleveIndex bleve.Index
 
 func BleveInit(remoteGit string, repoLocation string) {
-	if (remoteGit != "" && repoLocation != "") {
+	if remoteGit != "" && repoLocation != "" {
 		updateGitRepo(remoteGit, repoLocation, "jekyll")
 		openIndex()
-		addFilesToIndex(repoLocation + "/_posts", bleveIndex)
+		addFilesToIndex(repoLocation+"/_posts", bleveIndex)
 	} else {
 		log.Print("No SearchIndex parameters supplied, skipping")
 	}
@@ -89,13 +89,13 @@ var escapeChars = "\\+-=&|><!(){}[]^\"~*?:/ "
 func escape(term string) string {
 	escapedTerm := term
 	for _, char := range escapeChars {
-		escapedTerm = strings.Replace(escapedTerm, string(char), `\` + string(char), -1)
+		escapedTerm = strings.Replace(escapedTerm, string(char), `\`+string(char), -1)
 	}
 	return escapedTerm
 }
 
 func BleveSearchQuery(c *gin.Context) {
-	if (bleveIndex == nil) {
+	if bleveIndex == nil {
 		c.String(503, "Search not defined")
 		return
 	}

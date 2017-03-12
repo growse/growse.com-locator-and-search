@@ -43,6 +43,6 @@ func BuildRoutes(router *gin.Engine) {
 	router.POST("/blevesearch", BleveSearchQuery)
 	router.POST("/search/index", BleveIndexDocs)
 	router.POST("/locator/", LocatorHandler)
+	router.GET("/location/", LocationHandler)
 	router.GET("/search/:searchterm/", SearchHandler)
-
 }

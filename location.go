@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/kpawlik/geojson"
 	"strconv"
@@ -169,4 +170,16 @@ Receive POST from phone. This should be an application/json containing an array 
 func LocatorHandler(c *gin.Context) {
 	c.String(204, "Deprecated")
 	return
+}
+
+func LocationHandler(c *gin.Context) {
+	location, err := GetLastLoction()
+	if err != nil {
+		c.String(500, err.Error())
+	}
+	c.JSON(200, gin.H{
+		"name":      location.Name(),
+		"latitude":  fmt.Sprintf("%.2f", location.Latitude),
+		"longitude": fmt.Sprintf("%.2f", location.Longitude),
+	})
 }

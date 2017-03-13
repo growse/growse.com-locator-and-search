@@ -183,6 +183,6 @@ func LocationHandler(c *gin.Context) {
 		"name":          location.Name(),
 		"latitude":      fmt.Sprintf("%.2f", location.Latitude),
 		"longitude":     fmt.Sprintf("%.2f", location.Longitude),
-		"totalDistance": distance,
+		"totalDistance": fmt.Sprintf("%.2f", distance),
 	})
 }

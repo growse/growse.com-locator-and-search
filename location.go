@@ -94,7 +94,7 @@ func WhereLineStringHandler(c *gin.Context) {
 	linestring, err := GetLineStringAsJSON(c.Params.ByName("year"), filtered)
 	if err != nil {
 		InternalError(err)
-		c.String(500, "Internal Error")
+		c.String(500, "Internal Error\n"+err.Error())
 	}
 	c.Data(200, "application/json", []byte(linestring))
 }

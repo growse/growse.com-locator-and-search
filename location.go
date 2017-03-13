@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/dustin/go-humanize"
 	"github.com/gin-gonic/gin"
 	"github.com/kpawlik/geojson"
 	"strconv"
@@ -183,6 +184,6 @@ func LocationHandler(c *gin.Context) {
 		"name":          location.Name(),
 		"latitude":      fmt.Sprintf("%.2f", location.Latitude),
 		"longitude":     fmt.Sprintf("%.2f", location.Longitude),
-		"totalDistance": fmt.Sprintf("%.2f", distance),
+		"totalDistance": humanize.FormatFloat("#,###.##", distance),
 	})
 }

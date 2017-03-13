@@ -1,8 +1,8 @@
-hash: 5f490ff77ba4e6d1f56113d3b925b671189fb3205a541f9e2023b010305766d4
-updated: 2017-02-12T15:10:37.419632174Z
+hash: b5e42a0ef207b766039dd28857249d6d13c47ef6c58e5e53ce3a093d3f2fe876
+updated: 2017-03-13T21:15:16.358387833Z
 imports:
 - name: cloud.google.com/go
-  version: 513b07bb7468fa6d8c59519f35b66456bce959b5
+  version: bdd451d43030c0441b50809cf0aeffd941ec43ea
   subpackages:
   - compute/metadata
   - internal
@@ -47,19 +47,21 @@ imports:
   repo: https://github.com/boltdb/bolt
 - name: github.com/braintree/manners
   version: 0b5e6b2c2843f4c83c2a40f96980b09cf4af733c
+- name: github.com/dustin/go-humanize
+  version: 259d2a102b871d17f30e3cd9881a642961a1e486
 - name: github.com/eclipse/paho.mqtt.golang
   version: 45f9b18f4864c81d49c3ed01e5faec9eeb05de31
   subpackages:
   - packets
 - name: github.com/fsnotify/fsnotify
-  version: a904159b9206978bb6d53fcc7a769e5cd726c737
+  version: 7d7316ed6e1ed2de075aab8dfc76de5d158d66e1
 - name: github.com/gin-gonic/gin
   version: e2212d40c62a98b388a5eb48ecbdcf88534688ba
   subpackages:
   - binding
   - render
 - name: github.com/gocql/gocql
-  version: 9d95e30efacdf21ede20d750573676f86d1b2261
+  version: 6a9363e0c9b27431ce2ed5872279f85248115b9e
   subpackages:
   - internal/lru
   - internal/murmur
@@ -73,7 +75,7 @@ imports:
   version: cef980a12b316c5b7e5bb3a8e168eb43ae999a88
   repo: https://github.com/golang/snappy
 - name: github.com/googleapis/gax-go
-  version: da06d194a00e19ce00d9011a13931c3f6f6887c7
+  version: 8c5154c0fe5bf18cf649634d4c6df50897a32751
 - name: github.com/gorilla/feeds
   version: 441264de03a8117ed530ae8e049d8f601a33a099
 - name: github.com/growse/concurrent-expiring-map
@@ -83,11 +85,11 @@ imports:
 - name: github.com/kpawlik/geojson
   version: 98b60f908b4d322e71116b58c932bc7a6d379da5
 - name: github.com/lib/pq
-  version: 0477eb88c5ca4009cb281f13c90633375b6a9987
+  version: 472a0745531a17dbac346e828b4c60e73ddff30c
   subpackages:
   - oid
 - name: github.com/mailgun/mailgun-go
-  version: 369a1fa57ce6fb314e627087b9fff0db5c266c0f
+  version: a4002e2df2e8ca2da6a6fbb4a72871b504e49f50
 - name: github.com/manucorporat/sse
   version: ee05b128a739a0fb76c7ebd3ae4810c1de808d6d
 - name: github.com/mattn/go-isatty
@@ -96,6 +98,8 @@ imports:
   version: f4ea365e801b9d91b76da776f785a80e5ddf9a36
 - name: github.com/oxtoacart/bpool
   version: 4e1c5567d7c2dd59fa4c7c83d34c2f3528b025d6
+- name: github.com/pkg/errors
+  version: bfd5150e4e41705ded2129ec33379de1cb90b513
 - name: github.com/russross/blackfriday
   version: 0b647d0506a698cca42caca173e55559b12a69f2
 - name: github.com/shurcooL/sanitized_anchor_name
@@ -117,7 +121,7 @@ imports:
   - trace
   - websocket
 - name: golang.org/x/oauth2
-  version: de0725b330ab43c1a3d6c84d961cf01183783f1e
+  version: 1611bb46e67abc64a71ecc5c3ae67f1cbbc2b921
   subpackages:
   - google
   - internal
@@ -128,7 +132,7 @@ imports:
   subpackages:
   - unix
 - name: google.golang.org/appengine
-  version: 2e4a801b39fc199db615bfca7d0b9f8cd9580599
+  version: b79c28f0197795b4050bfcd7c4c2209136c594b1
   subpackages:
   - internal
   - internal/app_identity
@@ -140,12 +144,13 @@ imports:
   - internal/urlfetch
   - urlfetch
 - name: google.golang.org/grpc
-  version: 4acc9108c18937815db3306a66990869d22aa980
+  version: 0713829b980f4ddd276689a36235c5fcc82a21bf
   subpackages:
   - codes
   - credentials
   - grpclog
   - internal
+  - keepalive
   - metadata
   - naming
   - peer

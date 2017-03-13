@@ -71,6 +71,7 @@ func GetLineStringAsJSON(year string, filtered bool) (string, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var coords geojson.Coordinate
+		coords = geojson.Coordinate{0, 0}
 		var distance float32
 		rows.Scan(&coords[0], &coords[1], &distance)
 		if distance > 100 {

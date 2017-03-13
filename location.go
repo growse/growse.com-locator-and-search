@@ -174,12 +174,14 @@ func LocatorHandler(c *gin.Context) {
 
 func LocationHandler(c *gin.Context) {
 	location, err := GetLastLoction()
+	distance, err := GetTotalDistance()
 	if err != nil {
 		c.String(500, err.Error())
 	}
 	c.JSON(200, gin.H{
-		"name":      location.Name(),
-		"latitude":  fmt.Sprintf("%.2f", location.Latitude),
-		"longitude": fmt.Sprintf("%.2f", location.Longitude),
+		"name":          location.Name(),
+		"latitude":      fmt.Sprintf("%.2f", location.Latitude),
+		"longitude":     fmt.Sprintf("%.2f", location.Longitude),
+		"totalDistance": distance,
 	})
 }

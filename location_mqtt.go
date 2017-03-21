@@ -24,8 +24,9 @@ type MQTTMsg struct {
 	Distance             float64
 }
 
+var topic = "owntracks/#"
+
 func SubscribeMQTT(quit <-chan bool) error {
-	topic := "owntracks/#"
 	log.Print("Connecting to MQTT")
 	var mqttClientOptions = mqtt.NewClientOptions()
 	if configuration.MQTTURL != "" {
@@ -39,26 +40,27 @@ func SubscribeMQTT(quit <-chan bool) error {
 	}
 	mqttClientOptions.SetClientID("growselocator")
 	mqttClientOptions.SetAutoReconnect(true)
-
+	mqttClientOptions.SetConnectionLostHandler(connectionLostHandler)
+	mqttClientOptions.SetOnConnectHandler(onConnectHandler)
 	mqttClient := mqtt.NewClient(mqttClientOptions)
 
 	mqttClientToken := mqttClient.Connect()
 	defer mqttClient.Disconnect(250)
+
 	if mqttClientToken.Wait() && mqttClientToken.Error() != nil {
 		log.Printf("Error connecting to mqtt: %v", mqttClientToken.Error())
 		return mqttClientToken.Error()
 	}
-	log.Print("Connected")
+	log.Print("MQTT Connected")
 
-	mqttSubscribeToken := mqttClient.Subscribe(topic, 0, handler)
-	if mqttSubscribeToken.Wait() && mqttSubscribeToken.Error() != nil {
-		log.Printf("Error connecting to mqtt: %v", mqttSubscribeToken.Error())
-		mqttClient.Disconnect(250)
-		return mqttSubscribeToken.Error()
+	err := subscribeToMQTT(mqttClient, topic, handler)
+	if err != nil {
+		return err
 	}
+
 	select {
 	case <-quit:
-		log.Print("Unsubscribing")
+		log.Print("MQTT Unsubscribing")
 		mqttUnsubscribeToken := mqttClient.Unsubscribe(topic)
 		if mqttUnsubscribeToken.Wait() && mqttUnsubscribeToken.Error() != nil {
 			log.Printf("Error unsubscribing from mqtt: %v", mqttUnsubscribeToken.Error())
@@ -66,6 +68,17 @@ func SubscribeMQTT(quit <-chan bool) error {
 		log.Print("Closing MQTT")
 		return nil
 	}
+}
+func subscribeToMQTT(mqttClient mqtt.Client, topic string, handler mqtt.MessageHandler) error {
+	log.Printf("MQTT Subscribing to %v", topic)
+	mqttSubscribeToken := mqttClient.Subscribe(topic, 0, handler)
+	if mqttSubscribeToken.Wait() && mqttSubscribeToken.Error() != nil {
+		log.Printf("Error connecting to mqtt: %v", mqttSubscribeToken.Error())
+		mqttClient.Disconnect(250)
+		return mqttSubscribeToken.Error()
+	}
+	log.Printf("MQTT Subscribed to %v", topic)
+	return nil
 }
 
 func (loc *MQTTMsg) GetRelativeDistance(thisDb *sql.DB) {
@@ -83,37 +96,13 @@ func (loc *MQTTMsg) GetRelativeDistance(thisDb *sql.DB) {
 	}
 }
 
-func DistanceOnUnitSphere(lat1 float64, long1 float64, lat2 float64, long2 float64) float64 {
-	// Convert latitude and longitude to
-	//spherical coordinates in radians.
-	degrees_to_radians := math.Pi / 180.0
+var onConnectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
+	log.Print("MQTT Connected!")
+	subscribeToMQTT(client, topic, handler)
+}
 
-	// phi = 90 - latitude
-	phi1 := (90.0 - lat1) * degrees_to_radians
-	phi2 := (90.0 - lat2) * degrees_to_radians
-
-	// theta = longitude
-	theta1 := long1 * degrees_to_radians
-	theta2 := long2 * degrees_to_radians
-
-	// Compute spherical distance from spherical coordinates.
-
-	// For two locations in spherical coordinates
-	// (1, theta, phi) and (1, theta, phi)
-	// cosine( arc length ) =
-	// sin phi sin phi' cos(theta-theta') + cos phi cos phi'
-	// distance = rho * arc length
-
-	cos := (math.Sin(phi1)*math.Sin(phi2)*math.Cos(theta1-theta2) +
-		math.Cos(phi1)*math.Cos(phi2))
-
-	cos = math.Max(math.Min(cos, 1.0), -1.0)
-
-	arc := math.Acos(cos)
-
-	// Remember to multiply arc by the radius of the earth
-	// in your favorite set of units to get length.
-	return arc
+var connectionLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
+	log.Printf("MQTT Connection lost: %v", err)
 }
 
 var handler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
@@ -163,5 +152,37 @@ var handler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	if newLocation {
 		GeocodingWorkQueue <- true
 	}
+}
 
+func DistanceOnUnitSphere(lat1 float64, long1 float64, lat2 float64, long2 float64) float64 {
+	// Convert latitude and longitude to
+	//spherical coordinates in radians.
+	degrees_to_radians := math.Pi / 180.0
+
+	// phi = 90 - latitude
+	phi1 := (90.0 - lat1) * degrees_to_radians
+	phi2 := (90.0 - lat2) * degrees_to_radians
+
+	// theta = longitude
+	theta1 := long1 * degrees_to_radians
+	theta2 := long2 * degrees_to_radians
+
+	// Compute spherical distance from spherical coordinates.
+
+	// For two locations in spherical coordinates
+	// (1, theta, phi) and (1, theta, phi)
+	// cosine( arc length ) =
+	// sin phi sin phi' cos(theta-theta') + cos phi cos phi'
+	// distance = rho * arc length
+
+	cos := (math.Sin(phi1)*math.Sin(phi2)*math.Cos(theta1-theta2) +
+		math.Cos(phi1)*math.Cos(phi2))
+
+	cos = math.Max(math.Min(cos, 1.0), -1.0)
+
+	arc := math.Acos(cos)
+
+	// Remember to multiply arc by the radius of the earth
+	// in your favorite set of units to get length.
+	return arc
 }

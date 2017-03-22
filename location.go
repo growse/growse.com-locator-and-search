@@ -183,10 +183,20 @@ func LocationHandler(c *gin.Context) {
 	if err != nil {
 		c.String(500, err.Error())
 	}
+	c.Header("Last-modified",location.Timestamp)
 	c.JSON(200, gin.H{
 		"name":          location.Name(),
 		"latitude":      fmt.Sprintf("%.2f", location.Latitude),
 		"longitude":     fmt.Sprintf("%.2f", location.Longitude),
 		"totalDistance": humanize.FormatFloat("#,###.##", distance),
 	})
+}
+
+func LocationHeadHandler(c *gin.Context) {
+	location, err := GetLastLoction()
+	if err != nil {
+		c.String(500, err.Error())
+	}
+	c.Header("Last-modified",location.Timestamp)
+	c.Status(200)
 }

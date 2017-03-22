@@ -183,7 +183,7 @@ func LocationHandler(c *gin.Context) {
 	if err != nil {
 		c.String(500, err.Error())
 	}
-	c.Header("Last-modified",location.Timestamp)
+	c.Header("Last-modified", location.Timestamp.Format("Mon, 02 Jal 2006 15:04:05 GMT"))
 	c.JSON(200, gin.H{
 		"name":          location.Name(),
 		"latitude":      fmt.Sprintf("%.2f", location.Latitude),
@@ -197,6 +197,6 @@ func LocationHeadHandler(c *gin.Context) {
 	if err != nil {
 		c.String(500, err.Error())
 	}
-	c.Header("Last-modified",location.Timestamp)
+	c.Header("Last-modified", location.Timestamp.Format("Mon, 02 Jal 2006 15:04:05 GMT"))
 	c.Status(200)
 }

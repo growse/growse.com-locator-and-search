@@ -1,0 +1,2 @@
+create index idx_locations_geocoding on locations(geocoding);
+create index idx_locations_year on locations(date_part('year'::text, (date(timezone('UTC'::text, devicetimestamp)))::timestamp without time zone));

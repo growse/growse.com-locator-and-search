@@ -21,8 +21,8 @@ module.exports = function (grunt) {
     uglify: {
       target: {
         files: {
-          'js/www.js': ['js/jquery-2.1.3.min.js', 'js/jquery.timeago.js', 'js/jquery.nanoscroller.min.js', 'js/highlight.pack.js', 'js/scripts.js'],
-          'js/where.js': ['js/d3.js', 'js/topojson.v1.min.js']
+          'js/www.js': ['js/scripts.js'],
+          'js/where.js': ['js/topojson.v1.min.js']
         }
       },
       options: {

@@ -1,9 +1,4 @@
-{
-Error: Parse error on line 1:
-{{define "header"}}<!
--^
-Expecting 'STRING', '}'
-{define "header"}}<!DOCTYPE html>
+{{define "header"}}<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta http-equiv="Content-type" content="text/html"/>
@@ -66,8 +61,7 @@ Expecting 'STRING', '}'
         <div id="location">
             {{if .LastLocation}}
             <p>Last seen floating around near <a
-                    href="http://maps.google.com/?q={{ printf " %.2f" .LastLocation.Latitude }},{{ printf "%.2f"
-                .LastLocation.Longitude }}">
+                    href="http://maps.google.com/?q={{ printf " %.2f" .LastLocation.Latitude }},{{printf "%.2f" .LastLocation.Longitude }}">
                 {{ .LastLocation.Name }}</a>. {{ RenderFloat "#,###.##" .TotalDistance }} miles this year.
             </p>
             {{end}}

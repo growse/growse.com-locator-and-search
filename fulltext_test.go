@@ -51,7 +51,7 @@ func TestAddSingleFileToIndexAddsTheFileToTheIndex(t *testing.T) {
 }
 
 func TestSearchingIndexForFileContentReturnsResult(t *testing.T) {
-	content := "content"
+	content := "title:content\n---\ncontent"
 	tempDir, err := ioutil.TempDir("", "testprefix")
 	assert.Nil(t, err)
 
@@ -70,11 +70,14 @@ func TestSearchingIndexForFileContentReturnsResult(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(1), count)
 
-	query := bleve.NewMatchQuery(content)
-	searchRequest := bleve.NewSearchRequest(query)
-	searchResult, err := index.Search(searchRequest)
+	searchForm := SearchForm{SearchTerm: "content"}
+	searchResult, err := searchIndexForThings(index, searchForm)
+
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), searchResult.Total)
+	assert.Equal(t, 0, searchResult.Status.Failed)
+	assert.Equal(t, 1, searchResult.Status.Successful)
+	assert.Equal(t, 0, len(searchResult.Status.Errors))
+	assert.Equal(t, 1, len(searchResult.Hits))
 	os.RemoveAll("testIndex")
 }
 

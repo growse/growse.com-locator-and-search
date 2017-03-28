@@ -309,7 +309,7 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	BuildRoutes(router)
+	BuildRoutes(router, configuration.StaticPath)
 	log.Printf("Listening on port %d", configuration.Port)
 	manners.ListenAndServe(fmt.Sprintf(":%d", configuration.Port), router)
 }

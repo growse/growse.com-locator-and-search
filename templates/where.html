@@ -9,8 +9,9 @@
 
         <p>Last device ping:
             <strong>
-                <time class="timeago" datetime="{{ .LastLocation.Timestamp.UTC.Format "2006-01-02T15:04:05Z07:00" }}">
-                    {{.LastLocation.Timestamp}}</time>
+                <time class="timeago" datetime="{{ .LastLocation.Timestamp.UTC.Format " 2006-01-02T15:04:05Z07:00
+                " }}">
+                {{.LastLocation.Timestamp}}</time>
             </strong>.
         </p>
 
@@ -35,7 +36,7 @@
     //var speed_data ={{ .Speeds }};
     //var speed_hours_data = {{ .Speed_hours }};
     $(function () {
-        var mapfile = "/static/js/world-50m.json";
+        var mapfile = "/auth/static/js/world-50m.json";
         //growse.drawLineChart('#speedgraph', speed_data, 800, 200, '', 'mph');
         //growse.drawColumnChart('#speedhourgraph', speed_hours_data, 800, 200, 'hour', 'mph');
         growse.drawMap('#map', mapfile);

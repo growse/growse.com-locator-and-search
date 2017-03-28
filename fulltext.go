@@ -94,31 +94,20 @@ func escape(term string) string {
 	return escapedTerm
 }
 
+type SearchForm struct {
+	SearchTerm string `form:"a" binding:"required"`
+}
+
 func BleveSearchQuery(c *gin.Context) {
 	if bleveIndex == nil {
 		c.String(503, "Search not defined")
 		return
 	}
-	var searchForm struct {
-		SearchTerm string `form:"a" binding:"required"`
-	}
+	searchForm := SearchForm{}
 	c.Bind(&searchForm)
 	log.Printf("Searching for %v", searchForm.SearchTerm)
 
-	queryString := ""
-	for _, term := range strings.Split(searchForm.SearchTerm, " ") {
-		escapedTerm := escape(term)
-		log.Printf("Escaped search term: %s", escapedTerm)
-		queryString += fmt.Sprintf("Body:%s Title:%s^5 ", escapedTerm, escapedTerm)
-	}
-	log.Print(queryString)
-
-	query := bleve.NewQueryStringQuery(queryString)
-	searchRequest := bleve.NewSearchRequest(query)
-	searchRequest.Fields = []string{"Title"}
-
-	searchRequest.Highlight = bleve.NewHighlight()
-	searchResults, err := bleveIndex.Search(searchRequest)
+	searchResults, err := searchIndexForThings(bleveIndex, searchForm)
 
 	if err != nil {
 		log.Printf("Error doing search: %v", err)
@@ -130,6 +119,21 @@ func BleveSearchQuery(c *gin.Context) {
 			"hits":      searchResults.Hits,
 		})
 	}
+}
+func searchIndexForThings(index bleve.Index, searchForm SearchForm) (*bleve.SearchResult, error) {
+	queryString := ""
+	for _, term := range strings.Split(searchForm.SearchTerm, " ") {
+		escapedTerm := escape(term)
+		log.Printf("Escaped search term: %s", escapedTerm)
+		queryString += fmt.Sprintf("Body:%s Title:%s^5 ", escapedTerm, escapedTerm)
+	}
+
+	query := bleve.NewQueryStringQuery(queryString)
+	searchRequest := bleve.NewSearchRequest(query)
+	searchRequest.Fields = []string{"Title"}
+
+	searchRequest.Highlight = bleve.NewHighlight()
+	return index.Search(searchRequest)
 }
 
 func addFileToIndex(filePath string, index bleve.Index) error {
@@ -149,7 +153,7 @@ func addFileToIndex(filePath string, index bleve.Index) error {
 		if line == "---" {
 			numberOfDelimiters += 1
 		} else {
-			if numberOfDelimiters < 2 {
+			if numberOfDelimiters <= 1 {
 				if strings.HasPrefix(line, "title:") {
 					title = strings.Trim(strings.SplitN(line, ":", 2)[1], " \"")
 				}

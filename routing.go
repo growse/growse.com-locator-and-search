@@ -2,12 +2,13 @@ package main
 
 import "github.com/gin-gonic/gin"
 
-func BuildRoutes(router *gin.Engine) {
+func BuildRoutes(router *gin.Engine, staticDir string) {
 	//Ugly hack to deal with the fact that httprouter can't cope with both /static/ and /:year existing
 	//All years will begin with 2. So this sort of helps. Kinda.
 	authorized := router.Group("/auth/")
 	authorized.Use(AuthRequired())
 	{
+		authorized.Static("static/", staticDir)
 		authorized.GET("articles/", AdminArticleHandler)
 		authorized.POST("articles/", AdminNewArticleHandler)
 		authorized.PUT("articles/:id/", AdminUpdateArticleHandler)

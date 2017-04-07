@@ -1,6 +1,13 @@
-update locations set geocoding='{}' where geocoding ='';
-alter table locations add column json_geocoding jsonb;
-update locations set json_geocoding=geocoding::jsonb;
-alter table locations drop column geocoding;
-alter table locations rename json_geocoding to geocoding;
-alter table locations alter column geocoding set not null;
+UPDATE locations
+SET geocoding = '{}'
+WHERE geocoding = '';
+ALTER TABLE locations
+  ADD COLUMN json_geocoding JSONB;
+UPDATE locations
+SET json_geocoding = geocoding :: JSONB;
+ALTER TABLE locations
+  DROP COLUMN geocoding;
+ALTER TABLE locations
+  RENAME json_geocoding TO geocoding;
+ALTER TABLE locations
+  ALTER COLUMN geocoding SET NOT NULL;

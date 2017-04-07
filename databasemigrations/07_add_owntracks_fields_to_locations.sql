@@ -1,1 +1,4 @@
-alter table locations add doze bit, add batterylevel integer, add connectiontype nchar(1);
+ALTER TABLE locations
+  ADD doze BIT,
+  ADD batterylevel INTEGER,
+  ADD connectiontype NCHAR(1);

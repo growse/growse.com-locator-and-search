@@ -1,2 +1,4 @@
-alter table articles alter column datestamp set not null;
-alter table articles alter column datestamp set default now();
+ALTER TABLE articles
+  ALTER COLUMN datestamp SET NOT NULL;
+ALTER TABLE articles
+  ALTER COLUMN datestamp SET DEFAULT now();

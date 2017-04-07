@@ -1,2 +1,3 @@
-drop index if exists location_year_idx;
-create index location_year_idx on locations (date_part('year'::text, date(devicetimestamp at time zone 'UTC')));
+DROP INDEX IF EXISTS location_year_idx;
+CREATE INDEX location_year_idx
+  ON locations (date_part('year' :: TEXT, date(devicetimestamp AT TIME ZONE 'UTC')));

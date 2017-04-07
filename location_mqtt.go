@@ -125,8 +125,10 @@ var handler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt, 0)
 	locator.GetRelativeDistance(db)
 	dozebool := bool(locator.Doze)
-	_, err = db.Exec("insert into locations (timestamp,devicetimestamp,latitude,longitude,accuracy,doze,batterylevel,connectiontype,distance) "+
-		"values ($1,$2,$3,$4,$5,$6,$7,$8,$9)",
+	_, err = db.Exec("insert into locations " +
+		"(timestamp,devicetimestamp,latitude,longitude,accuracy,doze,batterylevel,connectiontype,distance,point,gisdistance) " +
+		"values ($1,$2,$3,$4,$5,$6,$7,$8,$9," +
+		"ST_GeographyFromText('SRID=4326;POINT($4 $3)'),ST_DISTANCE(ST_GeographyFromText('SRID=4326;POINT($4 $3)'),(select point from locations order by timestamp desc limit 1)))",
 		time.Now(),
 		&locator.DeviceTimestamp,
 		&locator.Latitude,
@@ -175,8 +177,8 @@ func DistanceOnUnitSphere(lat1 float64, long1 float64, lat2 float64, long2 float
 	// sin phi sin phi' cos(theta-theta') + cos phi cos phi'
 	// distance = rho * arc length
 
-	cos := (math.Sin(phi1)*math.Sin(phi2)*math.Cos(theta1-theta2) +
-		math.Cos(phi1)*math.Cos(phi2))
+	cos := (math.Sin(phi1) * math.Sin(phi2) * math.Cos(theta1 - theta2) +
+		math.Cos(phi1) * math.Cos(phi2))
 
 	cos = math.Max(math.Min(cos, 1.0), -1.0)
 

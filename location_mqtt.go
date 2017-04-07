@@ -128,7 +128,7 @@ var handler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	_, err = db.Exec("insert into locations " +
 		"(timestamp,devicetimestamp,latitude,longitude,accuracy,doze,batterylevel,connectiontype,distance,point,gisdistance) " +
 		"values ($1,$2,$3,$4,$5,$6,$7,$8,$9," +
-		"ST_GeographyFromText('SRID=4326;POINT($4::float $3::float)'),ST_DISTANCE(ST_GeographyFromText('SRID=4326;POINT($4::float $3::float)'),(select point from locations order by timestamp desc limit 1)))",
+		"ST_GeographyFromText('SRID=4326;POINT('||$4||' '||$3||')'),ST_DISTANCE(ST_GeographyFromText('SRID=4326;POINT('||$4||' '||$3||')'),(select point from locations order by timestamp desc limit 1)))",
 		time.Now(),
 		&locator.DeviceTimestamp,
 		&locator.Latitude,

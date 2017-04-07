@@ -8,6 +8,7 @@ import (
 	"log"
 	"math"
 	"time"
+	"fmt"
 )
 
 type MQTTMsg struct {
@@ -125,10 +126,13 @@ var handler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt, 0)
 	locator.GetRelativeDistance(db)
 	dozebool := bool(locator.Doze)
-	_, err = db.Exec("insert into locations " +
-		"(timestamp,devicetimestamp,latitude,longitude,accuracy,doze,batterylevel,connectiontype,distance,point,gisdistance) " +
-		"values ($1,$2,$3,$4,$5,$6,$7,$8,$9," +
-		"ST_GeographyFromText('SRID=4326;POINT('||$4::char||' '||$3::char||')'),ST_DISTANCE(ST_GeographyFromText('SRID=4326;POINT('||$4::char||' '||$3::char||')'),(select point from locations order by timestamp desc limit 1)))",
+	_, err = db.Exec(
+		fmt.Sprintf("insert into locations " +
+			"(timestamp,devicetimestamp,latitude,longitude,accuracy,doze,batterylevel,connectiontype,distance,point,gisdistance) " +
+			"values ($1,$2,$3,$4,$5,$6,$7,$8,$9," +
+			"ST_GeographyFromText('SRID=4326;POINT(%[1]f %[2]f)'),ST_DISTANCE(ST_GeographyFromText('SRID=4326;POINT(%[1]f %[2]f)'),(select point from locations order by timestamp desc limit 1)))",
+			locator.Longitude,
+			locator.Latitude),
 		time.Now(),
 		&locator.DeviceTimestamp,
 		&locator.Latitude,

@@ -32,7 +32,6 @@ deployment:
   production:
     branch: golang
     commands:
-      - cd static && npm install && grunt && cp assets.tgz $CIRCLE_ARTIFACTS/
       - cd templates && tar -zcvf templates.tgz * && cp templates.tgz $CIRCLE_ARTIFACTS/
       - cd databasemigrations && tar -zcvf databasemigrations.tgz * && cp databasemigrations.tgz $CIRCLE_ARTIFACTS/
       - ./deployment/deploy_prod.sh

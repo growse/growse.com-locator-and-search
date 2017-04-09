@@ -52,7 +52,7 @@ In miles.
 func GetTotalDistance() (float64, error) {
 	var distance float64
 	defer timeTrack(time.Now(), "GetTotalDistance")
-	err := db.QueryRow("select 0.000621371192*sum(distance) from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC')) = $1;", time.Now().UTC().Year()).Scan(&distance)
+	err := db.QueryRow("select 0.000621371192*sum(gisdistance) from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC')) = $1;", time.Now().UTC().Year()).Scan(&distance)
 	if err != nil {
 		return 0, err
 	}
@@ -65,7 +65,7 @@ func GetLineStringAsJSON(year string, filtered bool) (string, error) {
 	if filtered {
 		sqlStatement = "select kalmanlongitude,kalmanlatitude,kalmandistance from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC'))=$1 and kalmanaccuracy<(select percentile_disc(0.9) within group (order by kalmanaccuracy) from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC'))=$1) order by devicetimestamp asc"
 	} else {
-		sqlStatement = "select longitude,latitude,distance from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC'))=$1 and accuracy<(select percentile_disc(0.9) within group (order by accuracy) from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC'))=$1) order by devicetimestamp asc"
+		sqlStatement = "select longitude,latitude,gisdistance from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC'))=$1 and accuracy<(select percentile_disc(0.9) within group (order by accuracy) from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC'))=$1) order by devicetimestamp asc"
 	}
 	rows, err := db.Query(sqlStatement, year)
 	if err != nil {

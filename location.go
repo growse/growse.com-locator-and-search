@@ -39,7 +39,7 @@ Definately returns mph. Hence 2.236blahblah
 func GetAverageSpeed() (float64, error) {
 	var speed float64
 	defer timeTrack(time.Now(), "GetAverageSpeed")
-	err := db.QueryRow("select 2.23693629*avg(speed) from (select gisdistance/(extract(epoch from (devicetimestamp - lag(devicetimestamp) over (order by devicetimestamp asc)))::float) as speed from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC')) = $1) a;", time.Now().UTC().Year()).Scan(&speed)
+	err := db.QueryRow("select 2.23693629*sum(gisdistance)/extract(epoch from now()-date_trunc('year',now())) from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC')) = $1", time.Now().UTC().Year()).Scan(&speed)
 	if err != nil {
 		return 0, err
 	}

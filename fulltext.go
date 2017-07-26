@@ -23,7 +23,7 @@ var bleveIndex bleve.Index
 func BleveInit(remoteGit string, repoLocation string) {
 	if remoteGit != "" && repoLocation != "" {
 		err := updateGitRepo(remoteGit, repoLocation, "jekyll")
-		if err != nil {
+		if err == nil {
 			openIndex()
 			addFilesToIndex(repoLocation+"/_posts", bleveIndex)
 		} else {

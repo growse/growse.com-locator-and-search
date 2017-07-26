@@ -22,9 +22,13 @@ var bleveIndex bleve.Index
 
 func BleveInit(remoteGit string, repoLocation string) {
 	if remoteGit != "" && repoLocation != "" {
-		updateGitRepo(remoteGit, repoLocation, "jekyll")
-		openIndex()
-		addFilesToIndex(repoLocation+"/_posts", bleveIndex)
+		err := updateGitRepo(remoteGit, repoLocation, "jekyll")
+		if err != nil {
+			openIndex()
+			addFilesToIndex(repoLocation+"/_posts", bleveIndex)
+		} else {
+			log.Printf("Error opening git repository: %v", err)
+		}
 	} else {
 		log.Print("No SearchIndex parameters supplied, skipping")
 	}

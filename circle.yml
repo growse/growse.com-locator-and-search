@@ -8,6 +8,7 @@ machine:
 
 dependencies:
   pre:
+    - bundle install
     - go get -u github.com/kardianos/govendor
     - go get -u github.com/jstemmer/go-junit-report
   override:

@@ -26,15 +26,16 @@ test:
     - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && go build -v
     - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && ./www.growse.com -templateTestPath=templates
   post:
-    - cp www.growse.com $CIRCLE_ARTIFACTS/
+    - mkdir $CIRCLE_ARTIFACTS/app
+    - cp www.growse.com $CIRCLE_ARTIFACTS/app/
+    - cp -R databasemigrations $CIRCLE_ARTIFACTS/
+    - bundle exec fpm -s dir -t deb -n growse-com-golang --prefix /var/www/growse-web -p $CIRCLE_ARTIFACTS -a noarch -v 1.0.0-$CIRCLE_BUILD_NUM app/=app databasemigrations/=databasemigrations
 
 deployment:
   production:
     branch: golang
     commands:
-      - cd templates && tar -zcvf templates.tgz * && cp templates.tgz $CIRCLE_ARTIFACTS/
-      - cd databasemigrations && tar -zcvf databasemigrations.tgz * && cp databasemigrations.tgz $CIRCLE_ARTIFACTS/
-      - ./deployment/deploy_prod.sh
+      - bundle exec deb-s3 upload --s3-region=eu-west-1 --bucket apt-growse-com _site/growse-com-golang_1.0.0-"$CIRCLE_BUILD_NUM"_all.deb
 
 general:
   branches:

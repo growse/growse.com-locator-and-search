@@ -9,7 +9,6 @@ machine:
 dependencies:
   pre:
     - bundle install
-    - go get -u github.com/kardianos/govendor
     - go get -u github.com/jstemmer/go-junit-report
   override:
     - sudo add-apt-repository ppa:masterminds/glide -y
@@ -22,7 +21,8 @@ dependencies:
 
 test:
   override:
-    - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && go test -cover -covermode=count -coverprofile=coverprofile -v | go-junit-report > $CIRCLE_TEST_REPORTS/report.xml
+    - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && go test -cover -covermode=count -coverprofile=coverprofile -v > testoutput
+    - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && cat testoutput | go-junit-report > $CIRCLE_TEST_REPORTS/report.xml
     - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && go tool cover -html=coverprofile -o $CIRCLE_TEST_REPORTS/coverage.html
     - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && go build -v
     - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && ./www.growse.com -templateTestPath=templates

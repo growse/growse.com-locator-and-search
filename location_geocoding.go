@@ -109,11 +109,6 @@ func UpdateLatestLocationWithGeocoding(workChan <-chan bool) {
 			}
 			geocoding := location.GetGeocoding()
 			if geocoding != "" {
-				_, err = tx.Exec("Update locations set geocoding=null")
-				if err != nil {
-					tx.Rollback()
-					InternalError(err)
-				}
 				_, err = tx.Exec("update locations set geocoding=$1 where id=$2", geocoding, id)
 				if err != nil {
 					log.Printf("Location that caused fail is: %s", geocoding)

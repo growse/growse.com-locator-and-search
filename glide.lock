@@ -1,11 +1,10 @@
-hash: b5e42a0ef207b766039dd28857249d6d13c47ef6c58e5e53ce3a093d3f2fe876
-updated: 2017-03-13T21:15:16.358387833Z
+hash: c939bd1d8219cbf5229d1ef251aab4dcba6378b32f11ab808e61fd1e3e90123f
+updated: 2017-08-29T16:58:31.216654788+01:00
 imports:
 - name: cloud.google.com/go
-  version: bdd451d43030c0441b50809cf0aeffd941ec43ea
+  version: e4a2bf211d1a557cc85d9c5b801b52c54bc73030
   subpackages:
   - compute/metadata
-  - internal
 - name: github.com/blevesearch/bleve
   version: 97393d027342f43b17da2f02c090a4e728ac929f
   subpackages:
@@ -48,20 +47,22 @@ imports:
 - name: github.com/braintree/manners
   version: 0b5e6b2c2843f4c83c2a40f96980b09cf4af733c
 - name: github.com/dustin/go-humanize
-  version: 259d2a102b871d17f30e3cd9881a642961a1e486
+  version: 79e699ccd02f240a1f1fbbdcee7e64c1c12e41aa
 - name: github.com/eclipse/paho.mqtt.golang
-  version: 45f9b18f4864c81d49c3ed01e5faec9eeb05de31
+  version: aff15770515e3c57fc6109da73d42b0d46f7f483
   subpackages:
   - packets
 - name: github.com/fsnotify/fsnotify
-  version: 7d7316ed6e1ed2de075aab8dfc76de5d158d66e1
+  version: 4da3e2cfbabc9f751898f250b49f2439785783a1
+- name: github.com/gin-contrib/sse
+  version: 22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae
 - name: github.com/gin-gonic/gin
-  version: e2212d40c62a98b388a5eb48ecbdcf88534688ba
+  version: d459835d2b077e44f7c9b453505ee29881d5d12d
   subpackages:
   - binding
   - render
 - name: github.com/gocql/gocql
-  version: 6a9363e0c9b27431ce2ed5872279f85248115b9e
+  version: 2029819581ab63a84cd2dd172fbe5604757f906e
   subpackages:
   - internal/lru
   - internal/murmur
@@ -74,65 +75,60 @@ imports:
 - name: github.com/golang/snappy
   version: cef980a12b316c5b7e5bb3a8e168eb43ae999a88
   repo: https://github.com/golang/snappy
-- name: github.com/googleapis/gax-go
-  version: 8c5154c0fe5bf18cf649634d4c6df50897a32751
 - name: github.com/gorilla/feeds
-  version: 441264de03a8117ed530ae8e049d8f601a33a099
+  version: fa8f5548eedbe306d748925237a48d70ae4150de
 - name: github.com/growse/concurrent-expiring-map
   version: 25cb195ed6aefb0e6aa7fa02388939a907f6ba36
 - name: github.com/hailocab/go-hostpool
   version: e80d13ce29ede4452c43dea11e79b9bc8a15b478
 - name: github.com/kpawlik/geojson
-  version: 98b60f908b4d322e71116b58c932bc7a6d379da5
+  version: 155a68a7046c668c963b6a9e9d2d9eeae8f3ada7
 - name: github.com/lib/pq
-  version: 472a0745531a17dbac346e828b4c60e73ddff30c
+  version: e42267488fe361b9dc034be7a6bffef5b195bceb
   subpackages:
   - oid
 - name: github.com/mailgun/mailgun-go
   version: a4002e2df2e8ca2da6a6fbb4a72871b504e49f50
-- name: github.com/manucorporat/sse
-  version: ee05b128a739a0fb76c7ebd3ae4810c1de808d6d
 - name: github.com/mattn/go-isatty
-  version: 281032e84ae07510239465db46bf442aa44b953a
+  version: fc9e8d8ef48496124e79ae0df75490096eccf6fe
 - name: github.com/mschoch/blackfriday-text
   version: f4ea365e801b9d91b76da776f785a80e5ddf9a36
 - name: github.com/oxtoacart/bpool
   version: 4e1c5567d7c2dd59fa4c7c83d34c2f3528b025d6
 - name: github.com/pkg/errors
-  version: bfd5150e4e41705ded2129ec33379de1cb90b513
+  version: c605e284fe17294bda444b34710735b29d1a9d90
 - name: github.com/russross/blackfriday
-  version: 0b647d0506a698cca42caca173e55559b12a69f2
-- name: github.com/shurcooL/sanitized_anchor_name
-  version: 1dba4b3954bc059efc3991ec364f9f9a35f597d2
+  version: 4048872b16cc0fc2c5fd9eacf0ed2c2fedaa0c8c
 - name: github.com/steveyen/gtreap
   version: 0abe01ef9be25c4aedc174758ec2d917314d6d70
   repo: https://github.com/steveyen/gtreap
 - name: github.com/tanel/dbmigrate
-  version: f82f2962f891db9d5b17248742b6d9932e7c1b9b
+  version: 392e09648e1f5d8f0e757c38a799e0e4945e7222
+- name: github.com/ugorji/go
+  version: 8c0409fcbb70099c748d71f714529204975f6c3f
+  subpackages:
+  - codec
 - name: golang.org/x/net
   version: e45385e9b226f570b1f086bf287b25d3d4117776
   repo: https://go.googlesource.com/net
   subpackages:
   - context
   - context/ctxhttp
-  - http2
-  - http2/hpack
-  - internal/timeseries
-  - trace
+  - proxy
   - websocket
 - name: golang.org/x/oauth2
-  version: 1611bb46e67abc64a71ecc5c3ae67f1cbbc2b921
+  version: 9a379c6b3e95a790ffc43293c2a78dee0d7b6e20
   subpackages:
   - google
   - internal
   - jws
   - jwt
 - name: golang.org/x/sys
-  version: aaabbdc969c3935a2a7f61efac801e7163c73a2a
+  version: 2d6f6f883a06fc0d5f4b14a81e4c28705ea64c15
   subpackages:
   - unix
 - name: google.golang.org/appengine
-  version: b79c28f0197795b4050bfcd7c4c2209136c594b1
+  version: d9a072cfa7b9736e44311ef77b3e09d804bfa599
   subpackages:
   - internal
   - internal/app_identity
@@ -143,33 +139,19 @@ imports:
   - internal/remote_api
   - internal/urlfetch
   - urlfetch
-- name: google.golang.org/grpc
-  version: 0713829b980f4ddd276689a36235c5fcc82a21bf
-  subpackages:
-  - codes
-  - credentials
-  - grpclog
-  - internal
-  - keepalive
-  - metadata
-  - naming
-  - peer
-  - stats
-  - tap
-  - transport
 - name: gopkg.in/go-playground/validator.v8
-  version: c193cecd124b5cc722d7ee5538e945bdb3348435
+  version: 5f1438d3fca68893a817e4a66806cea46a9e4ebf
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: a3f3340b5840cee44f372bddb5880fcbc419b46a
+  version: eb3733d160e74a9c7e442f435eb3bea458e1d19f
 testImports:
 - name: github.com/davecgh/go-spew
-  version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
   subpackages:
   - spew
 - name: github.com/pmezard/go-difflib
-  version: 792786c7400a136282c1664665ae0a8db921c6c2
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
   subpackages:
   - difflib
 - name: github.com/stretchr/testify

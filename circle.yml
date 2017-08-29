@@ -29,7 +29,7 @@ test:
   post:
     - mkdir $CIRCLE_ARTIFACTS/app
     - cp www.growse.com $CIRCLE_ARTIFACTS/app/
-    - bundle exec fpm -s dir -t deb -n growse-com-golang --prefix /var/www/growse-web -p $CIRCLE_ARTIFACTS -a noarch -v 1.0.0-$CIRCLE_BUILD_NUM $CIRCLE_ARTIFACTS/app/=app databasemigrations/=databasemigrations
+    - bundle exec fpm -s dir -t deb -n growse-com-golang --prefix /var/www/growse-web -p $CIRCLE_ARTIFACTS -a noarch -v 1.0.0-$CIRCLE_BUILD_NUM $CIRCLE_ARTIFACTS/app/=app databasemigrations/=databasemigrations templates/=templates
 
 deployment:
   production:

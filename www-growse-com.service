@@ -1,0 +1,9 @@
+[Unit]
+Description=www.growse.com web app
+
+[Service]
+ExecStart=/var/www/growse-web/app/www.growse.com --configFile /var/www/growse-web/app/config.json
+User=www-data
+
+[Install]
+WantedBy=multi-user.target

@@ -8,6 +8,7 @@ machine:
 
 dependencies:
   pre:
+    - gem install bundler
     - bundle install
     - go get -u github.com/jstemmer/go-junit-report
   override:
@@ -29,7 +30,7 @@ test:
   post:
     - mkdir $CIRCLE_ARTIFACTS/app
     - cp www.growse.com $CIRCLE_ARTIFACTS/app/
-    - bundle exec fpm -s dir -t deb -n growse-com-golang --prefix /var/www/growse-web -p $CIRCLE_ARTIFACTS -a noarch -v 1.0.0-$CIRCLE_BUILD_NUM $CIRCLE_ARTIFACTS/app/=app databasemigrations/=databasemigrations templates/=templates
+    - bundle exec fpm -s dir -t deb --deb-systemd www-growse-com.service -n growse-com-golang --prefix /var/www/growse-web -p $CIRCLE_ARTIFACTS -a noarch -v 1.0.0-$CIRCLE_BUILD_NUM $CIRCLE_ARTIFACTS/app/=app databasemigrations/=databasemigrations templates/=templates
 
 deployment:
   production:

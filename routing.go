@@ -8,7 +8,7 @@ func BuildRoutes(router *gin.Engine, staticDir string) {
 	authorized := router.Group("/auth/")
 	authorized.Use(AuthRequired())
 	{
-		authorized.Static("static/", staticDir)
+		//authorized.Static("static/", staticDir)
 		authorized.GET("articles/", AdminArticleHandler)
 		authorized.POST("articles/", AdminNewArticleHandler)
 		authorized.PUT("articles/:id/", AdminUpdateArticleHandler)

@@ -6,7 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/braintree/manners"
-	"github.com/fsnotify/fsnotify"
 	"github.com/gin-gonic/gin"
 	"github.com/growse/concurrent-expiring-map"
 	_ "github.com/lib/pq"
@@ -15,7 +14,6 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"html/template"
-	"io/ioutil"
 	"log"
 	"mime"
 	"os"
@@ -23,7 +21,6 @@ import (
 	"path"
 	"runtime/debug"
 	"runtime/pprof"
-	"strings"
 	"syscall"
 	"time"
 )
@@ -221,80 +218,80 @@ func main() {
 	router := gin.Default()
 
 	//Load the templates. Don't use gin for this, because we want to render to a buffer later
-	LoadTemplates()
-
-	//Static is over here
-	router.Static("/static/", configuration.StaticPath)
-
-	//Get latest updated stylesheet
-	stylesheets, _ := ioutil.ReadDir(path.Join(configuration.StaticPath, "css"))
-	var lastTimeCss time.Time
-	for _, file := range stylesheets {
-		if !file.IsDir() && (lastTimeCss.IsZero() || file.ModTime().After(lastTimeCss)) && strings.HasSuffix(file.Name(), ".www.css") {
-			lastTimeCss = file.ModTime()
-			stylesheetfilename = file.Name()
-		}
-	}
-	if stylesheetfilename == "" {
-		log.Fatal("No stylesheet found in staticpath. Perhaps run Grunt first?")
-	}
-	//Get the latest javascript file
-	javascripts, _ := ioutil.ReadDir(path.Join(configuration.StaticPath, "js"))
-	var lastTimeJs time.Time
-
-	for _, file := range javascripts {
-		if !file.IsDir() && (lastTimeJs.IsZero() || file.ModTime().After(lastTimeJs)) && strings.HasSuffix(file.Name(), ".www.js") {
-			lastTimeJs = file.ModTime()
-			javascriptfilename = file.Name()
-		} else if !file.IsDir() && (lastTimeJs.IsZero() || file.ModTime().After(lastTimeJs)) && strings.HasSuffix(file.Name(), ".where.js") {
-			wherejavascriptfilename = file.Name()
-		}
-	}
-	if javascriptfilename == "" {
-		log.Fatal("No javascript found in staticpath. Perhaps run Grunt first?")
-	} else {
-		log.Printf("Javascript filename: %s", javascriptfilename)
-		log.Printf("Where Javascript filename: %s", wherejavascriptfilename)
-	}
-
-	//Detect changes to css / js and update those paths.
-	watcher, err := fsnotify.NewWatcher()
-	if err == nil {
-		defer watcher.Close()
-		watcher.Add(path.Join(configuration.StaticPath, "css"))
-		watcher.Add(path.Join(configuration.StaticPath, "js"))
-		watcher.Add(configuration.TemplatePath)
-		go func() {
-			for {
-				select {
-				case event := <-watcher.Events:
-					if event.Op&fsnotify.Create == fsnotify.Create {
-						if strings.HasSuffix(event.Name, ".www.css") {
-							log.Printf("New CSS Detected: %s", path.Base(event.Name))
-							stylesheetfilename = path.Base(event.Name)
-							memoryCache.Flush()
-
-						}
-						if strings.HasSuffix(event.Name, ".www.js") {
-							log.Printf("New JS Detected: %s", path.Base(event.Name))
-							javascriptfilename = path.Base(event.Name)
-							memoryCache.Flush()
-						}
-					} else if strings.HasSuffix(event.Name, ".html") {
-						log.Printf("Template changed: %s", path.Base(event.Name))
-						LoadTemplates()
-						memoryCache.Flush()
-					}
-				case err := <-watcher.Errors:
-					if err != nil {
-						log.Println("fsnotify error:", err)
-					}
-				}
-			}
-		}()
-	} else {
-		log.Printf("Initify watcher failed: %s Continuing.", err)
-	}
+	//LoadTemplates()
+	//
+	////Static is over here
+	//router.Static("/static/", configuration.StaticPath)
+	//
+	////Get latest updated stylesheet
+	//stylesheets, _ := ioutil.ReadDir(path.Join(configuration.StaticPath, "css"))
+	//var lastTimeCss time.Time
+	//for _, file := range stylesheets {
+	//	if !file.IsDir() && (lastTimeCss.IsZero() || file.ModTime().After(lastTimeCss)) && strings.HasSuffix(file.Name(), ".www.css") {
+	//		lastTimeCss = file.ModTime()
+	//		stylesheetfilename = file.Name()
+	//	}
+	//}
+	//if stylesheetfilename == "" {
+	//	log.Fatal("No stylesheet found in staticpath. Perhaps run Grunt first?")
+	//}
+	////Get the latest javascript file
+	//javascripts, _ := ioutil.ReadDir(path.Join(configuration.StaticPath, "js"))
+	//var lastTimeJs time.Time
+	//
+	//for _, file := range javascripts {
+	//	if !file.IsDir() && (lastTimeJs.IsZero() || file.ModTime().After(lastTimeJs)) && strings.HasSuffix(file.Name(), ".www.js") {
+	//		lastTimeJs = file.ModTime()
+	//		javascriptfilename = file.Name()
+	//	} else if !file.IsDir() && (lastTimeJs.IsZero() || file.ModTime().After(lastTimeJs)) && strings.HasSuffix(file.Name(), ".where.js") {
+	//		wherejavascriptfilename = file.Name()
+	//	}
+	//}
+	//if javascriptfilename == "" {
+	//	log.Fatal("No javascript found in staticpath. Perhaps run Grunt first?")
+	//} else {
+	//	log.Printf("Javascript filename: %s", javascriptfilename)
+	//	log.Printf("Where Javascript filename: %s", wherejavascriptfilename)
+	//}
+	//
+	////Detect changes to css / js and update those paths.
+	//watcher, err := fsnotify.NewWatcher()
+	//if err == nil {
+	//	defer watcher.Close()
+	//	watcher.Add(path.Join(configuration.StaticPath, "css"))
+	//	watcher.Add(path.Join(configuration.StaticPath, "js"))
+	//	watcher.Add(configuration.TemplatePath)
+	//	go func() {
+	//		for {
+	//			select {
+	//			case event := <-watcher.Events:
+	//				if event.Op&fsnotify.Create == fsnotify.Create {
+	//					if strings.HasSuffix(event.Name, ".www.css") {
+	//						log.Printf("New CSS Detected: %s", path.Base(event.Name))
+	//						stylesheetfilename = path.Base(event.Name)
+	//						memoryCache.Flush()
+	//
+	//					}
+	//					if strings.HasSuffix(event.Name, ".www.js") {
+	//						log.Printf("New JS Detected: %s", path.Base(event.Name))
+	//						javascriptfilename = path.Base(event.Name)
+	//						memoryCache.Flush()
+	//					}
+	//				} else if strings.HasSuffix(event.Name, ".html") {
+	//					log.Printf("Template changed: %s", path.Base(event.Name))
+	//					LoadTemplates()
+	//					memoryCache.Flush()
+	//				}
+	//			case err := <-watcher.Errors:
+	//				if err != nil {
+	//					log.Println("fsnotify error:", err)
+	//				}
+	//			}
+	//		}
+	//	}()
+	//} else {
+	//	log.Printf("Initify watcher failed: %s Continuing.", err)
+	//}
 
 	//Caching time
 	memoryCache = cmap.New()

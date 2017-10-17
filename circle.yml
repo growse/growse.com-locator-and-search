@@ -35,13 +35,13 @@ test:
     - mkdir $CIRCLE_ARTIFACTS/app
     - cp www.growse.com $CIRCLE_ARTIFACTS/app/
     - bundle exec fpm -s dir -t deb --deb-systemd www-growse-com.service -n growse-com-golang --prefix /var/www/growse-web -p $CIRCLE_ARTIFACTS -a noarch -v 1.0.0-$CIRCLE_BUILD_NUM $CIRCLE_ARTIFACTS/app/=app databasemigrations/=databasemigrations templates/=templates
-    - debsigs --sign=origin --default=key=6A2561804E290210909454E69640EFFBAA3B94A5 $CIRCLE_ARTIFACTS/growse-com-golang_1.0.0-"$CIRCLE_BUILD_NUM"_all.deb
+    - debsigs --sign=origin --default-key=63F29D43F8F9E605 $CIRCLE_ARTIFACTS/growse-com-golang_1.0.0-"$CIRCLE_BUILD_NUM"_all.deb
 
 deployment:
   production:
     branch: golang
     commands:
-      - bundle exec deb-s3 upload --s3-region=eu-west-1 --sign=6A2561804E290210909454E69640EFFBAA3B94A5 --bucket apt-growse-com $CIRCLE_ARTIFACTS/growse-com-golang_1.0.0-"$CIRCLE_BUILD_NUM"_all.deb
+      - bundle exec deb-s3 upload --s3-region=eu-west-1 --sign=63F29D43F8F9E605 --bucket apt-growse-com $CIRCLE_ARTIFACTS/growse-com-golang_1.0.0-"$CIRCLE_BUILD_NUM"_all.deb
 
 general:
   branches:

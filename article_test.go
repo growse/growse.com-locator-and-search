@@ -2,36 +2,7 @@ package main
 
 import (
 	"testing"
-	"time"
 )
-
-func TestEncodeDecode(t *testing.T) {
-	now := time.Now()
-	article := Article{1, now, "slug", "title", "markdown"}
-	bytes, err := article.ToBytes()
-	if err != nil {
-		t.Errorf("Failed to encode: %v", err)
-	}
-	article2, err := FromBytes(bytes)
-	if err != nil {
-		t.Errorf("Failed to decode: %v", err)
-	}
-	if article2.Id != article.Id {
-		t.Errorf("Bad article Id: %v", article2.Id)
-	}
-	if article2.Timestamp != article.Timestamp {
-		t.Errorf("Bad article Timestamp: %v", article2.Timestamp)
-	}
-	if article2.Slug != article.Slug {
-		t.Errorf("Bad article Slug: %v", article2.Slug)
-	}
-	if article2.Title != article.Title {
-		t.Errorf("Bad article Title: %v", article2.Title)
-	}
-	if article2.Markdown != article.Markdown {
-		t.Errorf("Bad article Markdown: %v", article2.Markdown)
-	}
-}
 
 func TestIndexOfContains(t *testing.T) {
 	thingToTest := []string{"hello", "there", "awesomesauce", "wibble", "ø∂˚¨˙ƒ´˚¨˙"}

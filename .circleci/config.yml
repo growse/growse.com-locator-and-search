@@ -1,0 +1,39 @@
+version: 2
+jobs:
+  build:
+    working_directory: /go/src/github.com/growse/www.growse.com
+    filters:
+      branches:
+        only:
+          - golang
+    docker:
+      - image: circleci/golang:1.9-stretch
+    steps:
+      - checkout
+      - restore_cache:
+          key: deps-{{ .Branch }}-{{ checksum "Gemfile.lock" }}-{{ checksum "glide.lock" }}
+      - run: mkdir test-reports
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y debsigs golang-glide ruby ruby-dev libffi-dev
+      - run: echo $DEBSIGN | base64 -d | gpg --import
+      - run: sudo gem install bundler
+      - run: bundle install
+      - run: go get -u github.com/jstemmer/go-junit-report
+      - run: glide update
+      - save_cache:
+          key: deps-{{ .Branch }}-{{ checksum "Gemfile.lock" }}-{{ checksum "glide.lock" }}
+          paths:
+            - ~/.glide
+            - ~/.bundle
+      - run: go test -cover -covermode=count -coverprofile=coverprofile -v > testoutput
+      - run: cat testoutput | go-junit-report > test-reports/report.xml
+      - run: go tool cover -html=coverprofile -o test-reports/coverage.html
+      - store_test_results:
+          path: test-reports/
+      - run: mkdir app
+      - run: go build -o app/www.growse.com
+      - run: bundle exec fpm -s dir -t deb --url https://www.growse.com/ --description "growse.com dynamic content (locator, search)" --deb-systemd www-growse-com.service -n growse-com-golang --prefix /var/www/growse-web -p . -a native -v 1.0.0-$CIRCLE_BUILD_NUM app/=app databasemigrations/=databasemigrations templates/=templates
+      - run: debsigs --sign=origin --default-key=63F29D43F8F9E605 growse-com-golang_1.0.0-"$CIRCLE_BUILD_NUM"_amd64.deb
+      - deploy:
+          name: Push to apt.growse.com
+          command: bundle exec deb-s3 upload --s3-region=eu-west-1 --sign=63F29D43F8F9E605 --bucket apt-growse-com growse-com-golang_1.0.0-"$CIRCLE_BUILD_NUM"_amd64.deb

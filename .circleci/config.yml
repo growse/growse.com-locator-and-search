@@ -36,4 +36,4 @@ jobs:
       - run: debsigs --sign=origin --default-key=63F29D43F8F9E605 growse-com-golang_1.0.0-"$CIRCLE_BUILD_NUM"_amd64.deb
       - deploy:
           name: Push to apt.growse.com
-          command: bundle exec deb-s3 upload --s3-region=eu-west-1 --sign=63F29D43F8F9E605 --bucket apt-growse-com growse-com-golang_1.0.0-"$CIRCLE_BUILD_NUM"_amd64.deb
+          command: bundle exec deb-s3 upload --s3-region=eu-west-1 --suite stable --origin "Andrew Rowson" --sign=63F29D43F8F9E605 --bucket apt-growse-com growse-com-golang_1.0.0-"$CIRCLE_BUILD_NUM"_amd64.deb

@@ -11,19 +11,19 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: deps-{{ .Branch }}-{{ checksum "Gemfile.lock" }}-{{ checksum "glide.lock" }}
+          key: deps-{{ .Branch }}-{{ checksum "Gemfile.lock" }}-{{ checksum "Gopkg.lock" }}
       - run: mkdir test-reports
       - run: sudo apt-get update
-      - run: sudo apt-get install -y debsigs golang-glide ruby ruby-dev libffi-dev
+      - run: sudo apt-get install -y debsigs golang-dep ruby ruby-dev libffi-dev
       - run: echo $DEBSIGN | base64 -d | gpg --import
       - run: sudo gem install bundler
       - run: bundle install
       - run: go get -u github.com/jstemmer/go-junit-report
-      - run: glide update
+      - run: dep ensure
       - save_cache:
-          key: deps-{{ .Branch }}-{{ checksum "Gemfile.lock" }}-{{ checksum "glide.lock" }}
+          key: deps-{{ .Branch }}-{{ checksum "Gemfile.lock" }}-{{ checksum "Gopkg.lock" }}
           paths:
-            - ~/.glide
+            - vendor
             - ~/.bundle
       - run: go test -cover -covermode=count -coverprofile=coverprofile -v > testoutput
       - run: cat testoutput | go-junit-report > test-reports/report.xml

@@ -68,7 +68,7 @@ func OauthCallback(c *gin.Context) {
 	var responseObject responsestruct
 	json.Unmarshal(responsebytes, &responseObject)
 	log.Println(responseObject)
-	if responseObject.Hd == "growse.com" {
+	if responseObject.Hd == "growse.com" || responseObject.Email == "growse@gmail.com" {
 		cookie := &http.Cookie{
 			Name:     "auth",
 			Value:    signedCookieValue(configuration.CookieSeed, "auth", responseObject.Email),

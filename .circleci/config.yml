@@ -14,12 +14,14 @@ jobs:
           key: deps-{{ .Branch }}-{{ checksum "Gemfile.lock" }}-{{ checksum "Gopkg.lock" }}
       - run: mkdir test-reports
       - run: sudo apt-get update
-      - run: sudo apt-get install -y debsigs golang-dep ruby ruby-dev libffi-dev
+      - run: sudo apt-get install -y debsigs ruby ruby-dev libffi-dev
       - run: echo $DEBSIGN | base64 -d | gpg --import
       - run: sudo gem install bundler
       - run: bundle install
       - run: go get -u github.com/jstemmer/go-junit-report
-      - run: dep ensure
+      - run: curl -L -o ~/dep https://github.com/golang/dep/releases/download/v0.3.2/dep-linux-amd64
+      - run: chmod +x ~/dep
+      - run: ~/dep ensure
       - save_cache:
           key: deps-{{ .Branch }}-{{ checksum "Gemfile.lock" }}-{{ checksum "Gopkg.lock" }}
           paths:

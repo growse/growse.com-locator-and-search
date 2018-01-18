@@ -3,7 +3,7 @@ Description=www.growse.com web app
 After=postgresql.service
 
 [Service]
-ExecStart=/var/www/growse-web/app/www.growse.com --configFile /var/www/growse-web/app/config.json
+ExecStart=/usr/bin/www.growse.com --configFile /etc/www-growse-com.conf
 User=www-data
 
 [Install]

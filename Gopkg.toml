@@ -75,3 +75,7 @@
 
 [[constraint]]
   name = "golang.org/x/oauth2"
+
+[[constraint]]
+  name = "github.com/growse/gin-oauth2"
+  branch = "master"

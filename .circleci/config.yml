@@ -33,8 +33,8 @@ jobs:
       - store_test_results:
           path: test-reports/
       - run: mkdir app
-      - run: go build -o app/www.growse.com
-      - run: bundle exec fpm -s dir -t deb --url https://www.growse.com/ --description "growse.com dynamic content (locator, search)" --deb-systemd www-growse-com.service -n growse-com-golang --prefix /var/www/growse-web -p . -a native -v 1.0.0-$CIRCLE_BUILD_NUM app/=app databasemigrations/=databasemigrations templates/=templates
+      - run: go build -o www.growse.com
+      - run: bundle exec fpm -s dir -t deb --url https://www.growse.com/ --description "growse.com dynamic content (locator, search)" --deb-systemd www-growse-com.service -n growse-com-golang --config-files /etc/www-growse-com.conf -p . -a native -v 1.0.0-$CIRCLE_BUILD_NUM www.growse.com=/usr/bin/www.growse.com config.json=/etc/www-growse-com.conf databasemigrations/=/var/www/growse-web/databasemigrations templates/=/var/www/growse-web/templates
       - run: debsigs --sign=origin --default-key=63F29D43F8F9E605 growse-com-golang_1.0.0-"$CIRCLE_BUILD_NUM"_amd64.deb
       - deploy:
           name: Push to apt.growse.com

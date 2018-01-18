@@ -132,19 +132,6 @@ func main() {
 		log.Fatalf("Unable to parse configuration file: %v", err)
 	}
 
-	//if configuration.TemplatePath == "" {
-	//	log.Fatal("No template directory supplied")
-	//}
-	//if configuration.StaticPath == "" {
-	//	log.Fatal("No static directory supplied")
-	//}
-	//if _, err := os.Stat(configuration.TemplatePath); os.IsNotExist(err) {
-	//	log.Fatalf("No such file or directory: %s", configuration.TemplatePath)
-	//
-	//}
-	//if _, err := os.Stat(configuration.StaticPath); os.IsNotExist(err) {
-	//	log.Fatalf("No such file or directory: %s", configuration.StaticPath)
-	//}
 	if configuration.CookieSeed == "" {
 		configuration.CookieSeed = "Wibble"
 	}

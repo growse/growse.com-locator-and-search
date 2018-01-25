@@ -4,7 +4,7 @@ After=postgresql.service
 
 [Service]
 ExecStart=/usr/bin/www.growse.com --configFile /etc/www-growse-com.conf
-User=www-data
+User=www_growse_com
 
 [Install]
 WantedBy=multi-user.target

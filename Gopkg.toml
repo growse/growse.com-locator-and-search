@@ -41,9 +41,6 @@
   version = "1.2.0"
 
 [[constraint]]
-  name = "github.com/gorilla/feeds"
-
-[[constraint]]
   name = "github.com/growse/concurrent-expiring-map"
 
 [[constraint]]
@@ -75,7 +72,3 @@
 
 [[constraint]]
   name = "golang.org/x/oauth2"
-
-[[constraint]]
-  name = "github.com/growse/gin-oauth2"
-  branch = "master"

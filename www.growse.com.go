@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/braintree/manners"
 	"github.com/gin-gonic/gin"
-	"github.com/growse/concurrent-expiring-map"
 	_ "github.com/lib/pq"
 	"github.com/mailgun/mailgun-go"
 	"github.com/oxtoacart/bpool"
@@ -23,6 +22,7 @@ import (
 	"runtime/pprof"
 	"syscall"
 	"time"
+	"github.com/growse/concurrent-expiring-map"
 )
 
 var (
@@ -217,7 +217,7 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	BuildRoutes(router, configuration.StaticPath)
+	BuildRoutes(router)
 	log.Printf("Listening on port %d", configuration.Port)
 	manners.ListenAndServe(fmt.Sprintf(":%d", configuration.Port), router)
 }

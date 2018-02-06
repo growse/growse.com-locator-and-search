@@ -12,7 +12,7 @@ import (
 
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !configuration.Production {
+		if !configuration.Production && false {
 			log.Print("WARNING: skipping auth due to configuration.SkipAuthentication=true")
 			c.Next()
 		} else {
@@ -24,6 +24,7 @@ func AuthRequired() gin.HandlerFunc {
 			}
 			log.Printf("Cookie valid?: %v", ok)
 			if err != nil || !ok {
+				log.Print(oAuthConf.Endpoint.AuthURL)
 				url := oAuthConf.AuthCodeURL(c.Request.URL.String())
 				c.Redirect(302, url)
 				c.Abort()

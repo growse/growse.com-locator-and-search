@@ -19,12 +19,13 @@
         </form>
     </div>
     <ul>
-        {{ range .Articles}}
-        <li id="article-{{.Id}}"><span class="title">{{.Title}}</span> - <a href="javascript:growse.editArticle({{.Id}});">Edit</a> <a
+    {{ range .Articles}}
+        <li id="article-{{.Id}}"><span class="title">{{.Title}}</span> - <a
+                href="javascript:growse.editArticle({{.Id}});">Edit</a> <a
                 href="javascript:growse.deleteArticle({{.Id}});">Delete</a></li>
-        {{else}}
+    {{else}}
         <li>No Articles Found</li>
-        {{end}}
+    {{end}}
     </ul>
 </div>
 <!--<script type="text/javascript" src="/static/js/admin.js"></script>-->
@@ -43,6 +44,7 @@
             }
         });
         window.onbeforeunload = confirmExit;
+
         function confirmExit() {
             if ($("#markdown").val().length > 0 && needsConfirm) {
                 return "You have attempted to leave this page.  If you have made any changes to the fields without clicking the Save button, your changes will be lost.  Are you sure you want to exit this page?";
@@ -63,6 +65,7 @@
         }, 2000);
 
     });
+
     function previewMarkdown(content) {
         $.post('/auth/preview/', {markdown: content}, function (response) {
             $("#newarticle #preview").html(response);

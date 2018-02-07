@@ -28,17 +28,17 @@ type Location struct {
 
 func GetLastLoction() (*Location, error) {
 	var location Location
-	defer timeTrack(time.Now(), "GetLocation")
+	defer timeTrack(time.Now())
 	err := db.QueryRow("select geocoding, latitude,longitude,devicetimestamp from locations where geocoding is not null order by devicetimestamp desc limit 1").Scan(&location.Geocoding, &location.Latitude, &location.Longitude, &location.Timestamp)
 	return &location, err
 }
 
 /*
-Definately returns mph. Hence 2.236blahblah
+Definitely returns mph. Hence 2.236blahblah
 */
 func GetAverageSpeed() (float64, error) {
 	var speed float64
-	defer timeTrack(time.Now(), "GetAverageSpeed")
+	defer timeTrack(time.Now())
 	err := db.QueryRow("select 2.23693629*sum(gisdistance)/extract(epoch from now()-date_trunc('year',now())) from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC')) = $1", time.Now().UTC().Year()).Scan(&speed)
 	if err != nil {
 		return 0, err
@@ -51,7 +51,7 @@ In miles.
 */
 func GetTotalDistance() (float64, error) {
 	var distance float64
-	defer timeTrack(time.Now(), "GetTotalDistance")
+	defer timeTrack(time.Now())
 	err := db.QueryRow("select 0.000621371192*sum(gisdistance) from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC')) = $1;", time.Now().UTC().Year()).Scan(&distance)
 	if err != nil {
 		return 0, err

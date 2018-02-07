@@ -1,14 +1,14 @@
 {
-    "cpuProfile": "pprof.cpu",
-    "dbHost": "/tmp",
-    "dbName": "www_growse_com",
-    "dbPassword": "",
-    "dbUser": "andrew",
-    "databaseMigrationsPath": "databasemigrations",
-    "defaultCacheExpiry": 600000000000,
-    "geocodeApiUrl": "",
-    "port": 3030,
-    "production": false,
-    "staticPath": "static",
-    "templatePath": "templates"
+  "cpuProfile": "pprof.cpu",
+  "dbHost": "/tmp",
+  "dbName": "www_growse_com",
+  "dbPassword": "",
+  "dbUser": "andrew",
+  "databaseMigrationsPath": "databasemigrations",
+  "defaultCacheExpiry": 600000000000,
+  "geocodeApiUrl": "",
+  "port": 3030,
+  "production": false,
+  "staticPath": "static",
+  "templatePath": "templates"
 }

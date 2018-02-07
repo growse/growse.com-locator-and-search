@@ -239,8 +239,8 @@ var growse = {
                 return (0.1 * x.rangeBand() + x(d.date)) + "px";
 
             }).attr('y', function (d) {
-                return y(d.val);
-            });
+            return y(d.val);
+        });
 
         svg.append("g")
             .attr("class", "axis")
@@ -299,7 +299,7 @@ var growse = {
             data: {title: title, markdown: markdown, published: published},
             success: function () {
                 growse.clearForm();
-                $("#article-" + id +" >span.title").text(title);
+                $("#article-" + id + " >span.title").text(title);
             }
         });
     },

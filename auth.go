@@ -1,9 +1,9 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/oauth2"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -12,26 +12,22 @@ import (
 
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !configuration.Production && false {
-			log.Print("WARNING: skipping auth due to configuration.SkipAuthentication=true")
-			c.Next()
-		} else {
-			cookie, err := c.Request.Cookie("auth")
-			ok := false
-			log.Printf("Supplied auth cookie: %v", cookie)
-			if err == nil && cookie != nil {
-				_, ok = validateCookie(cookie, configuration.CookieSeed)
-			}
-			log.Printf("Cookie valid?: %v", ok)
-			if err != nil || !ok {
-				log.Print(oAuthConf.Endpoint.AuthURL)
-				url := oAuthConf.AuthCodeURL(c.Request.URL.String())
-				c.Redirect(302, url)
-				c.Abort()
-				return
-			}
-			c.Next()
+
+		cookie, err := c.Request.Cookie("auth")
+		ok := false
+		log.Printf("Supplied auth cookie: %v", cookie)
+		if err == nil && cookie != nil {
+			_, ok = validateCookie(cookie, configuration.CookieSeed)
 		}
+		log.Printf("Cookie valid?: %v", ok)
+		if err != nil || !ok {
+			url := oAuthConf.AuthCodeURL(c.Request.URL.String())
+			c.Redirect(302, url)
+			c.Abort()
+			return
+		}
+		c.Next()
+
 	}
 }
 
@@ -39,22 +35,22 @@ func OauthCallback(c *gin.Context) {
 	c.Request.ParseForm()
 	authCode := c.Request.Form.Get("code")
 	state := c.Request.Form.Get("state")
-
-	tok, err := oAuthConf.Exchange(oauth2.NoContext, authCode)
+	oauthContext := context.Background()
+	tok, err := oAuthConf.Exchange(oauthContext, authCode)
 	if err != nil {
-		log.Fatal(err)
+		c.AbortWithError(500, err)
 	}
-	client := oAuthConf.Client(oauth2.NoContext, tok)
+	client := oAuthConf.Client(oauthContext, tok)
 
 	profileUrl := "https://www.googleapis.com/userinfo/v2/me"
 	resp, err := client.Get(profileUrl)
 
 	if err != nil {
-		log.Fatal(err)
+		c.AbortWithError(500, err)
 	}
 	responsebytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		c.AbortWithError(500, err)
 	}
 
 	type responsestruct struct {

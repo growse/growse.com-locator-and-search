@@ -10,8 +10,6 @@ func BuildRoutes(router *gin.Engine) {
 	authorized.Use(AuthRequired())
 	{
 		authorized.GET("ping", PingHandler)
-		authorized.GET("where/", WhereHandler)
-		authorized.GET("where/osm/:year/:filtered/", OSMWhereHandler)
 		authorized.GET("where/linestring/:year/", WhereLineStringHandlerNonFiltered)
 		authorized.GET("where/linestring/:year/:filtered/", WhereLineStringHandler)
 	}

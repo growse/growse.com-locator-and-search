@@ -112,62 +112,6 @@ func WhereLineStringHandlerNonFiltered(c *gin.Context) {
 	c.Data(200, "application/json", []byte(linestring))
 }
 
-func OSMWhereHandler(c *gin.Context) {
-	filtered, err := strconv.ParseBool(c.Params.ByName("filtered"))
-	if err != nil {
-		filtered = false
-	}
-	year := c.Params.ByName("year")
-	obj := gin.H{"Year": year, "Filtered": filtered}
-	buf := bufPool.Get()
-	defer bufPool.Put(buf)
-
-	err = templates.ExecuteTemplate(buf, "osm.html", obj)
-	pageBytes := buf.Bytes()
-	if err == nil {
-		c.Data(200, "text/html", pageBytes)
-	} else {
-		InternalError(err)
-		c.String(500, "Internal Error")
-	}
-}
-
-func WhereHandler(c *gin.Context) {
-	avgspeed, err := GetAverageSpeed()
-	if err != nil {
-		InternalError(err)
-	}
-
-	totaldistance, err := GetTotalDistance()
-	if err != nil {
-		InternalError(err)
-	}
-
-	lastlocation, err := GetLastLoction()
-	if err != nil {
-		InternalError(err)
-	}
-	obj := gin.H{
-		"Title":           "Where",
-		"Stylesheet":      stylesheetfilename,
-		"Javascript":      javascriptfilename,
-		"WhereJavascript": wherejavascriptfilename,
-		"Avgspeed":        avgspeed,
-		"Totaldistance":   totaldistance,
-		"LastLocation":    lastlocation}
-	buf := bufPool.Get()
-	defer bufPool.Put(buf)
-
-	err = templates.ExecuteTemplate(buf, "where.html", obj)
-	pageBytes := buf.Bytes()
-	if err == nil {
-		c.Data(200, "text/html", pageBytes)
-	} else {
-		InternalError(err)
-		c.String(500, "Internal Error")
-	}
-}
-
 /*
 Receive POST from phone. This should be an application/json containing an array of points.
 */

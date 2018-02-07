@@ -7,18 +7,15 @@ import (
 	"fmt"
 	"github.com/braintree/manners"
 	"github.com/gin-gonic/gin"
-	"github.com/growse/concurrent-expiring-map"
 	_ "github.com/lib/pq"
 	"github.com/mailgun/mailgun-go"
 	"github.com/oxtoacart/bpool"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-	"html/template"
 	"log"
 	"mime"
 	"os"
 	"os/signal"
-	"path"
 	"runtime/debug"
 	"runtime/pprof"
 	"syscall"
@@ -32,9 +29,7 @@ var (
 	wherejavascriptfilename string
 	configuration           Configuration
 	gun                     mailgun.Mailgun
-	templates               *template.Template
 	bufPool                 *bpool.BufferPool
-	memoryCache             cmap.ConcurrentMap
 	oAuthConf               *oauth2.Config
 	GeocodingWorkQueue      chan bool
 )
@@ -66,27 +61,6 @@ type Configuration struct {
 	SearchIndexLocalDir    string
 }
 
-type ArticleMonth struct {
-	FirstOfTheYear bool
-	Year           int
-	Month          time.Month
-	Count          int
-}
-
-var funcMap = template.FuncMap{
-	"RenderFloat": RenderFloat,
-}
-
-func RobotsHandler(c *gin.Context) {
-	c.File(path.Join(configuration.TemplatePath, "robots.txt"))
-}
-
-func LoadTemplates() {
-	log.Print("Loading templates")
-	templateGlob := path.Join(configuration.TemplatePath, "*.html")
-	templates = template.Must(template.New("Yay Templates").Funcs(funcMap).ParseGlob(templateGlob))
-}
-
 func InternalError(err error) {
 	log.Printf("%v", err)
 	debug.PrintStack()
@@ -106,17 +80,9 @@ func main() {
 	mime.AddExtensionType(".js", "application/javascript; charset=utf8")
 	//Flags
 	configFile := flag.String("configFile", "config.json", "File path to the JSON configuration")
-	templateTestPath := flag.String("templateTestPath", "", "Path to test the templates on")
 	kalmanFiltering := flag.Bool("kalmanFilter", false, "Enable kalman to populate the database with kalman-filtered locations")
 	flag.Parse()
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
-
-	if *templateTestPath != "" {
-		configuration.TemplatePath = *templateTestPath
-		LoadTemplates()
-		log.Print("Template Test Ok")
-		return
-	}
 
 	//Config parsing
 	file, err := os.Open(*configFile)
@@ -203,9 +169,6 @@ func main() {
 	//Get the router
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
-
-	//Caching time
-	memoryCache = cmap.New()
 
 	//Cpu Profiling time
 	if configuration.CpuProfile != "" {

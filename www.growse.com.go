@@ -19,7 +19,6 @@ import (
 	"runtime/debug"
 	"runtime/pprof"
 	"syscall"
-	"time"
 )
 
 var (
@@ -52,7 +51,6 @@ type Configuration struct {
 	ClientID               string
 	ClientSecret           string
 	Port                   int
-	DefaultCacheExpiry     time.Duration
 	MaxDBOpenConnections   int
 	MQTTURL                string
 	MQTTUsername           string
@@ -111,7 +109,6 @@ func main() {
 		Scopes:       []string{"openid", "email"},
 		Endpoint:     google.Endpoint,
 	}
-	log.Printf("Cache expiry duration: %fs\n", configuration.DefaultCacheExpiry.Seconds())
 
 	//Catch SIGINT & SIGTERM to stop the profiling
 	c := make(chan os.Signal, 1)

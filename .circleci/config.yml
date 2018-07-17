@@ -7,7 +7,7 @@ jobs:
         only:
           - golang
     docker:
-      - image: circleci/golang:1.9-stretch
+      - image: circleci/golang:1-stretch
     steps:
       - checkout
       - restore_cache:

@@ -41,9 +41,6 @@
   version = "1.2.0"
 
 [[constraint]]
-  name = "github.com/growse/concurrent-expiring-map"
-
-[[constraint]]
   name = "github.com/kpawlik/geojson"
 
 [[constraint]]

@@ -18,7 +18,7 @@ jobs:
       - run: sudo gem install bundler
       - run: bundle install
       - run: go get -u github.com/jstemmer/go-junit-report
-      - run: curl -L --output dep $(curl https://api.github.com/repos/golang/dep/releases/latest | jq -r '.assets | map(select(.name == "dep-linux-amd64"))[].browser_download_url')
+      - run: curl -L --output ~/dep $(curl https://api.github.com/repos/golang/dep/releases/latest | jq -r '.assets | map(select(.name == "dep-linux-amd64"))[].browser_download_url')
       - run: chmod +x ~/dep
       - run: ~/dep ensure
       - save_cache:

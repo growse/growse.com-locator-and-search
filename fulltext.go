@@ -13,7 +13,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"strings"
 )
@@ -25,7 +24,7 @@ func BleveInit(remoteGit string, repoLocation string) {
 		err := updateGitRepo(remoteGit, repoLocation, "jekyll")
 		if err == nil {
 			openIndex()
-			addFilesToIndex(repoLocation+"/_posts", bleveIndex)
+			addFilesToIndex(repoLocation, bleveIndex)
 		} else {
 			log.Printf("Error opening git repository: %v", err)
 		}
@@ -67,18 +66,16 @@ func updateGitRepo(remoteLocation string, localLocation string, tag string) erro
 }
 
 func addFilesToIndex(sourceLocation string, index bleve.Index) error {
-	fileinfos, err := ioutil.ReadDir(sourceLocation)
+	var globPattern = fmt.Sprintf("%v/**/_posts/*.md", sourceLocation)
+	fileinfos, err := filepath.Glob(globPattern)
 	if err != nil {
 		return err
 	}
-	for _, file := range fileinfos {
-		if !file.IsDir() {
-			fullFileName := path.Join(sourceLocation, file.Name())
-			log.Printf("Indexing file %v", fullFileName)
-			err := addFileToIndex(fullFileName, index)
-			if err != nil {
-				log.Printf("Error indexing file: %v", err)
-			}
+	for _, fullFileName := range fileinfos {
+		log.Printf("Indexing file %v", fullFileName)
+		err := addFileToIndex(fullFileName, index)
+		if err != nil {
+			log.Printf("Error indexing file: %v", err)
 		}
 	}
 	return nil

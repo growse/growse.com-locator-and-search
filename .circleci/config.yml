@@ -26,8 +26,7 @@ jobs:
           paths:
             - vendor
             - ~/.bundle
-      - run: go test -cover -covermode=count -coverprofile=coverprofile -v > testoutput
-      - run: cat testoutput | go-junit-report > test-reports/report.xml
+      - run: go test -cover -covermode=count -coverprofile=coverprofile -v | go-junit-report > test-reports/report.xml
       - run: go tool cover -html=coverprofile -o test-reports/coverage.html
       - store_test_results:
           path: test-reports/

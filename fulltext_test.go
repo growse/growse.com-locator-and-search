@@ -10,14 +10,22 @@ import (
 
 func TestAddingFilesToIndexAddsTheFilesToTheIndex(t *testing.T) {
 	tempdir, err := ioutil.TempDir("", "testprefix")
+	defer os.RemoveAll(tempdir)
 	assert.Nil(t, err)
-	_, err = ioutil.TempFile(tempdir, "testprefix1")
+	err = os.Mkdir(tempdir+"post1", os.ModePerm)
 	assert.Nil(t, err)
-	_, err = ioutil.TempFile(tempdir, "testprefix2")
+	err = os.Mkdir(tempdir+"post2", os.ModePerm)
+	assert.Nil(t, err)
+	_, err = os.Create(tempdir + "post1/first.md")
+	assert.Nil(t, err)
+	_, err = os.Create(tempdir + "post2/second.md")
 	assert.Nil(t, err)
 
 	mapping := bleve.NewIndexMapping()
 	index, err := bleve.New("testIndex", mapping)
+	if err != nil {
+		panic(err)
+	}
 	assert.Nil(t, err)
 
 	err = addFilesToIndex(tempdir, index)
@@ -27,13 +35,12 @@ func TestAddingFilesToIndexAddsTheFilesToTheIndex(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(2), count)
 
-	os.RemoveAll("testIndex")
 }
 
 func TestAddSingleFileToIndexAddsTheFileToTheIndex(t *testing.T) {
 	tempDir, err := ioutil.TempDir("", "testprefix")
+	defer os.RemoveAll(tempDir)
 	assert.Nil(t, err)
-
 	tempFile, err := ioutil.TempFile(tempDir, "testprefix1")
 	assert.Nil(t, err)
 
@@ -46,15 +53,13 @@ func TestAddSingleFileToIndexAddsTheFileToTheIndex(t *testing.T) {
 	count, err := index.DocCount()
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(1), count)
-
-	os.RemoveAll("testIndex")
 }
 
 func TestSearchingIndexForFileContentReturnsResult(t *testing.T) {
 	content := "title:content\n---\ncontent"
 	tempDir, err := ioutil.TempDir("", "testprefix")
+	defer os.RemoveAll(tempDir)
 	assert.Nil(t, err)
-
 	tempFile, err := ioutil.TempFile(tempDir, "testprefix1")
 	assert.Nil(t, err)
 
@@ -78,7 +83,6 @@ func TestSearchingIndexForFileContentReturnsResult(t *testing.T) {
 	assert.Equal(t, 1, searchResult.Status.Successful)
 	assert.Equal(t, 0, len(searchResult.Status.Errors))
 	assert.Equal(t, 1, len(searchResult.Hits))
-	os.RemoveAll("testIndex")
 }
 
 func TestSearchingIndexForNonFileContentReturnsResult(t *testing.T) {

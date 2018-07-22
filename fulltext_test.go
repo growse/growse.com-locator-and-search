@@ -34,7 +34,6 @@ func TestAddingFilesToIndexAddsTheFilesToTheIndex(t *testing.T) {
 	count, err := index.DocCount()
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(2), count)
-
 }
 
 func TestAddSingleFileToIndexAddsTheFileToTheIndex(t *testing.T) {

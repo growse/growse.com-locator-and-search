@@ -223,7 +223,7 @@
     "proxy",
     "websocket"
   ]
-  revision = "d0887baf81f4598189d4e12a37c6da86f0bba4d0"
+  revision = "a680a1efc54dd51c040b3b5ce4939ea3cf2ea0d1"
 
 [[projects]]
   branch = "master"
@@ -281,6 +281,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "abc78baeebb98925b9975595d7e989a03f82624ed0af7672991dd68a1eea9883"
+  inputs-digest = "1fe52768a75b9254b961a35d52b5f5eb2d87d6fbcfddfbdaadbd5c3f26c4ef76"
   solver-name = "gps-cdcl"
   solver-version = 1

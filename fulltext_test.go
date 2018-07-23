@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -12,13 +13,22 @@ func TestAddingFilesToIndexAddsTheFilesToTheIndex(t *testing.T) {
 	tempdir, err := ioutil.TempDir("", "testprefix")
 	defer os.RemoveAll(tempdir)
 	assert.Nil(t, err)
-	err = os.Mkdir(tempdir+"post1", os.ModePerm)
+	t.Logf("Tempdir: %v", tempdir)
+
+	firstPostDir := filepath.Join(tempdir, "post1", "_posts")
+	err = os.MkdirAll(firstPostDir, os.ModePerm)
 	assert.Nil(t, err)
-	err = os.Mkdir(tempdir+"post2", os.ModePerm)
+	t.Logf("Created %v", firstPostDir)
+
+	secondPostDir := filepath.Join(tempdir, "post2", "_posts")
+	err = os.MkdirAll(secondPostDir, os.ModePerm)
 	assert.Nil(t, err)
-	_, err = os.Create(tempdir + "post1/first.md")
+	t.Logf("Created %v", secondPostDir)
+
 	assert.Nil(t, err)
-	_, err = os.Create(tempdir + "post2/second.md")
+	_, err = os.Create(filepath.Join(firstPostDir, "first.md"))
+	assert.Nil(t, err)
+	_, err = os.Create(filepath.Join(secondPostDir, "second.md"))
 	assert.Nil(t, err)
 
 	mapping := bleve.NewIndexMapping()
@@ -45,6 +55,9 @@ func TestAddSingleFileToIndexAddsTheFileToTheIndex(t *testing.T) {
 
 	mapping := bleve.NewIndexMapping()
 	index, err := bleve.New("testIndex", mapping)
+	if err != nil {
+		panic(err)
+	}
 	assert.Nil(t, err)
 
 	err = addFileToIndex(tempFile.Name(), index)

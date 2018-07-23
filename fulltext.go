@@ -66,7 +66,7 @@ func updateGitRepo(remoteLocation string, localLocation string, tag string) erro
 }
 
 func addFilesToIndex(sourceLocation string, index bleve.Index) error {
-	var globPattern = fmt.Sprintf("%v/**/_posts/*.md", sourceLocation)
+	var globPattern = fmt.Sprintf("%v/*/_posts/*.md", sourceLocation)
 	fileinfos, err := filepath.Glob(globPattern)
 	if err != nil {
 		return err

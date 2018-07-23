@@ -53,6 +53,9 @@ func TestAddSingleFileToIndexAddsTheFileToTheIndex(t *testing.T) {
 
 	mapping := bleve.NewIndexMapping()
 	index, err := bleve.New("testIndex", mapping)
+	if err != nil {
+		panic(err)
+	}
 	assert.Nil(t, err)
 
 	err = addFileToIndex(tempFile.Name(), index)

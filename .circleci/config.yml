@@ -21,7 +21,7 @@ jobs:
       - run: curl -L --output ~/dep $(curl https://api.github.com/repos/golang/dep/releases/latest | jq -r '.assets | map(select(.name == "dep-linux-amd64"))[].browser_download_url')
       - run: chmod +x ~/dep
       - run:
-          command: ~/dep ensure
+          command: ~/dep ensure -v
           no_output_timout: 30m
       - save_cache:
           key: deps-{{ .Branch }}-{{ checksum "Gemfile.lock" }}-{{ checksum "Gopkg.lock" }}

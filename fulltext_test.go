@@ -10,16 +10,16 @@ import (
 )
 
 func TestAddingFilesToIndexAddsTheFilesToTheIndex(t *testing.T) {
-	tempdir, err := ioutil.TempDir("", "testprefix")
+	tempDir, err := ioutil.TempDir("", "testprefix")
 	assert.Nil(t, err)
-	t.Logf("Tempdir: %v", tempdir)
+	t.Logf("Tempdir: %v", tempDir)
 
-	firstPostDir := filepath.Join(tempdir, "post1", "_posts")
+	firstPostDir := filepath.Join(tempDir, "post1", "_posts")
 	err = os.MkdirAll(firstPostDir, os.ModePerm)
 	assert.Nil(t, err)
 	t.Logf("Created %v", firstPostDir)
 
-	secondPostDir := filepath.Join(tempdir, "post2", "_posts")
+	secondPostDir := filepath.Join(tempDir, "post2", "_posts")
 	err = os.MkdirAll(secondPostDir, os.ModePerm)
 	assert.Nil(t, err)
 	t.Logf("Created %v", secondPostDir)
@@ -34,14 +34,14 @@ func TestAddingFilesToIndexAddsTheFilesToTheIndex(t *testing.T) {
 	index, err := bleve.New("testIndex", mapping)
 	assert.Nil(t, err)
 
-	err = addFilesToIndex(tempdir, index)
+	err = addFilesToIndex(tempDir, index)
 	assert.Nil(t, err)
 
 	count, err := index.DocCount()
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(2), count)
 
-	err = os.RemoveAll(tempdir)
+	err = os.RemoveAll(tempDir)
 	assert.Nil(t, err)
 }
 
@@ -61,7 +61,7 @@ func TestAddSingleFileToIndexAddsTheFileToTheIndex(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(1), count)
 
-	err = os.RemoveAll(tempdir)
+	err = os.RemoveAll(tempDir)
 	assert.Nil(t, err)
 }
 

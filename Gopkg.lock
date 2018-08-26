@@ -2,12 +2,15 @@
 
 
 [[projects]]
+  digest = "1:2b10b9a545074605403d32baf9dda24b7582976ba7e9b46c4c7b9da9edac03e7"
   name = "cloud.google.com/go"
   packages = ["compute/metadata"]
+  pruneopts = ""
   revision = "aad3f485ee528456e0768f20397b4d9dd941e755"
   version = "v0.25.0"
 
 [[projects]]
+  digest = "1:349266232b1d3097cd393d68abbc74d286dd4c819b933957c1323fa1c4d1a42f"
   name = "github.com/blevesearch/bleve"
   packages = [
     ".",
@@ -37,213 +40,273 @@
     "search/highlight/highlighters/html",
     "search/highlight/highlighters/simple",
     "search/scorers",
-    "search/searchers"
+    "search/searchers",
   ]
+  pruneopts = ""
   revision = "97393d027342f43b17da2f02c090a4e728ac929f"
   version = "v0.5.0"
 
 [[projects]]
+  digest = "1:b9a6b4e079fea1e137c0f8caeb65030978a8dee9f37df5a6ffd9fabe98cdd32e"
   name = "github.com/blevesearch/go-porterstemmer"
   packages = ["."]
+  pruneopts = ""
   revision = "b4dd94e38f29620fe0f97ae4b0f6994b0d5d75f0"
   version = "v1.0.1"
 
 [[projects]]
   branch = "master"
+  digest = "1:eb75e36e2b8b6a24e51dd1cd5692bfa0594003aeeb867a774d0ff1159fcb9ff9"
   name = "github.com/blevesearch/segment"
   packages = ["."]
+  pruneopts = ""
   revision = "762005e7a34fd909a84586299f1dd457371d36ee"
 
 [[projects]]
+  digest = "1:ed112122ed4a920d944cc99b9d00b0441c11685939c28462c719488d36fe29aa"
   name = "github.com/boltdb/bolt"
   packages = ["."]
+  pruneopts = ""
   revision = "2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8"
   version = "v1.3.1"
 
 [[projects]]
+  digest = "1:7fb8c4db1864553558493179aa5ebe69ddbb1a77ecc1f6f6e50844b159ce0c55"
   name = "github.com/braintree/manners"
   packages = ["."]
+  pruneopts = ""
   revision = "0b5e6b2c2843f4c83c2a40f96980b09cf4af733c"
   version = "0.4.0"
 
 [[projects]]
+  digest = "1:56c130d885a4aacae1dd9c7b71cfe39912c7ebc1ff7d2b46083c8812996dc43b"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
+  pruneopts = ""
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:f1a75a8e00244e5ea77ff274baa9559eb877437b240ee7b278f3fc560d9f08bf"
   name = "github.com/dustin/go-humanize"
   packages = ["."]
+  pruneopts = ""
   revision = "9f541cc9db5d55bce703bd99987c9d5cb8eea45e"
 
 [[projects]]
+  digest = "1:3fa846cb3feb4e65371fe3c347c299de9b5bc3e71e256c0d940cd19b767a6ba0"
   name = "github.com/eclipse/paho.mqtt.golang"
   packages = [
     ".",
-    "packets"
+    "packets",
   ]
+  pruneopts = ""
   revision = "36d01c2b4cbeb3d2a12063e4880ce30800af9560"
   version = "v1.1.1"
 
 [[projects]]
   branch = "master"
+  digest = "1:1120f960f5c334f0f94bad29eefaf73d52d226893369693686148f66c1993f15"
   name = "github.com/gin-contrib/sse"
   packages = ["."]
+  pruneopts = ""
   revision = "22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae"
 
 [[projects]]
+  digest = "1:348ceb76f2ac958e541e4ba3190484b68df28c38ac9720ed4ef8d36af69ce52e"
   name = "github.com/gin-gonic/gin"
   packages = [
     ".",
     "binding",
-    "render"
+    "render",
   ]
+  pruneopts = ""
   revision = "d459835d2b077e44f7c9b453505ee29881d5d12d"
   version = "v1.2"
 
 [[projects]]
   branch = "master"
+  digest = "1:8a3d83fd1e00c49786834ae376e61e3afee8f09a2dcebf1549b3db44a61b5be2"
   name = "github.com/gocql/gocql"
   packages = [
     ".",
     "internal/lru",
     "internal/murmur",
-    "internal/streams"
+    "internal/streams",
   ]
+  pruneopts = ""
   revision = "e06f8c1bcd787e6bf0608288b314522f08cc7848"
 
 [[projects]]
+  digest = "1:f958a1c137db276e52f0b50efee41a1a389dcdded59a69711f3e872757dab34b"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
+  pruneopts = ""
   revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
   version = "v1.1.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:2a5888946cdbc8aa360fd43301f9fc7869d663f60d5eedae7d4e6e5e4f06f2bf"
   name = "github.com/golang/snappy"
   packages = ["."]
+  pruneopts = ""
   revision = "2e65f85255dbc3072edf28d6b5b8efc472979f5a"
 
 [[projects]]
   branch = "master"
+  digest = "1:60b7bc5e043a11213472ae05252527287d20e0a6ccc18f6ae67fad88e41004de"
   name = "github.com/hailocab/go-hostpool"
   packages = ["."]
+  pruneopts = ""
   revision = "e80d13ce29ede4452c43dea11e79b9bc8a15b478"
 
 [[projects]]
   branch = "master"
+  digest = "1:12b864bce751535bcf96b3f920d8654b51b2639b5604c8b14a4fa67def1e3786"
   name = "github.com/kpawlik/geojson"
   packages = ["."]
+  pruneopts = ""
   revision = "1a4f120c6b41bf523f825519ef8c25a50d1c9628"
 
 [[projects]]
   branch = "master"
+  digest = "1:29145d7af4adafd72a79df5e41456ac9e232d5a28c1cd4dacf3ff008a217fc10"
   name = "github.com/lib/pq"
   packages = [
     ".",
-    "oid"
+    "oid",
   ]
-  revision = "90697d60dd844d5ef6ff15135d0203f65d2f53b8"
+  pruneopts = ""
+  revision = "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
 
 [[projects]]
+  digest = "1:91fea695ea6dfbb356a9cfd888739a702e3d6e779219d4d80aa0d95f23f24074"
   name = "github.com/mailgun/mailgun-go"
   packages = ["."]
+  pruneopts = ""
   revision = "a4002e2df2e8ca2da6a6fbb4a72871b504e49f50"
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:78229b46ddb7434f881390029bd1af7661294af31f6802e0e1bedaad4ab0af3c"
   name = "github.com/mattn/go-isatty"
   packages = ["."]
+  pruneopts = ""
   revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
   version = "v0.0.3"
 
 [[projects]]
   branch = "master"
+  digest = "1:a925d1ff639de6476f57a70803264f3a21439464fcc4bafa438c800b304c9441"
   name = "github.com/mschoch/blackfriday-text"
   packages = ["."]
+  pruneopts = ""
   revision = "f4ea365e801b9d91b76da776f785a80e5ddf9a36"
 
 [[projects]]
   branch = "master"
+  digest = "1:44606d787e9fefb9198bc4ee34abcaffa5c0fdc6159698f1f1b5540ebb794c27"
   name = "github.com/oxtoacart/bpool"
   packages = ["."]
+  pruneopts = ""
   revision = "4e1c5567d7c2dd59fa4c7c83d34c2f3528b025d6"
 
 [[projects]]
+  digest = "1:7365acd48986e205ccb8652cc746f09c8b7876030d53710ea6ef7d0bd0dcd7ca"
   name = "github.com/pkg/errors"
   packages = ["."]
+  pruneopts = ""
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
   version = "v0.8.0"
 
 [[projects]]
+  digest = "1:256484dbbcd271f9ecebc6795b2df8cad4c458dd0f5fd82a8c2fa0c29f233411"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
+  pruneopts = ""
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:fd0e88ec70bf0efce538ec8b968a824d992cc60a6cf1539698aa366b3527a053"
   name = "github.com/russross/blackfriday"
   packages = ["."]
+  pruneopts = ""
   revision = "55d61fa8aa702f59229e6cff85793c22e580eaf5"
   version = "v1.5.1"
 
 [[projects]]
   branch = "master"
+  digest = "1:49f625590d0a3a4d0db850eb233fd22b110c490aa8123589445924d2d47bbe0a"
   name = "github.com/steveyen/gtreap"
   packages = ["."]
+  pruneopts = ""
   revision = "0abe01ef9be25c4aedc174758ec2d917314d6d70"
 
 [[projects]]
+  digest = "1:c587772fb8ad29ad4db67575dad25ba17a51f072ff18a22b4f0257a4d9c24f75"
   name = "github.com/stretchr/testify"
   packages = ["assert"]
+  pruneopts = ""
   revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
   version = "v1.2.2"
 
 [[projects]]
   branch = "master"
+  digest = "1:c68ca21eb14d7815d609b809d1ca5b8e22ed8857c91201923715276dd7af0777"
   name = "github.com/tanel/dbmigrate"
   packages = ["."]
+  pruneopts = ""
   revision = "e26edde7600ed3674fcd3749e6238934b5fd28c4"
 
 [[projects]]
+  digest = "1:2e7f653483e51243b6cd6de60ce39bde0d6927d10a3c24295ab0f82cb1efeae2"
   name = "github.com/ugorji/go"
   packages = ["codec"]
+  pruneopts = ""
   revision = "b4c50a2b199d93b13dc15e78929cfb23bfdf21ab"
   version = "v1.1.1"
 
 [[projects]]
   branch = "master"
+  digest = "1:00ff990baae4665bb0a8174af5ff78228574227ed96c89671247a56852a50e21"
   name = "golang.org/x/net"
   packages = [
     "context",
     "context/ctxhttp",
     "internal/socks",
     "proxy",
-    "websocket"
+    "websocket",
   ]
+  pruneopts = ""
   revision = "a680a1efc54dd51c040b3b5ce4939ea3cf2ea0d1"
 
 [[projects]]
   branch = "master"
+  digest = "1:a6237bd1fe4eed8524971a2923fcadb54e9584b19516a35d3f76f1c53f603cf9"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
     "google",
     "internal",
     "jws",
-    "jwt"
+    "jwt",
   ]
+  pruneopts = ""
   revision = "ef147856a6ddbb60760db74283d2424e98c87bff"
 
 [[projects]]
   branch = "master"
+  digest = "1:677e38cad6833ad266ec843739d167755eda1e6f2d8af1c63102b0426ad820db"
   name = "golang.org/x/sys"
   packages = ["unix"]
+  pruneopts = ""
   revision = "ac767d655b305d4e9612f5f6e33120b9176c4ad4"
 
 [[projects]]
+  digest = "1:c1771ca6060335f9768dff6558108bc5ef6c58506821ad43377ee23ff059e472"
   name = "google.golang.org/appengine"
   packages = [
     ".",
@@ -255,32 +318,113 @@
     "internal/modules",
     "internal/remote_api",
     "internal/urlfetch",
-    "urlfetch"
+    "urlfetch",
   ]
+  pruneopts = ""
   revision = "b1f26356af11148e710935ed1ac8a7f5702c7612"
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:dd549e360e5a8f982a28c2bcbe667307ceffe538ed9afc7c965524f1ac285b3f"
   name = "gopkg.in/go-playground/validator.v8"
   packages = ["."]
+  pruneopts = ""
   revision = "5f1438d3fca68893a817e4a66806cea46a9e4ebf"
   version = "v8.18.2"
 
 [[projects]]
+  digest = "1:75fb3fcfc73a8c723efde7777b40e8e8ff9babf30d8c56160d01beffea8a95a6"
   name = "gopkg.in/inf.v0"
   packages = ["."]
+  pruneopts = ""
   revision = "d2d2541c53f18d2a059457998ce2876cc8e67cbf"
   version = "v0.9.1"
 
 [[projects]]
+  digest = "1:f0620375dd1f6251d9973b5f2596228cc8042e887cd7f827e4220bc1ce8c30e2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
+  pruneopts = ""
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
   version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1fe52768a75b9254b961a35d52b5f5eb2d87d6fbcfddfbdaadbd5c3f26c4ef76"
+  input-imports = [
+    "cloud.google.com/go/compute/metadata",
+    "github.com/blevesearch/bleve",
+    "github.com/blevesearch/bleve/analysis",
+    "github.com/blevesearch/bleve/analysis/analyzers/standard_analyzer",
+    "github.com/blevesearch/bleve/analysis/datetime_parsers/datetime_optional",
+    "github.com/blevesearch/bleve/analysis/datetime_parsers/flexible_go",
+    "github.com/blevesearch/bleve/analysis/language/en",
+    "github.com/blevesearch/bleve/analysis/token_filters/lower_case_filter",
+    "github.com/blevesearch/bleve/analysis/token_filters/porter",
+    "github.com/blevesearch/bleve/analysis/token_filters/stop_tokens_filter",
+    "github.com/blevesearch/bleve/analysis/tokenizers/unicode",
+    "github.com/blevesearch/bleve/document",
+    "github.com/blevesearch/bleve/index",
+    "github.com/blevesearch/bleve/index/store",
+    "github.com/blevesearch/bleve/index/store/boltdb",
+    "github.com/blevesearch/bleve/index/store/gtreap",
+    "github.com/blevesearch/bleve/index/upside_down",
+    "github.com/blevesearch/bleve/numeric_util",
+    "github.com/blevesearch/bleve/registry",
+    "github.com/blevesearch/bleve/search",
+    "github.com/blevesearch/bleve/search/collectors",
+    "github.com/blevesearch/bleve/search/facets",
+    "github.com/blevesearch/bleve/search/highlight",
+    "github.com/blevesearch/bleve/search/highlight/fragment_formatters/html",
+    "github.com/blevesearch/bleve/search/highlight/fragmenters/simple",
+    "github.com/blevesearch/bleve/search/highlight/highlighters/html",
+    "github.com/blevesearch/bleve/search/highlight/highlighters/simple",
+    "github.com/blevesearch/bleve/search/scorers",
+    "github.com/blevesearch/bleve/search/searchers",
+    "github.com/blevesearch/go-porterstemmer",
+    "github.com/blevesearch/segment",
+    "github.com/boltdb/bolt",
+    "github.com/braintree/manners",
+    "github.com/davecgh/go-spew/spew",
+    "github.com/dustin/go-humanize",
+    "github.com/eclipse/paho.mqtt.golang",
+    "github.com/eclipse/paho.mqtt.golang/packets",
+    "github.com/gin-contrib/sse",
+    "github.com/gin-gonic/gin",
+    "github.com/gin-gonic/gin/binding",
+    "github.com/gin-gonic/gin/render",
+    "github.com/gocql/gocql",
+    "github.com/golang/protobuf/proto",
+    "github.com/golang/snappy",
+    "github.com/hailocab/go-hostpool",
+    "github.com/kpawlik/geojson",
+    "github.com/lib/pq",
+    "github.com/lib/pq/oid",
+    "github.com/mailgun/mailgun-go",
+    "github.com/mattn/go-isatty",
+    "github.com/mschoch/blackfriday-text",
+    "github.com/oxtoacart/bpool",
+    "github.com/pkg/errors",
+    "github.com/pmezard/go-difflib/difflib",
+    "github.com/russross/blackfriday",
+    "github.com/steveyen/gtreap",
+    "github.com/stretchr/testify/assert",
+    "github.com/tanel/dbmigrate",
+    "github.com/ugorji/go/codec",
+    "golang.org/x/net/context",
+    "golang.org/x/net/context/ctxhttp",
+    "golang.org/x/net/proxy",
+    "golang.org/x/net/websocket",
+    "golang.org/x/oauth2",
+    "golang.org/x/oauth2/google",
+    "golang.org/x/oauth2/jws",
+    "golang.org/x/oauth2/jwt",
+    "golang.org/x/sys/unix",
+    "google.golang.org/appengine",
+    "google.golang.org/appengine/urlfetch",
+    "gopkg.in/go-playground/validator.v8",
+    "gopkg.in/inf.v0",
+    "gopkg.in/yaml.v2",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

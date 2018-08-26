@@ -37,6 +37,23 @@ jobs:
       - run: go build -o www.growse.com
       - run: bundle exec fpm -s dir -t deb --url https://www.growse.com/ --description "growse.com dynamic content (locator, search)" --deb-systemd www-growse-com.service -n growse-com-golang --config-files /etc/www-growse-com.conf -p . -a native -v 1.0.0-$CIRCLE_BUILD_NUM www.growse.com=/usr/bin/www.growse.com config.json=/etc/www-growse-com.conf databasemigrations/=/var/www/growse-web/databasemigrations templates/=/var/www/growse-web/templates
       - run: debsigs --sign=origin --default-key=63F29D43F8F9E605 growse-com-golang_1.0.0-"$CIRCLE_BUILD_NUM"_amd64.deb
+  deploy:
+    working_directory: /go/src/github.com/growse/www.growse.com
+    branches:
+      only:
+        - golang
+    steps:
       - deploy:
           name: Push to apt.growse.com
           command: bundle exec deb-s3 upload --s3-region=eu-west-1 --suite stable --origin "Andrew Rowson" --sign=63F29D43F8F9E605 --bucket apt-growse-com growse-com-golang_1.0.0-"$CIRCLE_BUILD_NUM"_amd64.deb
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: golang

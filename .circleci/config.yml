@@ -35,7 +35,7 @@ jobs:
           paths:
             - bundledir
             - Gemfile*
-            - /
+            - .
 
   deploy:
     working_directory: /go/src/github.com/growse/www.growse.com

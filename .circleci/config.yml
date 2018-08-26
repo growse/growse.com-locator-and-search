@@ -5,6 +5,7 @@ jobs:
     branches:
       only:
         - golang
+        - golang/*
     docker:
       - image: circleci/golang:1-stretch
     steps:

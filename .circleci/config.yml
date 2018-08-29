@@ -37,7 +37,7 @@ jobs:
             - Gemfile*
             - .
 
-  deploy:
+  deploy:gra
     docker:
       - image: circleci/ruby:2.4-stretch
     steps:
@@ -61,6 +61,7 @@ workflows:
             branches:
               only:
               - golang
+              - dependabot/dep/golang/*
               - golang/*
       - deploy:
           requires:

@@ -37,7 +37,7 @@ jobs:
             - Gemfile*
             - .
 
-  deploy:gra
+  deploy:
     docker:
       - image: circleci/ruby:2.4-stretch
     steps:

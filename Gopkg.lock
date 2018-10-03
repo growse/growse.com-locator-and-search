@@ -191,12 +191,12 @@
   revision = "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
 
 [[projects]]
-  digest = "1:91fea695ea6dfbb356a9cfd888739a702e3d6e779219d4d80aa0d95f23f24074"
+  digest = "1:d2eb436da33c2337493d5b9dc8d82803442c24a8f913694ff21e72ac29a02e4d"
   name = "github.com/mailgun/mailgun-go"
   packages = ["."]
   pruneopts = ""
-  revision = "a4002e2df2e8ca2da6a6fbb4a72871b504e49f50"
-  version = "v1.1.0"
+  revision = "28c45085c063854b83107df6cf37ad8f88462105"
+  version = "v1.1.1"
 
 [[projects]]
   digest = "1:78229b46ddb7434f881390029bd1af7661294af31f6802e0e1bedaad4ab0af3c"

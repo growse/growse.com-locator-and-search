@@ -78,7 +78,6 @@ func main() {
 	mime.AddExtensionType(".js", "application/javascript; charset=utf8")
 	//Flags
 	configFile := flag.String("configFile", "config.json", "File path to the JSON configuration")
-	kalmanFiltering := flag.Bool("kalmanFilter", false, "Enable kalman to populate the database with kalman-filtered locations")
 	flag.Parse()
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 
@@ -153,12 +152,6 @@ func main() {
 	GeocodingWorkQueue = make(chan bool, 100)
 	go UpdateLatestLocationWithGeocoding(GeocodingWorkQueue)
 	go SubscribeMQTT(quit)
-
-	if *kalmanFiltering {
-		log.Print("Doing the Kalman batch processing")
-		DoKalmanFiltering(db)
-		return
-	}
 
 	DoDatabaseMigrations()
 	defer db.Close()

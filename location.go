@@ -5,7 +5,6 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/gin-gonic/gin"
 	"github.com/kpawlik/geojson"
-	"strconv"
 	"time"
 )
 
@@ -90,19 +89,10 @@ func GetLineStringAsJSON(year string) (string, error) {
 
 /* HTTP handlers */
 func WhereLineStringHandler(c *gin.Context) {
-	filtered, _ := strconv.ParseBool(c.Params.ByName("filtered"))
-	linestring, err := GetLineStringAsJSON(c.Params.ByName("year"), filtered)
+	linestring, err := GetLineStringAsJSON(c.Params.ByName("year"))
 	if err != nil {
 		InternalError(err)
 		c.String(500, "Internal Error\n"+err.Error())
-	}
-	c.Data(200, "application/json", []byte(linestring))
-}
-func WhereLineStringHandlerNonFiltered(c *gin.Context) {
-	linestring, err := GetLineStringAsJSON(c.Params.ByName("year"), false)
-	if err != nil {
-		InternalError(err)
-		c.String(500, "Internal Error")
 	}
 	c.Data(200, "application/json", []byte(linestring))
 }

@@ -7,29 +7,24 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: deps-{{ .Branch }}-{{ checksum "Gemfile.lock" }}-{{ checksum "Gopkg.lock" }}
+          key: deps-{{ .Branch }}-{{ checksum "go.mod" }}-{{ checksum "go.sum" }}
       - run: mkdir test-reports
       - run: sudo apt-get update
       - run: sudo apt-get install -y ruby ruby-dev libffi-dev
       - run: sudo gem install bundler
       - run: bundle install --path bundledir
       - run: go get -u github.com/jstemmer/go-junit-report
-      - run: curl -L --output ~/dep $(curl https://api.github.com/repos/golang/dep/releases/latest | jq -r '.assets | map(select(.name == "dep-linux-amd64"))[].browser_download_url')
-      - run: chmod +x ~/dep
-      - run:
-          command: ~/dep ensure -v
-          no_output_timout: 30m
-      - save_cache:
-          key: deps-{{ .Branch }}-{{ checksum "Gemfile.lock" }}-{{ checksum "Gopkg.lock" }}
-          paths:
-            - vendor
-            - bundledir
       - run: go test -cover -covermode=count -coverprofile=coverprofile -v | tee /dev/tty | go-junit-report > test-reports/report.xml
       - run: go tool cover -html=coverprofile -o test-reports/coverage.html
       - store_test_results:
           path: test-reports/
       - run: mkdir app
       - run: go build -o www.growse.com
+      - save_cache:
+          key: deps-{{ .Branch }}-{{ checksum "go.mod" }}-{{ checksum "go.sum" }}
+          paths:
+            - vendor
+            - bundledir
       - persist_to_workspace:
           root: .
           paths:

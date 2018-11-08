@@ -10,8 +10,7 @@ func BuildRoutes(router *gin.Engine) {
 	authorized.Use(AuthRequired())
 	{
 		authorized.GET("ping", PingHandler)
-		authorized.GET("where/linestring/:year/", WhereLineStringHandlerNonFiltered)
-		authorized.GET("where/linestring/:year/:filtered/", WhereLineStringHandler)
+		authorized.GET("where/linestring/:year/", WhereLineStringHandler)
 	}
 	router.GET("/oauth2callback", OauthCallback)
 

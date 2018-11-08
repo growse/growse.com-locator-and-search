@@ -1,7 +1,6 @@
 version: 2
 jobs:
   build:
-    working_directory: /go/src/github.com/growse/www.growse.com
     docker:
       - image: circleci/golang:1-stretch
     steps:

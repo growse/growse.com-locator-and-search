@@ -1,10 +1,10 @@
 {
   "cpuProfile": "pprof.cpu",
-  "dbHost": "/tmp",
+  "dbHost": "/var/run/postgresql",
   "dbName": "www_growse_com",
   "dbPassword": "",
-  "dbUser": "andrew",
-  "databaseMigrationsPath": "databasemigrations",
+  "dbUser": "growse",
+  "databaseMigrationsPath": "databasemigrations/",
   "defaultCacheExpiry": 600000000000,
   "geocodeApiUrl": "",
   "port": 3030,

@@ -99,7 +99,7 @@ func UpdateLatestLocationWithGeocoding(workChan <-chan bool) {
 			log.Print("Updating latest geocoding")
 			var location Location
 			var id int
-			err := db.QueryRow("select id,latitude,longitude from locations order by devicetimestamp desc limit 1").Scan(&id, &location.Latitude, &location.Longitude)
+			err := db.QueryRow("select id,ST_Y(ST_AsText(point)),ST_X(ST_AsText(point)) from locations order by devicetimestamp desc limit 1").Scan(&id, &location.Latitude, &location.Longitude)
 			if err != nil {
 				InternalError(err)
 			}

@@ -56,7 +56,7 @@ workflows:
             branches:
               only:
               - golang
-              - dependabot/dep/golang/*
+              - dependabot/go_modules/golang/*
               - golang/*
       - deploy:
           requires:

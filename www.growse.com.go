@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"github.com/mailgun/mailgun-go"
-	"github.com/oxtoacart/bpool"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"log"
@@ -23,12 +22,8 @@ import (
 
 var (
 	db                      *sql.DB
-	stylesheetfilename      string
-	javascriptfilename      string
-	wherejavascriptfilename string
 	configuration           Configuration
 	gun                     mailgun.Mailgun
-	bufPool                 *bpool.BufferPool
 	oAuthConf               *oauth2.Config
 	GeocodingWorkQueue      chan bool
 )
@@ -132,9 +127,6 @@ func main() {
 
 	gun = mailgun.NewMailgun("growse.com", configuration.MailgunKey, "")
 
-	// Initialize the template output buffer pool
-	bufPool = bpool.NewBufferPool(16)
-
 	// Database time
 
 	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", configuration.DbHost, configuration.DbUser, configuration.DbName, configuration.DbPassword)
@@ -153,7 +145,7 @@ func main() {
 	go UpdateLatestLocationWithGeocoding(GeocodingWorkQueue)
 	go SubscribeMQTT(quit)
 
-	DoDatabaseMigrations()
+	DoDatabaseMigrations(db, configuration.DatabaseMigrationsPath)
 	defer db.Close()
 
 	//Get the router

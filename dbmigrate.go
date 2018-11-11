@@ -22,7 +22,7 @@ func DoDatabaseMigrations(db *sql.DB, migrationsPath string) {
 		log.Fatalf("Errors encountered creating migrate instance : %v", err)
 	}
 	err = m.Up()
-	if err != nil {
+	if err != nil && err != migrate.ErrNoChange {
 		log.Fatalf("Errors encountered migrating database: %v", err)
 	}
 	log.Print("Database migration done")

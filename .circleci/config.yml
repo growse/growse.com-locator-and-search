@@ -23,7 +23,7 @@ jobs:
       - save_cache:
           key: deps-{{ .Branch }}-{{ checksum "go.mod" }}-{{ checksum "go.sum" }}
           paths:
-            - vendor
+            - "/go/pkg/mod"
             - bundledir
       - persist_to_workspace:
           root: .

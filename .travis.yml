@@ -1,0 +1,91 @@
+language: go
+
+go:
+- 1.11.1
+
+git:
+  depth: 5
+
+before_install:
+- sudo apt-get install -y debsigs
+- echo $DEBSIGN | base64 -d | gpg --import
+#
+#script:
+#- bundle exec jekyll b
+#- bundle exec fpm -s dir -t deb -n growse-com-jekyll --description "growse.com static content" --url https://www.growse.com/ --prefix /var/www/ -p _site -a noarch  -v 1.0.1-$TRAVIS_BUILD_NUMBER _site/=growse-jekyll
+#- debsigs --sign=origin --default-key=63F29D43F8F9E605 _site/growse-com-jekyll_1.0.1-"$TRAVIS_BUILD_NUMBER"_all.deb
+#
+#after_success:
+#- bundle exec deb-s3 upload --s3-region=eu-west-1 --suite stable --origin "Andrew Rowson" --sign=63F29D43F8F9E605 --bucket apt-growse-com _site/growse-com-jekyll_1.0.1-"$TRAVIS_BUILD_NUMBER"_all.deb
+
+
+
+
+
+
+#version: 2
+#jobs:
+#  build:
+#    docker:
+#    - image: circleci/golang:1-stretch
+#    steps:
+#    - checkout
+#    - restore_cache:
+#        key: deps-{{ .Branch }}-{{ checksum "go.mod" }}-{{ checksum "go.sum" }}
+#    - run: mkdir test-reports
+#    - run: sudo apt-get update
+#    - run: sudo apt-get install -y ruby ruby-dev libffi-dev
+#    - run: sudo gem install bundler
+#    - run: bundle install --path bundledir
+#    - run: go get -u github.com/jstemmer/go-junit-report
+#    - run: go mod tidy
+#    - run: go test -cover -covermode=count -coverprofile=coverprofile -v | tee /dev/tty | go-junit-report > test-reports/report.xml
+#    - run: go tool cover -html=coverprofile -o test-reports/coverage.html
+#    - store_test_results:
+#        path: test-reports/
+#    - run: mkdir app
+#    - run: go build -o www.growse.com
+#    - save_cache:
+#        key: deps-{{ .Branch }}-{{ checksum "go.mod" }}-{{ checksum "go.sum" }}
+#        paths:
+#        - "/go/pkg/mod"
+#        - bundledir
+#    - persist_to_workspace:
+#        root: .
+#        paths:
+#        - bundledir
+#        - Gemfile*
+#        - .
+#
+#  deploy:
+#    docker:
+#    - image: circleci/ruby:2.4-stretch
+#    steps:
+#    - attach_workspace:
+#        at: .
+#    - run: sudo apt install debsigs
+#    - run: echo $DEBSIGN | base64 -d | gpg --import
+#    - run: sudo gem install bundler
+#    - run: bundle install --path bundledir
+#    - run: bundle exec fpm -s dir -t deb --url https://www.growse.com/ --description "growse.com dynamic content (locator, search)" --deb-systemd www-growse-com.service -n growse-com-golang --config-files /etc/www-growse-com.conf -p . -a native -v 1.0.0-$CIRCLE_BUILD_NUM www.growse.com=/usr/bin/www.growse.com config.json=/etc/www-growse-com.conf databasemigrations/=/var/www/growse-web/databasemigrations templates/=/var/www/growse-web/templates
+#    - run: debsigs --sign=origin --default-key=63F29D43F8F9E605 growse-com-golang_1.0.0-"$CIRCLE_BUILD_NUM"_amd64.deb
+#    - deploy:
+#        name: Push to apt.growse.com
+#        command: bundle exec deb-s3 upload --s3-region=eu-west-1 --suite stable --origin "Andrew Rowson" --sign=63F29D43F8F9E605 --bucket apt-growse-com growse-com-golang_1.0.0-"$CIRCLE_BUILD_NUM"_amd64.deb
+#workflows:
+#  version: 2
+#  build-and-deploy:
+#    jobs:
+#    - build:
+#        filters:
+#          branches:
+#            only:
+#            - golang
+#            - dependabot/go_modules/golang/*
+#            - golang/*
+#    - deploy:
+#        requires:
+#        - build
+#        filters:
+#          branches:
+#            only: golang

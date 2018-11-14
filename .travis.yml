@@ -6,6 +6,9 @@ go:
 git:
   depth: 5
 
+env:
+  - GO111MODULE=on
+
 before_install:
 - sudo apt-get install -y debsigs
 - echo $DEBSIGN | base64 -d | gpg --import

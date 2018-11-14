@@ -17,7 +17,7 @@ before_install:
 
 script:
 - go mod tidy
-- go test -cover -covermode=count -coverprofile=coverprofile -v | tee /dev/tty | go-junit-report > test-reports/report.xml
+- go test -cover -covermode=count -coverprofile=coverprofile -v | tee /dev/tty | go-junit-report > report.xml
 - go build -o www.growse.com
 - bundle exec fpm -s dir -t deb --url https://www.growse.com/ --description "growse.com dynamic content (locator, search)" --deb-systemd www-growse-com.service -n growse-com-golang --config-files /etc/www-growse-com.conf -p . -a native -v 1.0.1-$TRAVIS_BUILD_NUMBER www.growse.com=/usr/bin/www.growse.com config.json=/etc/www-growse-com.conf databasemigrations/=/var/www/growse-web/databasemigrations templates/=/var/www/growse-web/templates
 - debsigs --sign=origin --default-key=63F29D43F8F9E605 growse-com-golang_1.0.1-"$TRAVIS_BUILD_NUMBER"_amd64.deb

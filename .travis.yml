@@ -2,10 +2,6 @@ language: go
 dist: xenial
 go:
 - 1.11.1
-cache:
-  directories:
-    - $HOME/.cache/go-build
-    - $HOME/gopath/pkg/mod
 
 git:
   depth: 5
@@ -17,14 +13,15 @@ before_install:
 - sudo apt-get install -y debsigs
 - echo $DEBSIGN | base64 -d | gpg --import
 - bundle install
+- go get -u github.com/jstemmer/go-junit-report
 
 script:
 - go mod tidy
-- go test
+- go test -cover -covermode=count -coverprofile=coverprofile -v | tee /dev/tty | go-junit-report > test-reports/report.xml
 - go build -o www.growse.com
 - bundle exec fpm -s dir -t deb --url https://www.growse.com/ --description "growse.com dynamic content (locator, search)" --deb-systemd www-growse-com.service -n growse-com-golang --config-files /etc/www-growse-com.conf -p . -a native -v 1.0.1-$TRAVIS_BUILD_NUMBER www.growse.com=/usr/bin/www.growse.com config.json=/etc/www-growse-com.conf databasemigrations/=/var/www/growse-web/databasemigrations templates/=/var/www/growse-web/templates
 - debsigs --sign=origin --default-key=63F29D43F8F9E605 growse-com-golang_1.0.1-"$TRAVIS_BUILD_NUMBER"_amd64.deb
 
 after_success:
+- go tool cover -html=coverprofile -o test-reports/coverage.html
 - bundle exec deb-s3 upload --s3-region=eu-west-1 --suite stable --origin "Andrew Rowson" --sign=63F29D43F8F9E605 --bucket apt-growse-com _site/growse-com-golang_1.0.1-"$TRAVIS_BUILD_NUMBER"_all.deb
-

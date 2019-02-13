@@ -15,7 +15,7 @@ require (
 	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect
 	github.com/gin-contrib/sse v0.0.0-20170109093832-22d885f9ecc7 // indirect
 	github.com/gin-gonic/gin v1.3.0
-	github.com/golang-migrate/migrate/v4 v4.2.3
+	github.com/golang-migrate/migrate/v4 v4.2.4
 	github.com/jmhodges/levigo v0.0.0-20161115193449-c42d9e0ca023 // indirect
 	github.com/json-iterator/go v1.1.5 // indirect
 	github.com/kpawlik/geojson v0.0.0-20171201195549-1a4f120c6b41

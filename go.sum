@@ -92,6 +92,8 @@ github.com/golang-migrate/migrate/v4 v4.2.2 h1:m9WF3B3yge1mKm5+/q6C3qPETMWqphrod
 github.com/golang-migrate/migrate/v4 v4.2.2/go.mod h1:JRwdki93/aFawDXMUM4GcRu/FAIfyw+1Kuyd9vkbaeA=
 github.com/golang-migrate/migrate/v4 v4.2.3 h1:Bc+xynPuLKqk/U1BjIFLxXPbW4tzlf9oMR35BUZRTdI=
 github.com/golang-migrate/migrate/v4 v4.2.3/go.mod h1:zt+104di20bTWX9M3cCcERBkS/6mncciH5sAjcn6kBU=
+github.com/golang-migrate/migrate/v4 v4.2.4 h1:gV/omO3K0upRsU3zkiwYgl9yHcBRzsKcC+BEEyFG1X8=
+github.com/golang-migrate/migrate/v4 v4.2.4/go.mod h1:zt+104di20bTWX9M3cCcERBkS/6mncciH5sAjcn6kBU=
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=
 github.com/golang/lint v0.0.0-20180702182130-06c8688daad7/go.mod h1:tluoj9z5200jBnyusfRPU2LqT6J+DAorxEvtC7LHB+E=
 github.com/golang/mock v1.1.1/go.mod h1:oTYuIxOrZwtPieC+H1uAHpcLFnEyAGVDL/k47Jfbm0A=

@@ -24,4 +24,4 @@ script:
 
 after_success:
 - go tool cover -html=coverprofile -o test-reports/coverage.html
-- bundle exec deb-s3 upload --s3-region=eu-west-1 --suite stable --origin "Andrew Rowson" --sign=63F29D43F8F9E605 --bucket apt-growse-com growse-com-golang_1.0.1-"$TRAVIS_BUILD_NUMBER"_all.deb
+- bundle exec deb-s3 upload --s3-region=eu-west-1 --suite stable --origin "Andrew Rowson" --sign=63F29D43F8F9E605 --bucket apt-growse-com growse-com-golang_1.0.1-"$TRAVIS_BUILD_NUMBER"_amd64.deb

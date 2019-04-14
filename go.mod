@@ -28,7 +28,7 @@ require (
 	github.com/mschoch/blackfriday-text v0.0.0-20160725121510-f4ea365e801b
 	github.com/onsi/gomega v1.4.2 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20170806203942-52369c62f446 // indirect
-	github.com/russross/blackfriday v1.5.1
+	github.com/russross/blackfriday v1.5.2
 	github.com/steveyen/gtreap v0.0.0-20150807155958-0abe01ef9be2 // indirect
 	github.com/stretchr/testify v1.3.0
 	github.com/stretchrcom/testify v1.2.2 // indirect

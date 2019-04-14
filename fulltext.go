@@ -19,9 +19,9 @@ import (
 
 var bleveIndex bleve.Index
 
-func BleveInit(remoteGit string, repoLocation string) {
-	if remoteGit != "" && repoLocation != "" {
-		err := updateGitRepo(remoteGit, repoLocation, "jekyll")
+func BleveInit(remoteGitUrl string, remoteGitBranch string, repoLocation string) {
+	if remoteGitUrl != "" && repoLocation != "" {
+		err := updateGitRepo(remoteGitUrl, repoLocation, remoteGitBranch)
 		if err == nil {
 			openIndex()
 			addFilesToIndex(repoLocation, bleveIndex)
@@ -139,7 +139,7 @@ func searchIndexForThings(index bleve.Index, searchForm SearchForm) (*bleve.Sear
 
 func addFileToIndex(filePath string, index bleve.Index) error {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		return errors.New("File does not exist")
+		return errors.New("file does not exist")
 	}
 	contentBytes, err := ioutil.ReadFile(filePath)
 	if err != nil {

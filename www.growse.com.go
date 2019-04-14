@@ -21,37 +21,38 @@ import (
 )
 
 var (
-	db                      *sql.DB
-	configuration           Configuration
-	gun                     mailgun.Mailgun
-	oAuthConf               *oauth2.Config
-	GeocodingWorkQueue      chan bool
+	db                 *sql.DB
+	configuration      Configuration
+	gun                mailgun.Mailgun
+	oAuthConf          *oauth2.Config
+	GeocodingWorkQueue chan bool
 )
 
 type Configuration struct {
-	DbUser                 string
-	DbName                 string
-	DbPassword             string
-	DbHost                 string
-	DatabaseMigrationsPath string
-	TemplatePath           string
-	StaticPath             string
-	CpuProfile             string
-	GeocodeApiURL          string
-	MailgunKey             string
-	Production             bool
-	CookieSeed             string
-	OAuth2CallbackUrl      string
-	Domain                 string
-	ClientID               string
-	ClientSecret           string
-	Port                   int
-	MaxDBOpenConnections   int
-	MQTTURL                string
-	MQTTUsername           string
-	MQTTPassword           string
-	SearchIndexRemoteGit   string
-	SearchIndexLocalDir    string
+	DbUser                     string
+	DbName                     string
+	DbPassword                 string
+	DbHost                     string
+	DatabaseMigrationsPath     string
+	TemplatePath               string
+	StaticPath                 string
+	CpuProfile                 string
+	GeocodeApiURL              string
+	MailgunKey                 string
+	Production                 bool
+	CookieSeed                 string
+	OAuth2CallbackUrl          string
+	Domain                     string
+	ClientID                   string
+	ClientSecret               string
+	Port                       int
+	MaxDBOpenConnections       int
+	MQTTURL                    string
+	MQTTUsername               string
+	MQTTPassword               string
+	SearchIndexRemoteGitUrl    string
+	SearchIndexRemoteGitBranch string
+	SearchIndexLocalDir        string
 }
 
 func InternalError(err error) {
@@ -123,7 +124,7 @@ func main() {
 	}()
 
 	// Initialize fulltext engine
-	BleveInit(configuration.SearchIndexRemoteGit, configuration.SearchIndexLocalDir)
+	BleveInit(configuration.SearchIndexRemoteGitUrl, configuration.SearchIndexRemoteGitBranch, configuration.SearchIndexLocalDir)
 
 	gun = mailgun.NewMailgun("growse.com", configuration.MailgunKey, "")
 

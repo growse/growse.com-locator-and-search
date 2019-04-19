@@ -9,7 +9,7 @@ require (
 	github.com/braintree/manners v0.0.0-20150503212558-0b5e6b2c2843
 	github.com/cznic/mathutil v0.0.0-20181021201202-eba54fb065b7 // indirect
 	github.com/dustin/go-humanize v1.0.0
-	github.com/eclipse/paho.mqtt.golang v1.1.1
+	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51 // indirect
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect

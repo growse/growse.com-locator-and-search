@@ -27,40 +27,7 @@ CREATE SEQUENCE public.locations_id_seq
     CACHE 1;
 
 
-CREATE TABLE public.old_migrations (
-    id integer NOT NULL,
-    name text NOT NULL,
-    created_at timestamp with time zone NOT NULL
-);
-
---
--- Name: old_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: www_growse_com
---
-
-CREATE SEQUENCE public.old_migrations_id_seq
-    START WITH 1
-    INCREMENT BY -1
-    MINVALUE 1
-    MAXVALUE 9223372036854775807
-    CACHE 1;
-
-
 ALTER TABLE ONLY public.locations ALTER COLUMN id SET DEFAULT nextval('public.locations_id_seq'::regclass);
-
-
---
--- Name: old_migrations id; Type: DEFAULT; Schema: public; Owner: www_growse_com
---
-
-ALTER TABLE ONLY public.old_migrations ALTER COLUMN id SET DEFAULT nextval('public.old_migrations_id_seq'::regclass);
-
-
---
--- Name: old_migrations PK_migrations_id; Type: CONSTRAINT; Schema: public; Owner: www_growse_com
---
-
-ALTER TABLE ONLY public.old_migrations
-    ADD CONSTRAINT "PK_migrations_id" PRIMARY KEY (id);
 
 
 --
@@ -94,22 +61,15 @@ CREATE INDEX idx_locations_year ON public.locations USING btree (date_part('year
 
 
 --
--- Name: idx_migrations_name; Type: INDEX; Schema: public; Owner: www_growse_com
---
-
-CREATE UNIQUE INDEX idx_migrations_name ON public.old_migrations USING btree (name);
-
-
---
 -- Name: locations_point_idx; Type: INDEX; Schema: public; Owner: www_growse_com
 --
 
-CREATE INDEX locations_point_idx ON public.locations USING gist (point);
+CREATE INDEX idx_locations_point ON public.locations USING gist (point);
 
 
 --
 -- Name: locations_timestamp_idx; Type: INDEX; Schema: public; Owner: www_growse_com
 --
 
-CREATE INDEX locations_timestamp_idx ON public.locations USING btree ("timestamp");
+CREATE INDEX idx_locations_timestamp ON public.locations USING btree ("timestamp");
 

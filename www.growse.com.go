@@ -16,7 +16,6 @@ import (
 	"os"
 	"os/signal"
 	"runtime/debug"
-	"runtime/pprof"
 	"syscall"
 )
 
@@ -36,7 +35,6 @@ type Configuration struct {
 	DatabaseMigrationsPath     string
 	TemplatePath               string
 	StaticPath                 string
-	CpuProfile                 string
 	GeocodeApiURL              string
 	MailgunKey                 string
 	Production                 bool
@@ -113,8 +111,7 @@ func main() {
 
 	go func() {
 		for sig := range c {
-			log.Printf("captured %v, stopping profiler and exiting..", sig)
-			pprof.StopCPUProfile()
+			log.Printf("captured %v. Exiting...", sig)
 			close(quit)
 			close(GeocodingWorkQueue)
 			log.Print("Closing manners")
@@ -130,11 +127,12 @@ func main() {
 
 	// Database time
 
-	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", configuration.DbHost, configuration.DbUser, configuration.DbName, configuration.DbPassword)
-	db, err = sql.Open("postgres", connectionString)
+	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable", configuration.DbHost, configuration.DbUser, configuration.DbName)
+	if configuration.DbPassword != "" {
+		connectionString = fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", configuration.DbHost, configuration.DbUser, configuration.DbName, configuration.DbPassword)
+	}
 
-	log.Printf("Setting maximum db connections to %d", configuration.MaxDBOpenConnections)
-	db.SetMaxOpenConns(configuration.MaxDBOpenConnections)
+	db, err = sql.Open("postgres", connectionString)
 
 	if err != nil {
 		log.Fatalf("Error connecting to database: %v", err)
@@ -142,28 +140,29 @@ func main() {
 		log.Print("Database connected")
 	}
 
+	log.Printf("Setting maximum db connections to %d", configuration.MaxDBOpenConnections)
+	db.SetMaxOpenConns(configuration.MaxDBOpenConnections)
+
 	GeocodingWorkQueue = make(chan bool, 100)
 	go UpdateLatestLocationWithGeocoding(GeocodingWorkQueue)
 	go SubscribeMQTT(quit)
 
 	DoDatabaseMigrations(db, configuration.DatabaseMigrationsPath)
-	defer db.Close()
+	defer func() {
+		err := db.Close()
+		if err != nil {
+			log.Fatalf("Error closing database: %v", err)
+		}
+	}()
 
 	//Get the router
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 
-	//Cpu Profiling time
-	if configuration.CpuProfile != "" {
-		f, err := os.Create(configuration.CpuProfile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		pprof.StartCPUProfile(f)
-		defer pprof.StopCPUProfile()
-	}
-
 	BuildRoutes(router)
 	log.Printf("Listening on port %d", configuration.Port)
-	manners.ListenAndServe(fmt.Sprintf(":%d", configuration.Port), router)
+	err = manners.ListenAndServe(fmt.Sprintf(":%d", configuration.Port), router)
+	if err != nil {
+		log.Fatalf("Error starting server: %v", err)
+	}
 }

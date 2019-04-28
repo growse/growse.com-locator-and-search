@@ -1,5 +1,3 @@
-create extension postgis;
-
 CREATE TABLE public.locations (
     id integer NOT NULL,
     "timestamp" timestamp with time zone NOT NULL,

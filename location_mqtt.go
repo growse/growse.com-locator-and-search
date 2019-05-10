@@ -23,7 +23,7 @@ type MQTTMsg struct {
 	Distance             float64
 }
 
-var topic = "owntracks/#"
+var topic = "owntracks/growse/nexus5"
 
 func SubscribeMQTT(quit <-chan bool) error {
 	log.Print("Connecting to MQTT")

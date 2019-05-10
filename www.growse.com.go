@@ -12,7 +12,6 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"log"
-	"mime"
 	"os"
 	"os/signal"
 	"runtime/debug"
@@ -57,7 +56,7 @@ func InternalError(err error) {
 	log.Printf("%v", err)
 	debug.PrintStack()
 	if configuration.Production {
-		m := mailgun.NewMessage("Sender <blogbot@growse.com>", "ERROR: www.growse.com", fmt.Sprintf("%v\n%v", err, string(debug.Stack())), "sysadmin@growse.com")
+		m := mailgun.Mailgun.NewMessage("Sender <blogbot@growse.com>", "ERROR: www.growse.com", fmt.Sprintf("%v\n%v", err, string(debug.Stack())), "sysadmin@growse.com")
 		log.Printf("Emailing stack: %v\n", m)
 		response, id, _ := gun.Send(m)
 		log.Printf("Response ID: %s\n", id)
@@ -68,8 +67,6 @@ func InternalError(err error) {
 }
 
 func main() {
-	//On a mac, javascript isn't served utf8. Oddly
-	mime.AddExtensionType(".js", "application/javascript; charset=utf8")
 	//Flags
 	configFile := flag.String("configFile", "config.json", "File path to the JSON configuration")
 	flag.Parse()

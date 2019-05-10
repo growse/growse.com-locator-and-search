@@ -39,7 +39,7 @@ func openIndex() {
 }
 
 func updateGitRepo(remoteLocation string, localLocation string, tag string) error {
-	log.Printf("cloning %s to %s", remoteLocation, localLocation)
+	log.Printf("cloning %v to %v on branch %v", remoteLocation, localLocation, tag)
 	if _, err := os.Stat(localLocation); os.IsNotExist(err) {
 		cmd := exec.Command("git", "clone", remoteLocation, localLocation)
 		err := cmd.Run()
@@ -55,7 +55,7 @@ func updateGitRepo(remoteLocation string, localLocation string, tag string) erro
 			return err
 		}
 	}
-
+	log.Printf("checking out commit: %v", tag)
 	cmd := exec.Command("git", "-C", localLocation, "checkout", tag)
 	err := cmd.Run()
 	if err != nil {

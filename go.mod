@@ -26,7 +26,6 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742 // indirect
 	github.com/mschoch/blackfriday-text v0.0.0-20160725121510-f4ea365e801b
-	github.com/onsi/gomega v1.4.2 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20170806203942-52369c62f446 // indirect
 	github.com/russross/blackfriday v1.5.1
 	github.com/steveyen/gtreap v0.0.0-20150807155958-0abe01ef9be2 // indirect
@@ -35,7 +34,8 @@ require (
 	github.com/syndtr/goleveldb v0.0.0-20181105012736-f9080354173f // indirect
 	github.com/tecbot/gorocksdb v0.0.0-20181010114359-8752a9433481 // indirect
 	github.com/ugorji/go v1.1.1 // indirect
-	golang.org/x/oauth2 v0.0.0-20181203162652-d668ce993890
+	golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect
+	gopkg.in/yaml.v2 v2.2.2 // indirect
 )

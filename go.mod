@@ -1,7 +1,7 @@
 module github.com/growse/www.growse.com
 
 require (
-	github.com/blevesearch/bleve v0.5.0
+	github.com/blevesearch/bleve v0.7.0
 	github.com/blevesearch/blevex v0.0.0-20180227211930-4b158bb555a3 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.1 // indirect
 	github.com/blevesearch/segment v0.0.0-20160915185041-762005e7a34f // indirect

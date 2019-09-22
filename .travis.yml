@@ -1,11 +1,17 @@
 language: ruby
 dist: bionic
-go:
-  - 1.12.3
+
 ruby:
   - 2.6.3
 git:
   depth: 1
+
+addons:
+  apt:
+    sources:
+      - ppa:longsleep/golang-backports
+    packages:
+      - golang-go
 
 env:
   - GO111MODULE=on

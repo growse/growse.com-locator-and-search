@@ -6,17 +6,14 @@ ruby:
 git:
   depth: 1
 
-addons:
-  apt:
-    sources:
-      - ppa:longsleep/golang-backports
-    packages:
-      - golang-go
 
 env:
   - GO111MODULE=on
 
 before_install:
+  - sudo apt-add-repository -y ppa:longsleep/golang-backports
+  - sudo apt-get update -q
+  - sudo apt-get install -y golang-go
   - echo $DEBSIGN | base64 -d | gpg --import --batch
   - echo 'aaaaaaaa' > passphrase_file
   - bundle install

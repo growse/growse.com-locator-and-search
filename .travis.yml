@@ -8,8 +8,7 @@ git:
 
 
 env:
-  - GO111MODULE=on
-  - GOVERSION=1.13
+  - GO111MODULE=on GOVERSION=1.13
 
 before_install:
   - sudo apt-add-repository -y ppa:longsleep/golang-backports

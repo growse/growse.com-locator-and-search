@@ -9,11 +9,12 @@ git:
 
 env:
   - GO111MODULE=on
+  - GOVERSION=1.13
 
 before_install:
   - sudo apt-add-repository -y ppa:longsleep/golang-backports
   - sudo apt-get update -q
-  - sudo apt-get install -y golang-1.13-go
+  - sudo apt-get install -y golang-$(GOVERSION)-go
   - echo $DEBSIGN | base64 -d | gpg --import --batch
   - echo 'aaaaaaaa' > passphrase_file
   - bundle install

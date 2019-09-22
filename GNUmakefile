@@ -6,7 +6,7 @@ PKGNAME := growse-com-locator-and-search
 TEST_REPORT := test-reports/report.xml
 TEST_COVERAGE := test-reports/coverage.html
 
-GO := /usr/lib/go-1.11/bin/go
+GO := /usr/lib/go-$(GOVERSION)/bin/go
 
 .PHONY: package
 

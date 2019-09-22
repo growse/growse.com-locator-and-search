@@ -11,7 +11,7 @@ env:
   - GO111MODULE=on
 
 before_install:
-  - echo $DEBSIGN | base64 -d | gpg --import
+  - echo $DEBSIGN | base64 -d | gpg --import --batch
   - echo 'aaaaaaaa' > passphrase_file
   - bundle install
 
@@ -22,5 +22,3 @@ deploy:
   skip_cleanup: true
   provider: script
   script: bundle install && bundle exec deb-s3 upload --s3-region=eu-west-1 --sign=6A2561804E290210909454E69640EFFBAA3B94A5 --gpg-options="\-\-pinentry\-mode=loopback \-\-passphrase\-file passphrase_file \-\-batch" --suite stable --origin "Andrew Rowson" --bucket apt-growse-com *.deb
-
-#  script: bundle install && bundle exec deb-s3 upload --s3-region=eu-west-1 --suite stable --origin "Andrew Rowson" --sign=63F29D43F8F9E605 --bucket apt-growse-com growse-com-golang_1.0.1-"$TRAVIS_BUILD_NUMBER"_amd64.deb

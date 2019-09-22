@@ -1,32 +1,26 @@
-language: go
-dist: xenial
+language: ruby
+dist: bionic
 go:
-- 1.12.3
-
+  - 1.12.3
+ruby:
+  - 2.6.3
 git:
-  depth: 5
+  depth: 1
 
 env:
   - GO111MODULE=on
 
 before_install:
-- sudo apt-get install -y debsigs
-- echo $DEBSIGN | base64 -d | gpg --import
-- bundle install
-- go get -u github.com/jstemmer/go-junit-report
+  - echo $DEBSIGN | base64 -d | gpg --import
+  - echo 'aaaaaaaa' > passphrase_file
+  - bundle install
 
 script:
-- go mod tidy
-- go test -cover -covermode=count -coverprofile=coverprofile -v | tee /dev/tty | go-junit-report > report.xml
-- go build -o www.growse.com
-- bundle exec fpm -s dir -t deb --url https://www.growse.com/ --description "growse.com dynamic content (locator, search)" --deb-systemd www-growse-com.service -n growse-com-golang --config-files /etc/www-growse-com.conf -p . -a native -v 1.0.1-$TRAVIS_BUILD_NUMBER www.growse.com=/usr/bin/www.growse.com config.json=/etc/www-growse-com.conf databasemigrations/=/var/www/growse-web/databasemigrations templates/=/var/www/growse-web/templates
-- debsigs --sign=origin --default-key=63F29D43F8F9E605 growse-com-golang_1.0.1-"$TRAVIS_BUILD_NUMBER"_amd64.deb
+  - make
 
 deploy:
   skip_cleanup: true
   provider: script
-  script: bundle install && bundle exec deb-s3 upload --s3-region=eu-west-1 --suite stable --origin "Andrew Rowson" --sign=63F29D43F8F9E605 --bucket apt-growse-com growse-com-golang_1.0.1-"$TRAVIS_BUILD_NUMBER"_amd64.deb
+  script: bundle install && bundle exec deb-s3 upload --s3-region=eu-west-1 --sign=6A2561804E290210909454E69640EFFBAA3B94A5 --gpg-options="\-\-pinentry\-mode=loopback \-\-passphrase\-file passphrase_file \-\-batch" --suite stable --origin "Andrew Rowson" --bucket apt-growse-com *.deb
 
-after_success:
-- go tool cover -html=coverprofile -o test-reports/coverage.html
-
+#  script: bundle install && bundle exec deb-s3 upload --s3-region=eu-west-1 --suite stable --origin "Andrew Rowson" --sign=63F29D43F8F9E605 --bucket apt-growse-com growse-com-golang_1.0.1-"$TRAVIS_BUILD_NUMBER"_amd64.deb

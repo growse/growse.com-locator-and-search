@@ -8,7 +8,6 @@ git:
   depth: 1
 
 before_install:
-  - go version
   - echo $DEBSIGN | base64 -d | gpg --import --batch
   - echo 'aaaaaaaa' > passphrase_file
   - bundle install

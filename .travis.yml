@@ -14,6 +14,9 @@ before_install:
   - sudo apt-add-repository -y ppa:longsleep/golang-backports
   - sudo apt-get update -q
   - sudo apt-get install -y golang-${GOVERSION}-go
+  - echo $PATH
+  - ls -laht /usr/lib/go-$GOVERSION/bin
+  - which go
   - go version
   - echo $DEBSIGN | base64 -d | gpg --import --batch
   - echo 'aaaaaaaa' > passphrase_file

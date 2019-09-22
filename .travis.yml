@@ -1,29 +1,20 @@
-language: ruby
+language: go
 dist: bionic
 
-ruby:
-  - 2.6.3
+go:
+  - 1.13.x
+
 git:
   depth: 1
 
-
-env:
-  - GO111MODULE=on GOVERSION=1.13 PATH=$PATH:/usr/lib/go-$GOVERSION/bin
-
 before_install:
-  - sudo apt-add-repository -y ppa:longsleep/golang-backports
-  - sudo apt-get update -q
-  - sudo apt-get install -y golang-${GOVERSION}-go
-  - echo $PATH
-  - ls -laht /usr/lib/go-$GOVERSION/bin
-  - which go
   - go version
   - echo $DEBSIGN | base64 -d | gpg --import --batch
   - echo 'aaaaaaaa' > passphrase_file
   - bundle install
 
 script:
-  - make -j $(grep ^processor /proc/cpuinfo)
+  - make -j $(grep -c ^processor /proc/cpuinfo)
 
 deploy:
   skip_cleanup: true

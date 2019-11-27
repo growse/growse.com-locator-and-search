@@ -16,6 +16,7 @@ import (
 	"os/signal"
 	"runtime/debug"
 	"syscall"
+	"time"
 )
 
 var (
@@ -139,6 +140,8 @@ func main() {
 
 	log.Printf("Setting maximum db connections to %d", configuration.MaxDBOpenConnections)
 	db.SetMaxOpenConns(configuration.MaxDBOpenConnections)
+	db.SetMaxIdleConns(1)
+	db.SetConnMaxLifetime(time.Hour)
 
 	GeocodingWorkQueue = make(chan bool, 100)
 	go UpdateLatestLocationWithGeocoding(GeocodingWorkQueue)

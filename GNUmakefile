@@ -7,6 +7,8 @@ PKGNAME := growse-com-locator-and-search
 TEST_REPORT := test-reports/report.xml
 TEST_COVERAGE := test-reports/coverage.html
 
+export GOPATH := $(shell go env GOPATH)
+
 .PHONY: package
 
 package: $(addsuffix .deb, $(addprefix $(PKGNAME)_$(VERSION)-$(BUILD_NUMBER)_, $(foreach a, $(ARCH), $(a))))

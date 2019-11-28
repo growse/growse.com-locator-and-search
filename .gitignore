@@ -31,4 +31,5 @@ vendor/
 testIndex
 
 test-results
+test-reports
 dist

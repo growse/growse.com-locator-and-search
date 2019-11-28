@@ -33,7 +33,7 @@ $(TEST_COVERAGE): $(TEST_REPORT)
 .PHONY: build
 build: $(addprefix dist/www-growse-com_linux_, $(foreach a, $(ARCH), $(a)))
 
-dist/www-growse-com_linux_%: $(TEST_COVERAGE)
+dist/www-growse-com_linux_%: 
 	GOOS=linux GOARCH=$* go build -o dist/www-growse-com_linux_$*
 
 .PHONY: clean

@@ -14,7 +14,7 @@ require (
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect
 	github.com/gin-gonic/gin v1.5.0
-	github.com/golang-migrate/migrate/v4 v4.7.0
+	github.com/golang-migrate/migrate/v4 v4.7.1
 	github.com/jmhodges/levigo v0.0.0-20161115193449-c42d9e0ca023 // indirect
 	github.com/jstemmer/go-junit-report v0.9.1 // indirect
 	github.com/kpawlik/geojson v0.0.0-20171201195549-1a4f120c6b41

@@ -14,6 +14,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"regexp"
 	"runtime/debug"
 	"syscall"
 	"time"
@@ -28,29 +29,26 @@ var (
 )
 
 type Configuration struct {
-	DbUser                     string
-	DbName                     string
-	DbPassword                 string
-	DbHost                     string
-	DatabaseMigrationsPath     string
-	TemplatePath               string
-	StaticPath                 string
-	GeocodeApiURL              string
-	MailgunKey                 string
-	Production                 bool
-	CookieSeed                 string
-	OAuth2CallbackUrl          string
-	Domain                     string
-	ClientID                   string
-	ClientSecret               string
-	Port                       int
-	MaxDBOpenConnections       int
-	MQTTURL                    string
-	MQTTUsername               string
-	MQTTPassword               string
-	SearchIndexRemoteGitUrl    string
-	SearchIndexRemoteGitBranch string
-	SearchIndexLocalDir        string
+	DbUser                 string
+	DbName                 string
+	DbPassword             string
+	DbHost                 string
+	DatabaseMigrationsPath string
+	GeocodeApiURL          string
+	MailgunKey             string
+	Production             bool
+	CookieSeed             string
+	OAuth2CallbackUrl      string
+	Domain                 string
+	ClientID               string
+	ClientSecret           string
+	Port                   int
+	MaxDBOpenConnections   int
+	MQTTURL                string
+	MQTTUsername           string
+	MQTTPassword           string
+	SearchIndexRoot        string
+	SearchPathPattern      string
 }
 
 func InternalError(err error) {
@@ -110,8 +108,12 @@ func main() {
 	go func() {
 		for sig := range c {
 			log.Printf("captured %v. Exiting...", sig)
-			close(quit)
-			close(GeocodingWorkQueue)
+			if quit != nil {
+				close(quit)
+			}
+			if GeocodingWorkQueue != nil {
+				close(GeocodingWorkQueue)
+			}
 			log.Print("Closing manners")
 			manners.Close()
 		}
@@ -119,18 +121,52 @@ func main() {
 	}()
 
 	// Initialize fulltext engine
-	BleveInit(configuration.SearchIndexRemoteGitUrl, configuration.SearchIndexRemoteGitBranch, configuration.SearchIndexLocalDir)
+	pathPattern, err := regexp.Compile(configuration.SearchPathPattern)
+	if err != nil {
+		log.Printf("Error building regex %v: %v", configuration.SearchPathPattern, err)
+	}
+	BleveInit(configuration.SearchIndexRoot, pathPattern)
 
 	gun = mailgun.NewMailgun("growse.com", configuration.MailgunKey, "")
 
 	// Database time
+	if configuration.DbHost != "" {
+		db, err := setupDatabase(configuration.DbHost, configuration.DbUser, configuration.DbName)
+		if err != nil {
+			log.Fatalf("Error setting up database")
+		}
+		GeocodingWorkQueue = make(chan bool, 100)
+		go UpdateLatestLocationWithGeocoding(GeocodingWorkQueue)
+		go SubscribeMQTT(quit)
+		DoDatabaseMigrations(db, configuration.DatabaseMigrationsPath)
+	}
+	defer func() {
+		if db != nil {
+			err := db.Close()
+			if err != nil {
+				log.Fatalf("Error closing database: %v", err)
+			}
+		}
+	}()
 
-	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable", configuration.DbHost, configuration.DbUser, configuration.DbName)
+	//Get the router
+	gin.SetMode(gin.ReleaseMode)
+	router := gin.Default()
+	BuildRoutes(router)
+	log.Printf("Listening on port %d", configuration.Port)
+	err = manners.ListenAndServe(fmt.Sprintf(":%d", configuration.Port), router)
+	if err != nil {
+		log.Fatalf("Error starting server: %v", err)
+	}
+}
+
+func setupDatabase(host string, user string, name string) (*sql.DB, error) {
+	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable", host, user, name)
 	if configuration.DbPassword != "" {
 		connectionString = fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", configuration.DbHost, configuration.DbUser, configuration.DbName, configuration.DbPassword)
 	}
 
-	db, err = sql.Open("postgres", connectionString)
+	db, err := sql.Open("postgres", connectionString)
 
 	if err != nil {
 		log.Fatalf("Error connecting to database: %v", err)
@@ -142,27 +178,5 @@ func main() {
 	db.SetMaxOpenConns(configuration.MaxDBOpenConnections)
 	db.SetMaxIdleConns(1)
 	db.SetConnMaxLifetime(time.Hour)
-
-	GeocodingWorkQueue = make(chan bool, 100)
-	go UpdateLatestLocationWithGeocoding(GeocodingWorkQueue)
-	go SubscribeMQTT(quit)
-
-	DoDatabaseMigrations(db, configuration.DatabaseMigrationsPath)
-	defer func() {
-		err := db.Close()
-		if err != nil {
-			log.Fatalf("Error closing database: %v", err)
-		}
-	}()
-
-	//Get the router
-	gin.SetMode(gin.ReleaseMode)
-	router := gin.Default()
-
-	BuildRoutes(router)
-	log.Printf("Listening on port %d", configuration.Port)
-	err = manners.ListenAndServe(fmt.Sprintf(":%d", configuration.Port), router)
-	if err != nil {
-		log.Fatalf("Error starting server: %v", err)
-	}
+	return db, err
 }

@@ -19,7 +19,6 @@ func BuildRoutes(router *gin.Engine) {
 	})
 
 	router.POST("/search/", BleveSearchQuery)
-	router.POST("/search/index", BleveIndexDocs)
 	router.POST("/locator/", LocatorHandler)
 	router.GET("/location/", LocationHandler)
 	router.HEAD("/location/", LocationHeadHandler)

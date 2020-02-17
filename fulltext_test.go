@@ -4,107 +4,34 @@ import (
 	"github.com/blevesearch/bleve"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
+	"log"
 	"os"
-	"path/filepath"
 	"testing"
 )
 
 func TestAddingFilesToIndexAddsTheFilesToTheIndex(t *testing.T) {
-	indexTempDir, err := ioutil.TempDir("", "testindex")
-	defer os.RemoveAll(indexTempDir)
-	assert.Nil(t, err)
-	t.Logf("Index Tempdir: %v", indexTempDir)
-
-	tempDir, err := ioutil.TempDir("", "testprefix")
-	defer os.RemoveAll(tempDir)
-	assert.Nil(t, err)
-	t.Logf("Posts Tempdir: %v", tempDir)
-
-	firstPostDir := filepath.Join(tempDir, "post1", "_posts")
-	err = os.MkdirAll(firstPostDir, os.ModePerm)
-	assert.Nil(t, err)
-	t.Logf("Created %v", firstPostDir)
-
-	secondPostDir := filepath.Join(tempDir, "post2", "_posts")
-	err = os.MkdirAll(secondPostDir, os.ModePerm)
-	assert.Nil(t, err)
-	t.Logf("Created %v", secondPostDir)
-
-	assert.Nil(t, err)
-	_, err = os.Create(filepath.Join(firstPostDir, "first.md"))
-	assert.Nil(t, err)
-	_, err = os.Create(filepath.Join(secondPostDir, "second.md"))
-	assert.Nil(t, err)
-
-	mapping := bleve.NewIndexMapping()
-	index, err := bleve.New(indexTempDir, mapping)
-	assert.Nil(t, err)
-
-	err = addFilesToIndex(tempDir, index)
-	assert.Nil(t, err)
+	contentMap := make(map[string]string)
+	contentMap["toot"] = "Hi There"
+	contentMap["parp"] = "Tootle"
+	err, index := createSearchIndex(t, contentMap)
 
 	count, err := index.DocCount()
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(2), count)
 }
 
-func TestAddSingleFileToIndexAddsTheFileToTheIndex(t *testing.T) {
-	indexTempDir, err := ioutil.TempDir("", "testindex")
-	defer os.RemoveAll(indexTempDir)
-	assert.Nil(t, err)
-	t.Logf("Index Tempdir: %v", indexTempDir)
-
-	tempDir, err := ioutil.TempDir("", "testprefix")
-	defer os.RemoveAll(tempDir)
-	assert.Nil(t, err)
-	t.Logf("Posts Tempdir: %v", tempDir)
-
-	tempFile, err := ioutil.TempFile(tempDir, "testprefix1")
-	assert.Nil(t, err)
-
-	mapping := bleve.NewIndexMapping()
-	index, err := bleve.New(indexTempDir, mapping)
-	if err != nil {
-		panic(err)
-	}
-	assert.Nil(t, err)
-
-	err = addFileToIndex(tempFile.Name(), index)
-	assert.Nil(t, err)
-	count, err := index.DocCount()
-	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), count)
-}
-
 func TestSearchingIndexForFileContentReturnsResult(t *testing.T) {
-	indexTempDir, err := ioutil.TempDir("", "testindex")
-	defer os.RemoveAll(indexTempDir)
-	assert.Nil(t, err)
-	t.Logf("Index Tempdir: %v", indexTempDir)
+	contentMap := make(map[string]string)
+	contentMap["toot"] = `<!DOCTYPE html> <html lang="en"> <head> <meta charset="utf-8" /> <meta name="viewport" content="width=device-width, initial-scale=1" /> <meta name="google-site-verification" content="Sr-L2EMmHr-hc4npzb8p1f7zi9ew1Iev84ly519r1p4" /> <meta name="description" content="I write things about what I do here" /> <title>Multi-coloured Bike! :: growse.com</title> <link rel="alternate" title="RSS Feed" href="/feed.xml" type="application/rss+xml" /> <style rel="stylesheet">html{font-size:100%}html body{font-size:1rem;font-family:Andada,Georgia,serif;color:#aaa;padding:0;margin:0;height:100%;text-align:center;background-color:#333;line-height:1.625;-webkit-font-smoothing:antialiased}html body #container{background:#333;text-align:left;vertical-align:middle;margin:0;padding:0}html body #container a{text-decoration:none;color:#6684e1}html body #container a img{border:0}html body #container p{margin:.5rem 0}html body #container input{margin:0;padding:2px;color:#aaa;font-size:.8rem;border:1px solid #666;font-family:Open Sans,Trebuchet,Sans;background:#222}@media screen and (max-width:1023px){html body #container nav{display:none}}@media screen and (min-width:1024px){html body #container nav{position:fixed;float:left;width:200px;padding:0;height:100vh}html body #container nav ul{list-style-type:none;margin:0;padding:0}html body #container nav ul li{background:#111}html body #container nav ul li a{font-family:Open Sans,Trebuchet,Sans;font-size:.8rem;width:200px;display:table-cell;vertical-align:middle;height:3rem;text-overflow:ellipsis;padding:.2rem 1rem;border-top:1px solid #222}html body #container nav ul li a.here{background-color:#222;border:0}}@media screen and (max-width:767px){html body #container>header{display:none}}@media screen and (min-width:768px){html body #container>header{width:200px;font-weight:400;float:right}html body #container>header h1{text-align:center}html body #container>header h1 a{font-weight:400;font-family:Open Sans,Trebuchet,Sans;text-align:center;color:#f90}html body #container>header h2{text-align:center;font-family:Andada,Georgia,serif;font-size:1rem;font-weight:300;line-height:1rem}html body #container>header #social-container{text-align:center}html body #container>header #social-container>a svg.social-logo{pointer-events:all;margin:4px;width:24px;height:24px}html body #container>header #social-container>a svg.social-logo path.twitterpath{fill:hsla(0,0%,100%,.67)}html body #container>header #social-container>a svg.social-logo path.keybasepath{fill:#999}html body #container>header p{font-size:.7rem;text-align:center}html body #container>header div{text-align:center;margin:1em}html body #container>header #location p{font-family:Open Sans,Trebuchet,Sans;font-size:.7rem}}html body #container #content{height:100%;background-color:#222}html body #container #content article header{width:auto;height:auto;float:none;background:none;min-height:5rem}@media screen and (max-width:767px){html body #container #content article header h1{text-align:left;font-family:Open Sans,Trebuchet,Sans;margin:0 0 .5rem;font-size:2rem;color:#f90;font-weight:100}html body #container #content article header time.fancy{display:none}html body #container #content article header time.plain{display:block;font-size:.7rem}}@media screen and (min-width:768px){html body #container #content article header h1{text-align:left;font-family:Open Sans,Trebuchet,Sans;margin:0 0 1rem;font-size:2.5rem;color:#f90;font-weight:300}html body #container #content article header time.plain{display:none}html body #container #content article header time.fancy{display:block;margin:0 0 1rem 1rem;float:right;width:5rem;height:4rem}html body #container #content article header time.fancy p{background:#333;font-size:1rem;font-weight:400;font-family:Open Sans,Trebuchet,Sans;text-align:center;color:#aaa;text-transform:uppercase;line-height:1.5;margin:0;padding:0;border-radius:5px}html body #container #content article header time.fancy p span{color:#aaa;background:#444;font-size:1.2rem;line-height:1.2;font-weight:700;display:block;padding:0}html body #container #content article header time.fancy p span.year{border-radius:0 0 5px 5px;font-size:.85rem;line-height:15px;background:#333;color:#aaa;padding:3px 0;font-weight:400}}html body #container #content article pre code{font-family:Inconsolata,monospace;font-size:.8rem;line-height:1;border:1px solid #556;white-space:pre;overflow:auto;padding:5px;background:#223;display:block;margin:1em 0}html body #container #content article code{border:1px solid #556;padding:2px;font-family:Inconsolata,monospace;background:#223}html body #container #content article section{line-height:1.6em}html body #container #content article section img{width:auto;height:auto}html body #container #content article h2{font-family:Open Sans,Trebuchet,Sans}html body #container #content article img{max-width:100%}@media screen and (max-width:767px){html body #container #content{margin:0}}@media screen and (min-width:768px) and (max-width:1023px){html body #container #content{margin:0 200px 0 0}}@media screen and (min-width:1024px){html body #container #content{margin:0 200px}}@media screen and (max-width:767px){html body #container #content{padding:.5rem 1rem}}@media screen and (min-width:768px){html body #container #content{padding:2rem}}html body #container footer{font-size:.8rem;background-color:#333;padding:10px;text-align:right}</style> <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png" /> <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png" /> <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png" /> <link rel="prefetch" href="https://www.growse.com/location/" /> <link rel="prefetch" href="/posts.json" /> <link rel="preload" as="script" href="https://www.growse.com/location/" /> <link rel="preload" as="script" href="/posts.json" /> <link rel="prefetch" href="/assets/packed/css/main.c3657b7eecec92cf95d9.css" /> <link rel="preload" as="style" href="/assets/packed/css/main.c3657b7eecec92cf95d9.css" /> <link rel="prefetch" href="/assets/packed/main.b0d0efc001ae70d59f7a.js" /> <link rel="preload" as="script" href="/assets/packed/main.b0d0efc001ae70d59f7a.js" /> <link rel="prefetch" href="/assets/packed/runtime.e9b551bceca7becd8de0.js" /> <link rel="preload" as="script" href="/assets/packed/runtime.e9b551bceca7becd8de0.js" /> <meta name="msapplication-TileColor" content="#ff9000" /> <meta name="theme-color" content="#ff9000" /> <meta name="twitter:card" content="summary" /> <meta name="twitter:site" content="@growse" /> <meta name="twitter:creator" content="@growse" /> <meta name="twitter:url" content="https://www.growse.com/2020/02/14/multicoloured-bike.html" /> <meta name="twitter:title" content="Multi-coloured Bike!" /> <meta name="twitter:description" content="I wrote a thing" /> <meta name="twitter:image" content="https://www.growse.com/assets/img/apple-touch-icon.png" /> <meta name="twitter:dnt" content="on" /> <meta name="pinterest" content="nopin" /> </head> <body> <div id="container" itemtype="http://schema.org/Blog" itemscope> <header> <h1 id="titletext"><a href="/" title="Home">growse.com</a></h1> <h2 id="about">I write things here.</h2> <!-- <div id="search">--> <!-- <form action="/search.html" method="get">--> <!-- <fieldset>--> <!-- <input placeholder="Search for things" id="searchbox" type="text" name="a" class="searchtext"/>--> <!-- </fieldset>--> <!-- </form>--> <!-- </div>--> <div id="social-container"> <a href="https://twitter.com/growse"> <svg class="social-logo" version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 400 400" style="enable-background:new 0 0 400 400;" xml:space="preserve"> <g> <path class="twitterpath" d="M350,400H50c-27.6,0-50-22.4-50-50V50C0,22.4,22.4,0,50,0h300c27.6,0,50,22.4,50,50v300 C400,377.6,377.6,400,350,400z M153.6,301.6c94.3,0,145.9-78.2,145.9-145.9c0-2.2,0-4.4-0.1-6.6c10-7.2,18.7-16.3,25.6-26.6 c-9.2,4.1-19.1,6.8-29.5,8.1c10.6-6.3,18.7-16.4,22.6-28.4c-9.9,5.9-20.9,10.1-32.6,12.4c-9.4-10-22.7-16.2-37.4-16.2 c-28.3,0-51.3,23-51.3,51.3c0,4,0.5,7.9,1.3,11.7c-42.6-2.1-80.4-22.6-105.7-53.6c-4.4,7.6-6.9,16.4-6.9,25.8 c0,17.8,9.1,33.5,22.8,42.7c-8.4-0.3-16.3-2.6-23.2-6.4c0,0.2,0,0.4,0,0.7c0,24.8,17.7,45.6,41.1,50.3c-4.3,1.2-8.8,1.8-13.5,1.8 c-3.3,0-6.5-0.3-9.6-0.9c6.5,20.4,25.5,35.2,47.9,35.6c-17.6,13.8-39.7,22-63.7,22c-4.1,0-8.2-0.2-12.2-0.7 C97.7,293.1,124.7,301.6,153.6,301.6"/> </g> </svg> </a> <a href="https://keybase.io/growse"> <svg class="social-logo" version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 71 76.3" style="enable-background:new 0 0 71 76.3;" xml:space="preserve"> <g transform="translate(-241.11756,-377.8123)"><path class="keybasepath" d="M247.8,451.8c-0.6-1.3-1.4-3.1-1.8-4l-0.6-1.7l-2,2.2l-2,2.2 l-0.2-4.2c-0.3-6,0.2-12.2,1.2-16.6c2.3-9.8,9.5-18.7,18.8-23.4l2.1-1l-0.5-1.5c-0.3-0.8-0.6-2.5-0.7-3.6l-0.2-2.1l-2.1-0.2 c-3.2-0.3-4.9-1.2-6-3.5c-0.6-1.2-0.6-1.4-0.4-4.6c0.2-4.2,0.5-5.1,1.8-6.5c1.6-1.8,2.7-2.1,6.7-1.9c2.9,0.2,3.5,0.3,4.8,0.9 c0.8,0.4,1.5,0.8,1.6,0.8c0.1,0,1-1.1,2.1-2.6l1.9-2.7l1.2,0.7c0.7,0.4,1.5,0.9,1.9,1.1l0.7,0.4l-0.6,1.5c-0.3,0.8-0.7,2.2-0.8,2.9 l-0.2,1.4l1.7,0.2c6.1,0.6,10.7,4.3,12.4,9.9c0.5,1.8,0.5,5.3,0,7c-0.5,1.6-0.5,1.7-0.1,1.7c0.7,0,5.4,2.3,7.3,3.5 c3.7,2.4,8,6.6,10.4,10.2c4.5,6.7,6.4,14,5.6,22c-0.4,4.8-1.3,8.6-2.9,12.3l-0.6,1.4l-2.5,0l-2.5,0l1.2-2.4 c1.3-2.6,2.3-6.2,2.8-9.4c0.3-2.2,0.4-8.2,0.1-9.3l-0.2-0.7l-1.3,1.4c-3.2,3.5-7.9,4.5-14.2,2.8c-5.4-1.4-7.6-1.7-12.7-1.7 c-3.9,0-5.2,0.1-7.3,0.6c-5.8,1.3-9.9,3.2-15.6,7.3c-2.1,1.5-3.8,2.7-3.9,2.7c-0.1,0,0.2-1,0.6-2.3c0.4-1.3,1.1-3.4,1.5-4.8 l0.8-2.5l-0.9,0.9c-0.5,0.5-1.9,1.9-3.1,3.2l-2.1,2.3l0.5,1.9c0.6,2.5,2,5.6,3.5,7.9c0.6,1,1.1,1.8,1.1,1.9s-1.2,0.1-2.6,0.1h-2.6 L247.8,451.8L247.8,451.8z M256.6,427.6c4.8-5.1,8.7-9.2,8.8-9.2c0.1,0.1-0.4,1.6-0.9,3.3c-3.3,10.4-4,12.4-3.9,12.5 c0,0,1.2-0.4,2.5-0.9c8.5-3.7,18.4-4.2,28.9-1.4c4.7,1.2,6.5,1.2,8.8,0c1.3-0.7,1.8-1.1,2.4-2.1c1.1-1.7,1.2-4.1,0.5-6.3 c-1.7-4.8-8.3-11-14.5-13.7c-3.2-1.4-3.4-1.4-4.1-0.7l-0.6,0.6l2.6,3.2c1.4,1.7,2.9,3.6,3.1,4.1c0.6,1.2,0.7,3.1,0.1,4.3 c-0.8,1.7-3.2,2.9-5.1,2.5c-0.8-0.2-1.1-0.1-1.9,0.5c-2.2,1.6-4.6,1.2-6.6-1.2c-1.6-1.8-2-2.7-2.1-4.5c0-0.9-0.3-2-0.5-2.4 c-0.3-0.6-0.4-1.3-0.4-2.2l0.1-1.4l-1.3-0.3c-1.8-0.5-3.9-1.5-5.1-2.4c-0.6-0.4-1.1-0.8-1.3-0.8s-1.5,0.6-2.9,1.3 c-9.7,5-16,14.3-17,24.8c-0.1,1-0.2,2.3-0.3,2.8l-0.1,0.9l1.1-1.1C247.4,437.3,251.8,432.7,256.6,427.6L256.6,427.6z M282.5,420.2 c0.9-0.7,1.7-1.3,1.9-1.3c0.1,0,0.4,0.3,0.7,0.7c0.5,0.8,1.4,0.8,1.8,0.1c0.3-0.5,0.3-0.6-5.6-7.8c-3.5-4.3-4.2-5-4.7-5 c-1.2,0.1-0.9,1,1,3.3l1.8,2.2l-1,0.8c-1.1,1-1.2,1.2-0.5,1.8c0.5,0.5,0.6,0.4,1.6-0.3l1.1-0.7l0.7,0.6c0.4,0.3,0.6,0.8,0.6,0.9 c0,0.2-0.8,0.9-1.7,1.7c-0.9,0.7-1.6,1.5-1.6,1.7c0,0.3,0.5,1.1,1.4,2.2C280.3,421.7,280.8,421.5,282.5,420.2L282.5,420.2z M272.2,406c0.6-1.8,2.6-3.2,4.6-3.2c1.1,0,2.7,0.9,3.8,2.1l1,1.2l0.9-1.1c2.5-2.8,2.8-6.7,0.8-10.1c-1.5-2.5-4.3-4-8.2-4.4 c-2.1-0.2-2.6-0.4-3.7-1.5l-0.8-0.8l-0.4,0.6c-0.8,1.2-2.5,5.1-3,6.6c-0.7,2.3-0.4,5.9,0.5,7.7c0.9,1.7,3.3,4,4,3.7 C271.8,406.9,272,406.5,272.2,406L272.2,406z M263.3,392.4c0.2-0.5,0.7-1.8,1.2-2.8c0.5-1,0.9-2,0.9-2.3c0-0.9-1-1.3-3.7-1.5 c-2.4-0.2-2.6-0.1-3.1,0.4c-0.4,0.4-0.6,0.9-0.6,1.6c0,0.6-0.1,1.7-0.2,2.6c-0.2,2.1,0.1,2.5,2.2,2.8 C263.1,393.4,263,393.4,263.3,392.4z M260.2,390c0-1.7,0.2-1.9,1.6-1.9h1.3v1.4v1.4h-1.4h-1.4V390z M266.5,448.3 c-0.6-0.6-0.8-1-0.8-2c0-1.9,1.1-3,2.9-3c1.7,0,2.9,1.2,2.9,2.9c0,1.8-1.1,2.8-3,2.9C267.5,449.1,267.1,448.9,266.5,448.3 L266.5,448.3z M285.8,448.6c-2.3-1.8-1.1-5.3,1.8-5.3c1.8,0,2.8,1.1,2.9,3c0,1.1-0.1,1.4-0.8,2s-1,0.8-2,0.8 C286.8,449.1,286.2,448.9,285.8,448.6L285.8,448.6z"/></g></svg> </a> </div> <div id="location"> </div> </header> <nav id="postlist"> <ul id="articlenav"> </ul> </nav> <div id="content"> <article itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting"> <header> <time class="fancy" itemprop="datePublished" datetime="2020-02-14"> <p>Feb <span class="day">14</span><span class="year">2020</span></p></time> <h1 itemprop="name headline">Multi-coloured Bike!</h1> <time class="plain" itemprop="datePublished" datetime="2020-02-14"> 14 February 2020 </time> </header> <section itemprop="articleBody"> <p><a href="/2009/09/28/brrrm-brrrrrrrrrrrrrmmmmmm.html">Ages ago</a> I started riding a motorbike to work, because I lived in/near London and it’s infinitely preferable to the tube. This was a Very Good Decision (except for the times when drivers decided that I didn’t exist and tried to occupy the same part of space/time as me). Pretty much all the bikes I then bought (and broke) mostly existed for the purpose of getting me to work and back.</p> <p>At some point later, I moved to “The North”, and my need to commute dropped pretty dramatically. I ended up with a <a href="https://www.superbike.co.uk/article/ducati-monster-evo-retro-review">Ducati Monster 1100 Evo</a> wihch had always been on my “I’d like to own that one day” list. Typically Italian, it was a bit eccentric and quite noisy. It had a tiny fuel tank and no fuel gauge, so any journey was a bit of a gamble. Presumably the Italian approach is to see running out of fuel as an <em>opportunity</em> to… drink espresso and meet nice people? I don’t know. It was very keen to tell me the voltage across the alternator though, so presumably that’s somehow more important than knowing how much actual go-juice you had left. Also, the servicing costs are hilarious - you hear the myths about Ducati V-twin engines expensively needing their belts doing every two years and think “Surely you mean <em>old</em> ones. The modern ones are sensible, right?”. No - even the recent ones need a 7-hour service every two years. Ouch.</p> <p>Other than that, a joy to ride. Lightweight, nimble, simple and fun. The last of the air-cooled monsters, I’m sure the newer ones are “very good”, but seem overly complex.</p> <p>But suddenly I need to do some actual commuting again, involving some bits of motorway. So the Monster had to go, and I ended up with this. Behold!</p> <p><img src="/assets/img/png-transparent.png" alt="BMW S1000R" class="lazyload" data-src="/assets/img/2020-02-14-multicoloured-bike/bmw-s1000r.jpg" width="806" height="605" /></p> <noscript><img src="/assets/img/2020-02-14-multicoloured-bike/bmw-s1000r.jpg" alt="BMW S1000R" width="806" height="605" /></noscript> <p>Yet another BMW! (Specifically, an S1000R).</p> <p>This has also been on my “I’d really like on of these at some point”. Having done 180 miles on the motorway after picking it up, I can confidently say that it does motorways “pretty well”. It’s got heated grips, cruise control (!), a sensible “oh no it’s raining please turn yourself down” mode, and is generally a nice place to be. On the flip side, it’s got 160bhp, fancy electronic damping and a magic dongle that basically turns on track mode, so it’s good fun at the weekend too. I can already confidently assert that the traction control works.</p> <p>I’ve already drawn up a far-too-large list of things to buy for it.</p> </section> </article> </div> <footer> Almost everything (c) 2002-2020 <span itemprop="author" itemscope itemtype="http://schema.org/Person"> <span itemprop="name">Andrew Rowson</span></span>. If you break anything because of something you read here, that's your own problem. </footer> </div> <script type="text/javascript"> const post_url = '/2020/02/14/multicoloured-bike.html'; </script> <link rel="stylesheet" href="/assets/packed/css/main.c3657b7eecec92cf95d9.css" /> <script src="/assets/packed/main.b0d0efc001ae70d59f7a.js" async></script> <script src="/assets/packed/runtime.e9b551bceca7becd8de0.js" async></script> </body> </html>`
+	err, index := createSearchIndex(t, contentMap)
 
-	content := "title:content\n---\ncontent"
-	tempDir, err := ioutil.TempDir("", "testprefix")
-	defer os.RemoveAll(tempDir)
-	assert.Nil(t, err)
-
-	tempFile, err := ioutil.TempFile(tempDir, "testprefix1")
-	assert.Nil(t, err)
-
-	ioutil.WriteFile(tempFile.Name(), []byte(content), os.ModePerm)
-
-	mapping := bleve.NewIndexMapping()
-	index, err := bleve.New(indexTempDir, mapping)
-	assert.Nil(t, err)
-
-	err = addFileToIndex(tempFile.Name(), index)
-	assert.Nil(t, err)
-	count, err := index.DocCount()
-	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), count)
-
-	searchForm := SearchForm{SearchTerm: "content"}
+	searchForm := SearchForm{SearchTerm: "track motorway"}
 	searchResult, err := searchIndexForThings(index, searchForm)
-
+	if searchResult != nil && searchResult.Hits.Len() > 0 {
+		log.Printf("Search result title: %v", searchResult.Hits[0].Fields["title"])
+		log.Printf("Search result id: %v", searchResult.Hits[0].ID)
+		log.Printf("Search result id: %v", searchResult.Hits[0].Fragments)
+	}
 	assert.Nil(t, err)
 	assert.Equal(t, 0, searchResult.Status.Failed)
 	assert.Equal(t, 1, searchResult.Status.Successful)
@@ -112,35 +39,34 @@ func TestSearchingIndexForFileContentReturnsResult(t *testing.T) {
 	assert.Equal(t, 1, len(searchResult.Hits))
 }
 
-func TestSearchingIndexForNonFileContentReturnsResult(t *testing.T) {
-	indexTempDir, err := ioutil.TempDir("", "testindex")
-	defer os.RemoveAll(indexTempDir)
-	assert.Nil(t, err)
-	t.Logf("Index Tempdir: %v", indexTempDir)
+func TestSearchingIndexForHTMLTagContentReturnsNoResults(t *testing.T) {
+	contentMap := make(map[string]string)
+	contentMap["toot"] = "The quick <parpter>brown</parpter> fox jumped over the lazy dog"
+	err, index := createSearchIndex(t, contentMap)
 
-	content := "content"
+	searchForm := SearchForm{SearchTerm: "parpter"}
+	searchResult, err := searchIndexForThings(index, searchForm)
+	assert.Nil(t, err)
+	assert.Equal(t, 0, searchResult.Status.Failed)
+	assert.Equal(t, 1, searchResult.Status.Successful)
+	assert.Equal(t, 0, len(searchResult.Status.Errors))
+	assert.Equal(t, 0, len(searchResult.Hits))
+}
+
+func createSearchIndex(t *testing.T, contentMap map[string]string) (error, bleve.Index) {
 	tempDir, err := ioutil.TempDir("", "testprefix")
 	defer os.RemoveAll(tempDir)
 	assert.Nil(t, err)
 
-	tempFile, err := ioutil.TempFile(tempDir, "testprefix1")
+	index, err := createInMemoryHTMLBlogPostBleveIndex()
 	assert.Nil(t, err)
 
-	ioutil.WriteFile(tempFile.Name(), []byte(content), os.ModePerm)
-
-	mapping := bleve.NewIndexMapping()
-	index, err := bleve.New(indexTempDir, mapping)
-	assert.Nil(t, err)
-
-	err = addFileToIndex(tempFile.Name(), index)
-	assert.Nil(t, err)
-	count, err := index.DocCount()
-	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), count)
-
-	query := bleve.NewMatchQuery("not")
-	searchRequest := bleve.NewSearchRequest(query)
-	searchResult, err := index.Search(searchRequest)
-	assert.Nil(t, err)
-	assert.Equal(t, uint64(0), searchResult.Total)
+	for fileName, htmlContent := range contentMap {
+		tempFile, err := ioutil.TempFile(tempDir, fileName)
+		assert.Nil(t, err)
+		_ = ioutil.WriteFile(tempFile.Name(), []byte(htmlContent), os.ModePerm)
+		err = addFileToIndex(tempFile.Name(), index)
+		assert.Nil(t, err)
+	}
+	return err, index
 }

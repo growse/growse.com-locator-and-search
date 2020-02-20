@@ -131,7 +131,7 @@ func main() {
 
 	// Database time
 	if configuration.DbHost != "" {
-		db, err := setupDatabase(configuration.DbHost, configuration.DbUser, configuration.DbName)
+		db, err = setupDatabase(configuration.DbHost, configuration.DbUser, configuration.DbName)
 		if err != nil {
 			log.Fatalf("Error setting up database")
 		}
@@ -139,6 +139,8 @@ func main() {
 		go UpdateLatestLocationWithGeocoding(GeocodingWorkQueue)
 		go SubscribeMQTT(quit)
 		DoDatabaseMigrations(db, configuration.DatabaseMigrationsPath)
+	} else {
+		log.Print("No database host specified, disabling")
 	}
 	defer func() {
 		if db != nil {

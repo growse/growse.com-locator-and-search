@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/grokify/html-strip-tags-go"
 	"github.com/pkg/errors"
+	"github.com/radovskyb/watcher"
 	"io/ioutil"
 	"log"
 	"os"
@@ -31,17 +32,64 @@ func (*BlogPost) Type() string {
 
 var bleveIndex bleve.Index
 
-func BleveInit(webroot string, pathPattern *regexp.Regexp) {
+func BleveInit(webroot string, pathPattern *regexp.Regexp) chan bool {
 	if _, err := os.Stat(webroot); err == nil {
 		index, err := createInMemoryHTMLBlogPostBleveIndex()
 		if err != nil {
 			log.Fatalf("Error opening index: %v", err)
 		}
-		addHtmlFilesToIndex(webroot, pathPattern, index)
+		addHtmlFilesToIndex(webroot, pathPattern, &index)
+		setupChangeDetector(webroot, pathPattern, &index)
 		bleveIndex = index
+
 	} else {
 		log.Print("No webroot provided for search")
 	}
+	return nil
+}
+
+func receiveFileSystemWatcherEvents(fileSystemWatcher *watcher.Watcher, index *bleve.Index, webroot string) {
+	for {
+		select {
+		case event := <-fileSystemWatcher.Event:
+			if !event.IsDir() {
+				if event.Op == watcher.Create || event.Op == watcher.Write {
+					log.Printf("%v change event: %v", event.Path, event.Op)
+					if err := addFileToIndex(webroot, event.Path, index); err != nil {
+						log.Printf("Error adding %v to index on change: %v", event.Path, err)
+					}
+				} else if event.Op == watcher.Remove {
+					if _, err := os.Stat(event.Path); err != nil {
+						log.Printf("Removing %v from index", event.Path)
+						(*index).Delete(getUrlFromFilePath(webroot, event.Path))
+					}
+				}
+			}
+		case err := <-fileSystemWatcher.Error:
+			log.Fatalln(err)
+		case <-fileSystemWatcher.Closed:
+			log.Print("FS watcher closed")
+			return
+		}
+	}
+}
+
+func setupChangeDetector(webroot string, pattern *regexp.Regexp, index *bleve.Index) *watcher.Watcher {
+	fileSystemWatcher := watcher.New()
+	err := fileSystemWatcher.AddRecursive(webroot)
+	if err != nil {
+		log.Printf("Error adding %v to watcher: %v", webroot, err)
+	}
+	fileSystemWatcher.FilterOps(watcher.Write, watcher.Create, watcher.Remove)
+	fileSystemWatcher.AddFilterHook(watcher.RegexFilterHook(pattern, true))
+	go receiveFileSystemWatcherEvents(fileSystemWatcher, index, webroot)
+	go func() {
+		err = fileSystemWatcher.Start(1 * time.Second)
+		if err != nil {
+			log.Printf("Could not start filesystem watcher: %v", err)
+		}
+	}()
+	return fileSystemWatcher
 }
 
 func buildIndexMapping() (*mapping.IndexMappingImpl, error) {
@@ -71,7 +119,7 @@ func createInMemoryHTMLBlogPostBleveIndex() (bleve.Index, error) {
 	return bleveIndex, err
 }
 
-func addHtmlFilesToIndex(sourceLocation string, regexPattern *regexp.Regexp, index bleve.Index) {
+func addHtmlFilesToIndex(sourceLocation string, regexPattern *regexp.Regexp, index *bleve.Index) {
 	err := filepath.Walk(sourceLocation, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			log.Printf("Error: %v", err)
@@ -87,12 +135,12 @@ func addHtmlFilesToIndex(sourceLocation string, regexPattern *regexp.Regexp, ind
 	if err != nil {
 		log.Printf("Error walking the webroot: %v", err)
 	} else {
-		count, _ := index.DocCount()
+		count, _ := (*index).DocCount()
 		log.Printf("Indexing complete. %v items added", count)
 	}
 }
 
-func addFileToIndex(webroot string, filePath string, index bleve.Index) error {
+func addFileToIndex(webroot string, filePath string, index *bleve.Index) error {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return errors.New("file does not exist")
 	}
@@ -101,13 +149,17 @@ func addFileToIndex(webroot string, filePath string, index bleve.Index) error {
 		log.Printf("Error reading file: %v", err)
 		return err
 	}
+	documentId := getUrlFromFilePath(webroot, filePath)
+	if _, err := (*index).Document(documentId); err == nil {
+		(*index).Delete(documentId)
+	}
 
 	data, err := extractBlogPostFromHTML(contentBytes)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("Unable to create indexable content from %v", filePath))
 	}
 	// index some data
-	err = index.Index(getUrlFromFilePath(webroot, filePath), data)
+	err = (*index).Index(documentId, data)
 	if err != nil {
 		return err
 	}

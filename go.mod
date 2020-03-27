@@ -20,7 +20,7 @@ require (
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect
 	github.com/fsnotify/fsnotify v1.4.9
-	github.com/gin-gonic/gin v1.6.1
+	github.com/gin-gonic/gin v1.6.2
 	github.com/golang-migrate/migrate/v4 v4.10.0
 	github.com/grokify/html-strip-tags-go v0.0.0-20190921062105-daaa06bf1aaf
 	github.com/jmhodges/levigo v0.0.0-20161115193449-c42d9e0ca023 // indirect

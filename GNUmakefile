@@ -27,7 +27,8 @@ test: $(TEST_COVERAGE)
 
 $(TEST_REPORT): $(GOPATH)/bin/go-junit-report
 	mkdir -p test-reports
-	go test -cover -covermode=count -coverprofile=test-reports/coverprofile -v | $(GOPATH)/bin/go-junit-report > $(TEST_REPORT)
+	go test -cover -covermode=count -coverprofile=test-reports/coverprofile -v > testout
+	cat testout | $(GOPATH)/bin/go-junit-report > $(TEST_REPORT)
 
 $(TEST_COVERAGE): $(TEST_REPORT)
 	go tool cover -html=test-reports/coverprofile -o $(TEST_COVERAGE)

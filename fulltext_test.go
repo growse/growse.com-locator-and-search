@@ -67,7 +67,7 @@ func createSearchIndex(t *testing.T, contentMap map[string]string) (error, bleve
 		tempFile, err := ioutil.TempFile(tempDir, fileName)
 		assert.Nil(t, err)
 		_ = ioutil.WriteFile(tempFile.Name(), []byte(htmlContent), os.ModePerm)
-		err = addFileToIndex("", tempFile.Name(), index)
+		err = addFileToIndex("", tempFile.Name(), &index)
 		assert.Nil(t, err)
 	}
 	return err, index

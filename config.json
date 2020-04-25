@@ -9,6 +9,4 @@
   "geocodeApiUrl": "",
   "port": 3030,
   "production": false,
-  "staticPath": "static",
-  "templatePath": "templates"
 }

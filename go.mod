@@ -2,7 +2,7 @@ module github.com/growse/www.growse.com
 
 require (
 	github.com/RoaringBitmap/roaring v0.4.21 // indirect
-	github.com/antchfx/htmlquery v1.2.2
+	github.com/antchfx/htmlquery v1.2.3
 	github.com/antchfx/xpath v1.1.4 // indirect
 	github.com/blevesearch/bleve v0.9.0
 	github.com/blevesearch/blevex v0.0.0-20180227211930-4b158bb555a3 // indirect

@@ -26,7 +26,7 @@ require (
 	github.com/grokify/html-strip-tags-go v0.0.0-20190921062105-daaa06bf1aaf
 	github.com/jmhodges/levigo v0.0.0-20161115193449-c42d9e0ca023 // indirect
 	github.com/kpawlik/geojson v0.0.0-20171201195549-1a4f120c6b41
-	github.com/lib/pq v1.5.0
+	github.com/lib/pq v1.5.1
 	github.com/mailgun/mailgun-go v1.1.1
 	github.com/martinlindhe/unit v0.0.0-20180817222220-284ab7627fae
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect

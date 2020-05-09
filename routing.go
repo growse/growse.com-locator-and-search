@@ -11,7 +11,7 @@ func BuildRoutes(router *gin.Engine) {
 	{
 		authorized.GET("ping", PingHandler)
 		authorized.GET("where/linestring/:year/", WhereLineStringHandler)
-		api := router.Group("api/0")
+		api := router.Group("location/api/0")
 		{
 			api.GET("list", OTListUserHandler)
 		}

@@ -9,9 +9,9 @@ func BuildRoutes(router *gin.Engine) {
 	authorized := router.Group("/auth/")
 	authorized.Use(AuthRequired())
 	{
-		authorized.GET("ping", PingHandler)
+		authorized.GET("", PingHandler)
 		authorized.GET("where/linestring/:year/", WhereLineStringHandler)
-		api := router.Group("location/api/0")
+		api := authorized.Group("location/api/0")
 		{
 			api.GET("list", OTListUserHandler)
 		}

@@ -12,7 +12,6 @@ import (
 
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
 		cookie, err := c.Request.Cookie("auth")
 		ok := false
 		log.Printf("Supplied auth cookie: %v", cookie)

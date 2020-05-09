@@ -118,5 +118,45 @@ func LocationHeadHandler(c *gin.Context) {
 }
 
 func OTListUserHandler(c *gin.Context) {
-	c.JSON(200, []string{"growse"})
+	c.JSON(200, gin.H{
+		"results": []string{"growse"},
+	})
+}
+
+type OTPos struct {
+	tst   int64
+	acc   float32
+	_type string
+	alt   int
+	lon   float64
+	vac   int
+	vel   int
+	lat   float64
+	addr  string
+}
+
+func OTLastPosHandler(c *gin.Context) {
+	location, err := GetLastLoction()
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	if location == nil {
+		c.String(500, "No location found")
+		return
+	}
+	last := OTPos{
+		tst:   location.DeviceTimestampAsInt,
+		acc:   location.Accuracy,
+		_type: "location",
+		alt:   0,
+		lat:   location.Latitude,
+		lon:   location.Longitude,
+		vel:   0,
+		vac:   0,
+		addr:  location.Geocoding,
+	}
+	c.JSON(200, []OTPos{
+		last,
+	})
 }

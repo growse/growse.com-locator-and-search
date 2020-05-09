@@ -1,6 +1,9 @@
 {
+  "oAuth2CallBackUrl": "http://localhost:3030/oauth2callback",
+  "clientID": "887447903183-eo28kl30eqjqod2hacdgcm6dlurc8itl.apps.googleusercontent.com",
+  "clientSecret": "",
   "cpuProfile": "pprof.cpu",
-  "dbHost": "/var/run/postgresql",
+  "dbHost": "",
   "dbName": "www_growse_com",
   "dbPassword": "",
   "dbUser": "growse",
@@ -8,5 +11,5 @@
   "defaultCacheExpiry": 600000000000,
   "geocodeApiUrl": "",
   "port": 3030,
-  "production": false,
+  "production": false
 }

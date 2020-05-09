@@ -16,10 +16,11 @@ func BuildRoutes(router *gin.Engine) {
 			api.GET("list", OTListUserHandler)
 		}
 	}
-	
+
 	noauthapi := router.Group("location/api/0")
 	{
 		noauthapi.GET("list", OTListUserHandler)
+		noauthapi.GET("last",OTLastPosHandler)
 	}
 
 	router.GET("/oauth2callback", OauthCallback)

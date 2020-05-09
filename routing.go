@@ -21,6 +21,7 @@ func BuildRoutes(router *gin.Engine) {
 	{
 		noauthapi.GET("list", OTListUserHandler)
 		noauthapi.GET("last",OTLastPosHandler)
+		noauthapi.GET("locations",OTLocationsHandler)
 	}
 
 	router.GET("/oauth2callback", OauthCallback)

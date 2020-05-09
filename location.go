@@ -34,6 +34,26 @@ func GetLastLoction() (*Location, error) {
 	return &location, err
 }
 
+func GetLocationsBetweenDates(from time.Time, to time.Time) (*[]Location, error) {
+	defer timeTrack(time.Now())
+	rows, err := db.Query("select geocoding, ST_Y(ST_AsText(point)),ST_X(ST_AsText(point)),devicetimestamp from locations where geocoding is not null and devicetimestamp>$1 and devicetimestamp<$2 order by devicetimestamp desc", from, to)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var locations []Location
+	for rows.Next() {
+		var location Location
+		err := rows.Scan(&location.Geocoding, &location.Latitude, &location.Longitude, &location.Timestamp)
+		if err != nil {
+			return nil, err
+		}
+		locations = append(locations, location)
+	}
+	return &locations, nil
+
+}
+
 /*
 In miles.
 */
@@ -159,4 +179,46 @@ func OTLastPosHandler(c *gin.Context) {
 	c.JSON(200, []OTPos{
 		last,
 	})
+}
+
+func OTLocationsHandler(c *gin.Context) {
+	from := c.DefaultQuery("from", time.Now().AddDate(0, 0, -1).Format(time.RFC3339))
+	to := c.DefaultQuery("to", time.Now().Format(time.RFC3339))
+	fromTime, err := time.Parse(time.RFC3339, from)
+
+	if err != nil {
+		c.String(500, fmt.Sprintf("Invalid from time %v", from))
+		return
+	}
+	toTime, err := time.Parse(time.RFC3339, to)
+	if err != nil {
+		c.String(500, fmt.Sprintf("Invalid to time %v", to))
+		return
+	}
+
+	locations, err := GetLocationsBetweenDates(fromTime, toTime)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	if locations == nil {
+		c.String(500, "No locations found")
+		return
+	}
+	var otpos []OTPos
+	for _, location := range *locations {
+		pos := OTPos{
+			tst:   location.DeviceTimestampAsInt,
+			acc:   location.Accuracy,
+			_type: "location",
+			alt:   0,
+			lat:   location.Latitude,
+			lon:   location.Longitude,
+			vel:   0,
+			vac:   0,
+			addr:  location.Geocoding,
+		}
+		otpos = append(otpos, pos)
+	}
+	c.JSON(200, otpos)
 }

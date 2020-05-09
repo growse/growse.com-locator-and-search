@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kpawlik/geojson"
 	"github.com/martinlindhe/unit"
+	"log"
 	"strconv"
 	"time"
 )
@@ -30,7 +31,7 @@ type Location struct {
 func GetLastLoction() (*Location, error) {
 	var location Location
 	defer timeTrack(time.Now())
-	err := db.QueryRow("select geocoding, ST_Y(ST_AsText(point)),ST_X(ST_AsText(point)),devicetimestamp from locations where geocoding is not null order by devicetimestamp desc limit 1").Scan(&location.Geocoding, &location.Latitude, &location.Longitude, &location.Timestamp)
+	err := db.QueryRow("select geocoding, ST_Y(ST_AsText(point)),ST_X(ST_AsText(point)),devicetimestamp from locations where geocoding is not null order by devicetimestamp desc limit 1").Scan(&location.Geocoding, &location.Latitude, &location.Longitude, &location.DeviceTimestamp)
 	return &location, err
 }
 
@@ -44,7 +45,7 @@ func GetLocationsBetweenDates(from time.Time, to time.Time) (*[]Location, error)
 	var locations []Location
 	for rows.Next() {
 		var location Location
-		err := rows.Scan(&location.Geocoding, &location.Latitude, &location.Longitude, &location.Timestamp)
+		err := rows.Scan(&location.Geocoding, &location.Latitude, &location.Longitude, &location.DeviceTimestamp)
 		if err != nil {
 			return nil, err
 		}
@@ -156,6 +157,7 @@ type OTPos struct {
 }
 
 func (location Location) toOT() OTPos {
+	log.Printf("%v",location.DeviceTimestamp)
 	return OTPos{
 		Tst:  location.DeviceTimestamp.Unix(),
 		Acc:  location.Accuracy,

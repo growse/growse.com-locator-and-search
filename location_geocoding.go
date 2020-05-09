@@ -62,12 +62,12 @@ func (location *Location) Name() string {
 
 }
 
-func (loc *Location) GetGeocoding() string {
+func (location *Location) GetGeocoding() string {
 	if configuration.GeocodeApiURL == "" {
 		InternalError(errors.New("Geocoding API should not be blank"))
 		return ""
 	}
-	geocodingUrl := fmt.Sprintf(configuration.GeocodeApiURL, loc.Latitude, loc.Longitude)
+	geocodingUrl := fmt.Sprintf(configuration.GeocodeApiURL, location.Latitude, location.Longitude)
 	start := time.Now()
 	response, err := http.Get(geocodingUrl)
 	duration := time.Since(start)

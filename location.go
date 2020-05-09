@@ -186,7 +186,7 @@ func OTLastPosHandler(c *gin.Context) {
 }
 
 func OTLocationsHandler(c *gin.Context) {
-	const iso8061fmt = "2006-01-02T15:04:05Z0700"
+	const iso8061fmt = "2006-01-02T15:04:05"
 	from := c.DefaultQuery("from", time.Now().AddDate(0, 0, -1).Format(iso8061fmt))
 	to := c.DefaultQuery("to", time.Now().Format(iso8061fmt))
 	fromTime, err := time.Parse(iso8061fmt, from)

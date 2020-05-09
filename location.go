@@ -155,7 +155,19 @@ type OTPos struct {
 	addr  string
 }
 
- func  toOT() (OTPos) {}
+ func (location Location) toOT() OTPos {
+ 	return OTPos{
+		tst:   location.DeviceTimestampAsInt,
+		acc:   location.Accuracy,
+		_type: "location",
+		alt:   0,
+		lat:   location.Latitude,
+		lon:   location.Longitude,
+		vel:   0,
+		vac:   0,
+		addr:  location.Geocoding,
+	}
+ }
 
 func OTLastPosHandler(c *gin.Context) {
 	location, err := GetLastLoction()
@@ -167,17 +179,7 @@ func OTLastPosHandler(c *gin.Context) {
 		c.String(500, "No location found")
 		return
 	}
-	last := OTPos{
-		tst:   location.DeviceTimestampAsInt,
-		acc:   location.Accuracy,
-		_type: "location",
-		alt:   0,
-		lat:   location.Latitude,
-		lon:   location.Longitude,
-		vel:   0,
-		vac:   0,
-		addr:  location.Geocoding,
-	}
+	last := location.toOT()
 	c.JSON(200, []OTPos{
 		last,
 	})
@@ -210,18 +212,8 @@ func OTLocationsHandler(c *gin.Context) {
 	}
 	var otpos []OTPos
 	for _, location := range *locations {
-		pos := OTPos{
-			tst:   location.DeviceTimestampAsInt,
-			acc:   location.Accuracy,
-			_type: "location",
-			alt:   0,
-			lat:   location.Latitude,
-			lon:   location.Longitude,
-			vel:   0,
-			vac:   0,
-			addr:  location.Geocoding,
-		}
-		otpos = append(otpos, pos)
+		otpos = append(otpos, location.toOT())
 	}
+	fmt.Println(otpos)
 	c.JSON(200, otpos)
 }

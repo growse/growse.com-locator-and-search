@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kpawlik/geojson"
 	"github.com/martinlindhe/unit"
+	"log"
 	"strconv"
 	"time"
 )
@@ -182,15 +183,16 @@ func OTLastPosHandler(c *gin.Context) {
 }
 
 func OTLocationsHandler(c *gin.Context) {
-	from := c.DefaultQuery("from", time.Now().AddDate(0, 0, -1).Format(time.RFC3339))
-	to := c.DefaultQuery("to", time.Now().Format(time.RFC3339))
-	fromTime, err := time.Parse(time.RFC3339, from)
+	const iso8061fmt = "2006-01-02T15:04:05Z0700"
+	from := c.DefaultQuery("from", time.Now().AddDate(0, 0, -1).Format(iso8061fmt))
+	to := c.DefaultQuery("to", time.Now().Format(iso8061fmt))
+	fromTime, err := time.Parse(iso8061fmt, from)
 
 	if err != nil {
 		c.String(500, fmt.Sprintf("Invalid from time %v", from))
 		return
 	}
-	toTime, err := time.Parse(time.RFC3339, to)
+	toTime, err := time.Parse(iso8061fmt, to)
 	if err != nil {
 		c.String(500, fmt.Sprintf("Invalid to time %v", to))
 		return
@@ -207,6 +209,7 @@ func OTLocationsHandler(c *gin.Context) {
 	}
 	var otpos []OTPos
 	for _, location := range *locations {
+		log.Printf("Location %v", location)
 		pos := OTPos{
 			tst:   location.DeviceTimestampAsInt,
 			acc:   location.Accuracy,

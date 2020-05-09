@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kpawlik/geojson"
 	"github.com/martinlindhe/unit"
-	"log"
 	"strconv"
 	"time"
 )
@@ -156,6 +155,8 @@ type OTPos struct {
 	addr  string
 }
 
+ func  toOT() (OTPos) {}
+
 func OTLastPosHandler(c *gin.Context) {
 	location, err := GetLastLoction()
 	if err != nil {
@@ -189,12 +190,12 @@ func OTLocationsHandler(c *gin.Context) {
 	fromTime, err := time.Parse(iso8061fmt, from)
 
 	if err != nil {
-		c.String(500, fmt.Sprintf("Invalid from time %v", from))
+		c.String(500, fmt.Sprintf("Invalid from time %v: %v", from,err))
 		return
 	}
 	toTime, err := time.Parse(iso8061fmt, to)
 	if err != nil {
-		c.String(500, fmt.Sprintf("Invalid to time %v", to))
+		c.String(500, fmt.Sprintf("Invalid to time %v: %v", to,err))
 		return
 	}
 
@@ -209,7 +210,6 @@ func OTLocationsHandler(c *gin.Context) {
 	}
 	var otpos []OTPos
 	for _, location := range *locations {
-		log.Printf("Location %v", location)
 		pos := OTPos{
 			tst:   location.DeviceTimestampAsInt,
 			acc:   location.Accuracy,

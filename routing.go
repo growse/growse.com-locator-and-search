@@ -11,6 +11,10 @@ func BuildRoutes(router *gin.Engine) {
 	{
 		authorized.GET("ping", PingHandler)
 		authorized.GET("where/linestring/:year/", WhereLineStringHandler)
+		api := router.Group("api/0")
+		{
+			api.GET("list", OTListUserHandler)
+		}
 	}
 	router.GET("/oauth2callback", OauthCallback)
 
@@ -19,7 +23,6 @@ func BuildRoutes(router *gin.Engine) {
 	})
 
 	router.POST("/search/", BleveSearchQuery)
-	router.POST("/locator/", LocatorHandler)
 	router.GET("/location/", LocationHandler)
 	router.HEAD("/location/", LocationHeadHandler)
 }

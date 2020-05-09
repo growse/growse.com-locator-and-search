@@ -92,15 +92,6 @@ func WhereLineStringHandler(c *gin.Context) {
 	c.Data(200, "application/json", []byte(linestring))
 }
 
-/*
-Receive POST from phone. This should be an application/json containing an array of points.
-*/
-
-func LocatorHandler(c *gin.Context) {
-	c.String(204, "Deprecated")
-	return
-}
-
 func LocationHandler(c *gin.Context) {
 	thisyear := time.Now().UTC().Year()
 	location, err := GetLastLoction()
@@ -124,4 +115,8 @@ func LocationHeadHandler(c *gin.Context) {
 	}
 	c.Header("Last-modified", location.Timestamp.Format("Mon, 02 Jal 2006 15:04:05 GMT"))
 	c.Status(200)
+}
+
+func OTListUserHandler(c *gin.Context) {
+	c.JSON(200, []string{"growse"})
 }

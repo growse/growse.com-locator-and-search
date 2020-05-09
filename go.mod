@@ -3,7 +3,6 @@ module github.com/growse/www.growse.com
 require (
 	github.com/RoaringBitmap/roaring v0.4.21 // indirect
 	github.com/antchfx/htmlquery v1.2.3
-	github.com/antchfx/xpath v1.1.4 // indirect
 	github.com/blevesearch/bleve v0.9.0
 	github.com/blevesearch/blevex v0.0.0-20180227211930-4b158bb555a3 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.1 // indirect
@@ -16,7 +15,6 @@ require (
 	github.com/cznic/strutil v0.0.0-20181122101858-275e90344537 // indirect
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eclipse/paho.mqtt.golang v1.2.0
-	github.com/etcd-io/bbolt v1.3.3 // indirect
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51 // indirect
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect

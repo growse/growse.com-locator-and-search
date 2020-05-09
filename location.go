@@ -144,30 +144,30 @@ func OTListUserHandler(c *gin.Context) {
 }
 
 type OTPos struct {
-	tst   int64
-	acc   float32
-	_type string
-	alt   int
-	lon   float64
-	vac   int
-	vel   int
-	lat   float64
-	addr  string
+	Tst  int64   `json:"tst" binding:"required"`
+	Acc  float32 `json:"acc" binding:"required"`
+	Type string  `json:"_type" binding:"required"`
+	Alt  int     `json:"alt" binding:"required"`
+	Lon  float64 `json:"lon" binding:"required"`
+	Vac  int     `json:"vac" binding:"required"`
+	Vel  int     `json:"vel" binding:"required"`
+	Lat  float64 `json:"lat" binding:"required"`
+	Addr string  `json:"addr" binding:"required"`
 }
 
- func (location Location) toOT() OTPos {
- 	return OTPos{
-		tst:   location.DeviceTimestampAsInt,
-		acc:   location.Accuracy,
-		_type: "location",
-		alt:   0,
-		lat:   location.Latitude,
-		lon:   location.Longitude,
-		vel:   0,
-		vac:   0,
-		addr:  location.Geocoding,
+func (location Location) toOT() OTPos {
+	return OTPos{
+		Tst:  location.DeviceTimestamp.Unix(),
+		Acc:  location.Accuracy,
+		Type: "location",
+		Alt:  0,
+		Lat:  location.Latitude,
+		Lon:  location.Longitude,
+		Vel:  0,
+		Vac:  0,
+		Addr: location.Geocoding,
 	}
- }
+}
 
 func OTLastPosHandler(c *gin.Context) {
 	location, err := GetLastLoction()
@@ -192,12 +192,12 @@ func OTLocationsHandler(c *gin.Context) {
 	fromTime, err := time.Parse(iso8061fmt, from)
 
 	if err != nil {
-		c.String(500, fmt.Sprintf("Invalid from time %v: %v", from,err))
+		c.String(500, fmt.Sprintf("Invalid from time %v: %v", from, err))
 		return
 	}
 	toTime, err := time.Parse(iso8061fmt, to)
 	if err != nil {
-		c.String(500, fmt.Sprintf("Invalid to time %v: %v", to,err))
+		c.String(500, fmt.Sprintf("Invalid to time %v: %v", to, err))
 		return
 	}
 

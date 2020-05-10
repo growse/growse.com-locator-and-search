@@ -1,14 +1,12 @@
 package main
 
 import (
-	"github.com/gin-contrib/cors"
 	_ "time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func BuildRoutes(router *gin.Engine) {
-	router.Use(cors.Default())
 	authorized := router.Group("/auth/")
 	authorized.Use(AuthRequired())
 	{

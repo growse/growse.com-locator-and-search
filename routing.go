@@ -11,10 +11,6 @@ func BuildRoutes(router *gin.Engine) {
 	authorized.Use(AuthRequired())
 	{
 		authorized.GET("", PingHandler)
-		api := authorized.Group("location/api/0")
-		{
-			api.GET("list", OTListUserHandler)
-		}
 		otRecorderAPI := authorized.Group("location")
 		{
 			restAPI := otRecorderAPI.Group("api/0")

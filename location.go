@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"github.com/dustin/go-humanize"
 	"github.com/gin-gonic/gin"
-	"github.com/kpawlik/geojson"
+	"github.com/gorilla/websocket"
 	"github.com/martinlindhe/unit"
-	"log"
-	"strconv"
+	"net/http"
 	"time"
 )
 
@@ -69,50 +68,7 @@ func GetTotalDistance(year int) (float64, error) {
 	return distanceInMeters.Miles(), nil
 }
 
-func GetLineStringAsJSON(year int) (string, error) {
-	lineString := geojson.NewLineString(nil)
-	sqlStatement := "select ST_X(ST_AsText(point)),ST_Y(ST_AsText(point)),ST_Distance(point,lag(point) over (order by devicetimestamp asc)) from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC'))=$1 and accuracy<(select percentile_disc(0.9) within group (order by accuracy) from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC'))=$1) order by devicetimestamp asc"
-	rows, err := db.Query(sqlStatement, year)
-	if err != nil {
-		return "", err
-	}
-
-	defer rows.Close()
-	for rows.Next() {
-		var coords geojson.Coordinate
-		coords = geojson.Coordinate{0, 0}
-		var distance float32
-		rows.Scan(&coords[0], &coords[1], &distance)
-		if distance > 100 {
-			// We only want to add points where something's actually moved significantly, this is in metres
-			lineString.AddCoordinates(coords)
-		}
-	}
-	// Dump the stuff into some sort of geojson thingie
-	feature := geojson.NewFeature(lineString, nil, nil)
-	featureCollection := geojson.NewFeatureCollection([]*geojson.Feature{feature})
-	json, err := geojson.Marshal(featureCollection)
-	if err != nil {
-		return "", err
-	}
-	return json, nil
-}
-
 /* HTTP handlers */
-func WhereLineStringHandler(c *gin.Context) {
-	yearstring := c.Params.ByName("year")
-	year, err := strconv.Atoi(yearstring)
-	if err != nil {
-		c.String(400, fmt.Sprintf("%v does not look like a year", yearstring))
-	}
-	linestring, err := GetLineStringAsJSON(year)
-	if err != nil {
-		InternalError(err)
-		c.String(500, "Internal Error\n"+err.Error())
-	}
-	c.Data(200, "application/json", []byte(linestring))
-}
-
 func LocationHandler(c *gin.Context) {
 	thisyear := time.Now().UTC().Year()
 	location, err := GetLastLoction()
@@ -157,7 +113,6 @@ type OTPos struct {
 }
 
 func (location Location) toOT() OTPos {
-	log.Printf("%v",location.DeviceTimestamp)
 	return OTPos{
 		Tst:  location.DeviceTimestamp.Unix(),
 		Acc:  location.Accuracy,
@@ -216,6 +171,32 @@ func OTLocationsHandler(c *gin.Context) {
 	for _, location := range *locations {
 		otpos = append(otpos, location.toOT())
 	}
-	fmt.Println(otpos)
-	c.JSON(200, otpos)
+	c.JSON(200, gin.H{"data": otpos})
+}
+
+func OTVersionHandler(c *gin.Context) {
+	c.JSON(200, gin.H{"version": "0.1"})
+}
+
+var wsupgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
+
+func wshandler(w http.ResponseWriter, r *http.Request) {
+	// At the moment, this is just an echo impl. At some point publish new updates down this.
+	wsupgrader.CheckOrigin = func(r *http.Request) bool { return true }
+	conn, err := wsupgrader.Upgrade(w, r, nil)
+	if err != nil {
+		fmt.Printf("Failed to set websocket upgrade: %+v\n", err)
+		return
+	}
+
+	for {
+		t, msg, err := conn.ReadMessage()
+		if err != nil {
+			break
+		}
+		conn.WriteMessage(t, msg)
+	}
 }

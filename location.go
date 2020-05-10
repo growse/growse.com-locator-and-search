@@ -21,9 +21,10 @@ type Location struct {
 	DeviceTimestampAsInt int64   `json:"time" binding:"required"`
 	Accuracy             float32 `json:"acc" binding:"required"`
 	Distance             float64
-	GSMType              string `json:"gsmtype" binding:"required"`
-	WifiSSID             string `json:"wifissid" binding:"required"`
 	DeviceID             string `json:"deviceid" binding:"required"`
+	Altitude             float32
+	VerticalAccuracy     float32
+	Speed                float32
 	Geocoding            string
 }
 
@@ -104,10 +105,10 @@ type OTPos struct {
 	Tst  int64   `json:"tst" binding:"required"`
 	Acc  float32 `json:"acc" binding:"required"`
 	Type string  `json:"_type" binding:"required"`
-	Alt  int     `json:"alt" binding:"required"`
+	Alt  float32 `json:"alt" binding:"required"`
 	Lon  float64 `json:"lon" binding:"required"`
-	Vac  int     `json:"vac" binding:"required"`
-	Vel  int     `json:"vel" binding:"required"`
+	Vac  float32 `json:"vac" binding:"required"`
+	Vel  float32 `json:"vel" binding:"required"`
 	Lat  float64 `json:"lat" binding:"required"`
 	Addr string  `json:"addr" binding:"required"`
 }
@@ -117,11 +118,11 @@ func (location Location) toOT() OTPos {
 		Tst:  location.DeviceTimestamp.Unix(),
 		Acc:  location.Accuracy,
 		Type: "location",
-		Alt:  0,
+		Alt:  location.Altitude,
 		Lat:  location.Latitude,
 		Lon:  location.Longitude,
-		Vel:  0,
-		Vac:  0,
+		Vel:  location.Speed,
+		Vac:  location.VerticalAccuracy,
 		Addr: location.Geocoding,
 	}
 }

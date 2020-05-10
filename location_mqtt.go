@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/eclipse/paho.mqtt.golang"
 	"github.com/lib/pq"
 	"log"
@@ -12,15 +11,17 @@ import (
 type MQTTMsg struct {
 	Type                 string             `json:"_type" binding:"required"`
 	TrackerId            string             `json:"tid"`
-	Accuracy             int                `json:"acc"`
+	Accuracy             float32            `json:"acc"`
+	VerticalAccuracy     float32            `json:"vac"`
 	Battery              int                `json:"batt"`
 	Connection           string             `json:"conn"`
 	Doze                 ConvertibleBoolean `json:"doze"`
 	Latitude             float64            `json:"lat"`
 	Longitude            float64            `json:"lon"`
+	Speed                float32            `json:"vel"`
+	Altitude             float32            `json:"alt"`
 	DeviceTimestampAsInt int64              `json:"tst" binding:"required"`
 	DeviceTimestamp      time.Time
-	Distance             float64
 }
 
 var topic = "owntracks/growse/nexus5"
@@ -109,18 +110,21 @@ var handler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt, 0)
 	dozebool := bool(locator.Doze)
 	_, err = db.Exec(
-		fmt.Sprintf(`
-insert into locations
-(timestamp,devicetimestamp,accuracy,doze,batterylevel,connectiontype,point) 
-values ($1,$2,$3,$4,$5,$6, ST_GeographyFromText('SRID=4326;POINT(%[1]f %[2]f)'))`,
-			locator.Longitude,
-			locator.Latitude),
+		"insert into locations "+
+			"(timestamp,devicetimestamp,accuracy,doze,batterylevel,connectiontype,point, altitude, verticalaccuracy) "+
+			"values ($1,$2,$3,$4,$5,$6, ST_SetSRID(ST_MakePoint($7, $8), 4326), $9, $10)",
+
 		time.Now(),
-		&locator.DeviceTimestamp,
-		&locator.Accuracy,
-		&dozebool,
-		&locator.Battery,
-		&locator.Connection)
+		locator.DeviceTimestamp,
+		locator.Accuracy,
+		dozebool,
+		locator.Battery,
+		locator.Connection,
+		locator.Longitude,
+		locator.Latitude,
+		locator.Altitude,
+		locator.VerticalAccuracy,
+	)
 
 	switch i := err.(type) {
 	case nil:

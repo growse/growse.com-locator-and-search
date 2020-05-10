@@ -14,8 +14,6 @@ func TestLocationConvertsToOTLoc(t *testing.T) {
 		DeviceTimestamp: time.Date(2010, 2, 3, 4, 5, 6, 0, time.UTC),
 		Accuracy:        5,
 		Distance:        20,
-		GSMType:         "",
-		WifiSSID:        "",
 		DeviceID:        "",
 		Geocoding:       "",
 	}

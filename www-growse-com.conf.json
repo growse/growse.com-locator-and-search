@@ -1,6 +1,6 @@
 {
   "oAuth2CallBackUrl": "http://localhost:3030/oauth2callback",
-  "clientID": "887447903183-eo28kl30eqjqod2hacdgcm6dlurc8itl.apps.googleusercontent.com",
+  "clientID": "",
   "clientSecret": "",
   "cpuProfile": "pprof.cpu",
   "dbHost": "/tmp",

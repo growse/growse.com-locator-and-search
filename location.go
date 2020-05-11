@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/dustin/go-humanize"
@@ -47,8 +48,8 @@ func GetLastLoction() (*Location, error) {
 
 func GetLocationsBetweenDates(from time.Time, to time.Time) (*[]Location, error) {
 	defer timeTrack(time.Now())
-	rows, err := db.Query("select "+
-		"coalesce(geocoding, '{}'), "+
+	query:="select "+
+		"coalesce(geocoding -> 'results' -> 0 ->> 'formatted_address', ''), "+
 		"ST_Y(ST_AsText(point)), "+
 		"ST_X(ST_AsText(point)), "+
 		"devicetimestamp, "+
@@ -59,7 +60,8 @@ func GetLocationsBetweenDates(from time.Time, to time.Time) (*[]Location, error)
 		"coalesce(verticalaccuracy, 0) "+
 		"from locations where "+
 		"devicetimestamp>$1 and devicetimestamp<$2 "+
-		"order by devicetimestamp desc", from, to)
+		"order by devicetimestamp desc"
+	rows, err := db.Query(query, from, to)
 	if err != nil {
 		return nil, err
 	}
@@ -206,7 +208,12 @@ func OTLocationsHandler(c *gin.Context) {
 	for _, location := range *locations {
 		otpos = append(otpos, location.toOT())
 	}
-	c.JSON(200, gin.H{"data": otpos})
+	response := struct {
+		Data []OTPos `json:"data"`
+	}{otpos}
+	responseBytes, _ := json.Marshal(response)
+	responseReader := bytes.NewReader(responseBytes)
+	c.DataFromReader(200, int64(len(responseBytes)), "application/json", responseReader, nil)
 }
 
 func OTVersionHandler(c *gin.Context) {

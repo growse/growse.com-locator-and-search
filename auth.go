@@ -15,6 +15,10 @@ func AuthRequired() gin.HandlerFunc {
 		cookie, err := c.Request.Cookie("auth")
 		ok := false
 		cookieContent := ""
+		if configuration.ClientID == "" {
+			c.Next()
+			return
+		}
 		log.Printf("Supplied auth cookie: %v", cookie)
 		if err == nil && cookie != nil {
 			cookieContent, ok = validateCookie(cookie, configuration.CookieSeed)

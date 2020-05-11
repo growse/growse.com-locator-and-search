@@ -89,15 +89,16 @@ func GetLocationsBetweenDates(from time.Time, to time.Time) (*[]Location, error)
 
 }
 
-func GetTotalDistanceInMiles(year int) (float64, error) {
+func GetTotalDistanceInMiles() (float64, error) {
 	var distance float64
 	defer timeTrack(time.Now())
+	log.Println(time.Date(time.Now().UTC().Year(),1,1,0,0,0,0,time.UTC).String())
 	err := db.QueryRow("select "+
 		"sum(distance) "+
 		"from "+
 		"(select ST_Distance(point,lag(point,1,point) over (order by devicetimestamp asc)) as distance "+
-		"from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC')) = $1"+
-		") a;", time.Now().UTC().Year()).Scan(&distance)
+		"from locations where devicetimestamp> $1"+
+		") a;", time.Date(time.Now().UTC().Year(),1,1,0,0,0,0,time.UTC)).Scan(&distance)
 	if err != nil {
 		return 0, err
 	}
@@ -107,9 +108,8 @@ func GetTotalDistanceInMiles(year int) (float64, error) {
 
 /* HTTP handlers */
 func LocationHandler(c *gin.Context) {
-	thisyear := time.Now().UTC().Year()
 	location, err := GetLastLoction()
-	distance, err := GetTotalDistanceInMiles(thisyear)
+	distance, err := GetTotalDistanceInMiles()
 	if err != nil {
 		c.String(500, err.Error())
 	}

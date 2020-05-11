@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/dustin/go-humanize"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/martinlindhe/unit"
+	"log"
 	"net/http"
 	"time"
 )
@@ -92,7 +94,7 @@ func GetTotalDistanceInMiles(year int) (float64, error) {
 		"sum(distance) "+
 		"from "+
 		"(select ST_Distance(point,lag(point,1,point) over (order by devicetimestamp asc)) as distance "+
-		"from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC')) = $1" +
+		"from locations where date_part('year'::text, date(devicetimestamp at time zone 'UTC')) = $1"+
 		") a;", time.Now().UTC().Year()).Scan(&distance)
 	if err != nil {
 		return 0, err
@@ -208,7 +210,7 @@ func OTLocationsHandler(c *gin.Context) {
 }
 
 func OTVersionHandler(c *gin.Context) {
-	c.JSON(200, gin.H{"version": "0.1"})
+	c.JSON(200, gin.H{"version": "1.0-growse-locator"})
 }
 
 var wsupgrader = websocket.Upgrader{
@@ -230,6 +232,22 @@ func wshandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			break
 		}
-		conn.WriteMessage(t, msg)
+		switch string(msg) {
+		case "LAST":
+			location, err := GetLastLoction()
+			if err != nil {
+				log.Printf("Error fetching last location: %v", err)
+				break
+			}
+			locationAsBytes, err := json.Marshal(location.toOT())
+			if err != nil {
+				log.Printf("Error formatting location for websocket: %v", err)
+				break
+			}
+			conn.WriteMessage(t, locationAsBytes)
+			break
+		default:
+			break
+		}
 	}
 }

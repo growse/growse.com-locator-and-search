@@ -2,8 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
-	"flag"
 	"fmt"
 	"github.com/braintree/manners"
 	"github.com/gin-gonic/gin"
@@ -28,29 +26,6 @@ var (
 	GeocodingWorkQueue chan bool
 )
 
-type Configuration struct {
-	DbUser                 string
-	DbName                 string
-	DbPassword             string
-	DbHost                 string
-	DatabaseMigrationsPath string
-	GeocodeApiURL          string
-	MailgunKey             string
-	Production             bool
-	CookieSeed             string
-	OAuth2CallbackUrl      string
-	Domain                 string
-	ClientID               string
-	ClientSecret           string
-	Port                   int
-	MaxDBOpenConnections   int
-	MQTTURL                string
-	MQTTUsername           string
-	MQTTPassword           string
-	SearchIndexRoot        string
-	SearchPathPattern      string
-}
-
 func InternalError(err error) {
 	log.Printf("%v", err)
 	debug.PrintStack()
@@ -66,31 +41,8 @@ func InternalError(err error) {
 }
 
 func main() {
-	//Flags
-	configFile := flag.String("configFile", "config.json", "File path to the JSON configuration")
-	flag.Parse()
-	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+	configuration = *getConfiguration()
 
-	//Config parsing
-	file, err := os.Open(*configFile)
-	if err != nil {
-		log.Fatalf("Unable to open configuration file: %v", err)
-	}
-
-	decoder := json.NewDecoder(file)
-
-	err = decoder.Decode(&configuration)
-
-	if err != nil {
-		log.Fatalf("Unable to parse configuration file: %v", err)
-	}
-
-	if configuration.CookieSeed == "" {
-		configuration.CookieSeed = "Wibble"
-	}
-	if configuration.Port <= 0 {
-		configuration.Port = 8000
-	}
 	oAuthConf = &oauth2.Config{
 		ClientID:     configuration.ClientID,
 		ClientSecret: configuration.ClientSecret,

@@ -17,7 +17,7 @@ package: $(addsuffix .deb, $(addprefix $(PKGNAME)_$(VERSION)-$(BUILD_NUMBER)_, $
 
 $(PKGNAME)_$(VERSION)-$(BUILD_NUMBER)_%.deb: dist/www-growse-com_linux_%
 	chmod +x $<
-	bundle exec fpm -f -s dir -t deb --url https://www.growse.com/ --description "growse.com dynamic content (locator, search)" --deb-systemd www-growse-com.service -n $(PKGNAME) --config-files /etc/www-growse-com.conf -p . -a $* -v $(DEBVERSION) $<=/usr/bin/www.growse.com config.json=/etc/www-growse-com.conf databasemigrations/=/var/www/growse-web/databasemigrations
+	bundle exec fpm -f -s dir -t deb --url https://www.growse.com/ --description "growse.com dynamic content (locator, search)" --deb-systemd www-growse-com.service -n $(PKGNAME) --config-files /etc/www-growse-com.conf.json -p . -a $* -v $(DEBVERSION) $<=/usr/bin/www.growse.com www-growse-com.conf.json=/etc/www-growse-com.conf.json databasemigrations/=/var/www/growse-web/databasemigrations
 
 $(GOPATH)/bin/go-junit-report:
 	go get -u github.com/jstemmer/go-junit-report

@@ -8,7 +8,6 @@
   "dbPassword": "parp",
   "dbUser": "www_growse_com",
   "databaseMigrationsPath": "databasemigrations/",
-  "defaultCacheExpiry": 600000000000,
   "geocodeApiUrl": "",
   "port": 3030,
   "production": false

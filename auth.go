@@ -26,6 +26,9 @@ func AuthRequired() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		if cookieContent != configuration.AllowedAuthUsers {
+			c.AbortWithStatus(401)
+		}
 		log.Printf("Cookie contents: %v", cookieContent)
 		c.Next()
 

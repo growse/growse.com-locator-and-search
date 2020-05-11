@@ -41,5 +41,5 @@ func BuildRoutes(router *gin.Engine) {
 }
 
 func PingHandler(c *gin.Context) {
-	c.Status(201)
+	c.Status(204)
 }

@@ -12,3 +12,10 @@ ALTER TABLE public.locations_distance_this_year
     OWNER TO www_growse_com;
 
 alter table public.locations drop column distance;
+
+
+
+CREATE UNIQUE INDEX idx_locations_distance_this_year
+    ON public.locations_distance_this_year USING btree
+        (distance ASC NULLS LAST)
+    TABLESPACE pg_default;

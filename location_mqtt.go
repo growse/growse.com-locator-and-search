@@ -91,9 +91,10 @@ var connectionLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, 
 }
 
 var handler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
+	defer timeTrack(time.Now())
 	log.Printf("Received mqtt message from %v", msg.Topic())
 	var locator MQTTMsg
-	err := json.Unmarshal([]byte(msg.Payload()), &locator)
+	err := json.Unmarshal(msg.Payload(), &locator)
 
 	if err != nil {
 		log.Printf("Error decoding MQTT message: %v", err)

@@ -63,15 +63,15 @@ func (location *Location) Name() string {
 }
 
 func (location *Location) GetGeocoding() string {
+
 	if configuration.GeocodeApiURL == "" {
 		InternalError(errors.New("Geocoding API should not be blank"))
 		return ""
 	}
+	defer timeTrack(time.Now())
 	geocodingUrl := fmt.Sprintf(configuration.GeocodeApiURL, location.Latitude, location.Longitude)
-	start := time.Now()
 	response, err := http.Get(geocodingUrl)
-	duration := time.Since(start)
-	log.Printf("Reverse geocoded in %v", duration)
+
 	if err != nil {
 		log.Printf("Error getting geolocation from API: %v", err)
 		return ""

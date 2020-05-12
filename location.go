@@ -64,7 +64,6 @@ func GetLocationsBetweenDates(from time.Time, to time.Time) (*[]Location, error)
 		"ST_Y(ST_AsText(point)), " +
 		"ST_X(ST_AsText(point)), " +
 		"devicetimestamp, " +
-		"ST_Distance(point,lag(point,1,point) over (order by devicetimestamp asc)) as distance, " +
 		"coalesce(speed, coalesce(3.6*ST_Distance(point,lag(point,1,point) over (order by devicetimestamp asc))/extract('epoch' from (devicetimestamp-lag(devicetimestamp) over (order by devicetimestamp asc))),0)) as speed, " +
 		"coalesce(altitude, 0), " +
 		"accuracy, " +
@@ -85,7 +84,6 @@ func GetLocationsBetweenDates(from time.Time, to time.Time) (*[]Location, error)
 			&location.Latitude,
 			&location.Longitude,
 			&location.DeviceTimestamp,
-			&location.Distance,
 			&location.Speed,
 			&location.Altitude,
 			&location.Accuracy,

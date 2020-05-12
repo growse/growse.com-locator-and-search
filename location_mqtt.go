@@ -91,7 +91,6 @@ var connectionLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, 
 }
 
 var handler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	defer timeTrack(time.Now())
 	log.Printf("Received mqtt message from %v", msg.Topic())
 	var locator MQTTMsg
 	err := json.Unmarshal(msg.Payload(), &locator)
@@ -106,11 +105,16 @@ var handler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 		return
 	}
 
-	newLocation := false
-
 	locator.DeviceTimestamp = time.Unix(locator.DeviceTimestampAsInt, 0)
+
+	insertLocationToDatabase(locator)
+}
+
+func insertLocationToDatabase(locator MQTTMsg) {
+	defer timeTrack(time.Now())
+	newLocation := false
 	dozebool := bool(locator.Doze)
-	_, err = db.Exec(
+	_, err := db.Exec(
 		"insert into locations "+
 			"(timestamp,devicetimestamp,accuracy,doze,batterylevel,connectiontype,point, altitude, verticalaccuracy, speed) "+
 			"values ($1,$2,$3,$4,$5,$6, ST_SetSRID(ST_MakePoint($7, $8), 4326), $9, $10, $11)",

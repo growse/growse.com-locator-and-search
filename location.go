@@ -31,35 +31,52 @@ type Location struct {
 	Geocoding            string
 }
 
-func GetLastLoction() (*Location, error) {
+func GetLastLocation() (*Location, error) {
 	var location Location
 	defer timeTrack(time.Now())
-	err := db.QueryRow("select "+
-		"geocoding, "+
-		"ST_Y(ST_AsText(point)), "+
-		"ST_X(ST_AsText(point)), "+
-		"devicetimestamp "+
-		"from locations "+
-		"where geocoding is not null "+
-		"order by devicetimestamp desc "+
-		"limit 1").Scan(&location.Geocoding, &location.Latitude, &location.Longitude, &location.DeviceTimestamp)
+	query := "select " +
+		"geocoding, " +
+		"ST_Y(ST_AsText(point)), " +
+		"ST_X(ST_AsText(point)) " +
+		"from locations " +
+		"where where geocoding is not null" +
+		"order by devicetimestamp desc " +
+		"limit 1"
+	err := db.QueryRow(query).Scan(&location.Geocoding, &location.Latitude, &location.Longitude, &location.DeviceTimestamp)
 	return &location, err
+}
+
+func GetTotalDistanceInMiles() (float64, error) {
+	var distance float64
+	defer timeTrack(time.Now())
+	log.Println(time.Date(time.Now().UTC().Year(), 1, 1, 0, 0, 0, 0, time.UTC).String())
+	err := db.QueryRow("select "+
+		"sum(distance) "+
+		"from "+
+		"(select ST_Distance(point,lag(point,1,point) over (order by devicetimestamp asc)) as distance "+
+		"from locations where devicetimestamp> $1"+
+		") a;", time.Date(time.Now().UTC().Year(), 1, 1, 0, 0, 0, 0, time.UTC)).Scan(&distance)
+	if err != nil {
+		return 0, err
+	}
+	distanceInMeters := unit.Length(distance) * unit.Meter
+	return distanceInMeters.Miles(), nil
 }
 
 func GetLocationsBetweenDates(from time.Time, to time.Time) (*[]Location, error) {
 	defer timeTrack(time.Now())
-	query:="select "+
-		"coalesce(geocoding -> 'results' -> 0 ->> 'formatted_address', ''), "+
-		"ST_Y(ST_AsText(point)), "+
-		"ST_X(ST_AsText(point)), "+
-		"devicetimestamp, "+
-		"ST_Distance(point,lag(point,1,point) over (order by devicetimestamp asc)) as distance, "+
-		"coalesce(speed, coalesce(3.6*ST_Distance(point,lag(point,1,point) over (order by devicetimestamp asc))/extract('epoch' from (devicetimestamp-lag(devicetimestamp) over (order by devicetimestamp asc))),0)) as speed, "+
-		"coalesce(altitude, 0), "+
-		"accuracy, "+
-		"coalesce(verticalaccuracy, 0) "+
-		"from locations where "+
-		"devicetimestamp>$1 and devicetimestamp<$2 "+
+	query := "select " +
+		"coalesce(geocoding -> 'results' -> 0 ->> 'formatted_address', ''), " +
+		"ST_Y(ST_AsText(point)), " +
+		"ST_X(ST_AsText(point)), " +
+		"devicetimestamp, " +
+		"ST_Distance(point,lag(point,1,point) over (order by devicetimestamp asc)) as distance, " +
+		"coalesce(speed, coalesce(3.6*ST_Distance(point,lag(point,1,point) over (order by devicetimestamp asc))/extract('epoch' from (devicetimestamp-lag(devicetimestamp) over (order by devicetimestamp asc))),0)) as speed, " +
+		"coalesce(altitude, 0), " +
+		"accuracy, " +
+		"coalesce(verticalaccuracy, 0) " +
+		"from locations where " +
+		"devicetimestamp>$1 and devicetimestamp<$2 " +
 		"order by devicetimestamp desc"
 	rows, err := db.Query(query, from, to)
 	if err != nil {
@@ -89,26 +106,9 @@ func GetLocationsBetweenDates(from time.Time, to time.Time) (*[]Location, error)
 
 }
 
-func GetTotalDistanceInMiles() (float64, error) {
-	var distance float64
-	defer timeTrack(time.Now())
-	log.Println(time.Date(time.Now().UTC().Year(),1,1,0,0,0,0,time.UTC).String())
-	err := db.QueryRow("select "+
-		"sum(distance) "+
-		"from "+
-		"(select ST_Distance(point,lag(point,1,point) over (order by devicetimestamp asc)) as distance "+
-		"from locations where devicetimestamp> $1"+
-		") a;", time.Date(time.Now().UTC().Year(),1,1,0,0,0,0,time.UTC)).Scan(&distance)
-	if err != nil {
-		return 0, err
-	}
-	distanceInMeters := unit.Length(distance) * unit.Meter
-	return distanceInMeters.Miles(), nil
-}
-
 /* HTTP handlers */
 func LocationHandler(c *gin.Context) {
-	location, err := GetLastLoction()
+	location, err := GetLastLocation()
 	distance, err := GetTotalDistanceInMiles()
 	if err != nil {
 		c.String(500, err.Error())
@@ -123,7 +123,7 @@ func LocationHandler(c *gin.Context) {
 }
 
 func LocationHeadHandler(c *gin.Context) {
-	location, err := GetLastLoction()
+	location, err := GetLastLocation()
 	if err != nil {
 		c.String(500, err.Error())
 	}
@@ -164,7 +164,7 @@ func (location Location) toOT() OTPos {
 }
 
 func OTLastPosHandler(c *gin.Context) {
-	location, err := GetLastLoction()
+	location, err := GetLastLocation()
 	if err != nil {
 		c.String(500, err.Error())
 		return
@@ -241,7 +241,7 @@ func wshandler(w http.ResponseWriter, r *http.Request) {
 		}
 		switch string(msg) {
 		case "LAST":
-			location, err := GetLastLoction()
+			location, err := GetLastLocation()
 			if err != nil {
 				log.Printf("Error fetching last location: %v", err)
 				break

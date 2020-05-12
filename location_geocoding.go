@@ -42,18 +42,18 @@ func (location *Location) Name() string {
 		return unknownLocation
 	}
 
-	var postal_town, locality string
+	var postalTown, locality string
 
 	for _, addresscomponents := range geoLocation.Results[0].AddressComponents {
 		if stringSliceContains(addresscomponents.Types, "postal_town") {
-			postal_town = addresscomponents.LongName
+			postalTown = addresscomponents.LongName
 		}
 		if stringSliceContains(addresscomponents.Types, "locality") {
 			locality = addresscomponents.LongName
 		}
 	}
-	if postal_town != "" {
-		return postal_town
+	if postalTown != "" {
+		return postalTown
 	}
 	if locality != "" {
 		return locality

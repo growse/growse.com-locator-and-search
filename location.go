@@ -70,7 +70,7 @@ func GetLocationsBetweenDates(from time.Time, to time.Time) (*[]Location, error)
 		"accuracy, " +
 		"coalesce(verticalaccuracy, 0) " +
 		"from locations where " +
-		"devicetimestamp>$1 and devicetimestamp<$2 " +
+		"devicetimestamp>=$1 and devicetimestamp<$2 " +
 		"order by devicetimestamp desc"
 	rows, err := db.Query(query, from, to)
 	if err != nil {

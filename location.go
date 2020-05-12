@@ -39,23 +39,17 @@ func GetLastLocation() (*Location, error) {
 		"ST_Y(ST_AsText(point)), " +
 		"ST_X(ST_AsText(point)) " +
 		"from locations " +
-		"where geocoding is not null" +
+		"where geocoding is not null " +
 		"order by devicetimestamp desc " +
 		"limit 1"
-	err := db.QueryRow(query).Scan(&location.Geocoding, &location.Latitude, &location.Longitude, &location.DeviceTimestamp)
+	err := db.QueryRow(query).Scan(&location.Geocoding, &location.Latitude, &location.Longitude)
 	return &location, err
 }
 
 func GetTotalDistanceInMiles() (float64, error) {
 	var distance float64
 	defer timeTrack(time.Now())
-	log.Println(time.Date(time.Now().UTC().Year(), 1, 1, 0, 0, 0, 0, time.UTC).String())
-	err := db.QueryRow("select "+
-		"sum(distance) "+
-		"from "+
-		"(select ST_Distance(point,lag(point,1,point) over (order by devicetimestamp asc)) as distance "+
-		"from locations where devicetimestamp>=$1"+
-		") a;", time.Date(time.Now().UTC().Year(), 1, 1, 0, 0, 0, 0, time.UTC)).Scan(&distance)
+	err := db.QueryRow("select distance from locations_distance_this_year").Scan(&distance)
 	if err != nil {
 		return 0, err
 	}

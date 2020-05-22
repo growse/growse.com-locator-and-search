@@ -35,8 +35,11 @@ func SubscribeMQTT(quit <-chan bool) error {
 		mqttClientOptions.AddBroker("tcp://localhost:1883")
 	}
 	if configuration.MQTTUsername != "" && configuration.MQTTPassword != "" {
+		log.Printf("Authenticating to MQTT as %v", configuration.MQTTUsername)
 		mqttClientOptions.SetUsername(configuration.MQTTUsername)
 		mqttClientOptions.SetPassword(configuration.MQTTPassword)
+	} else {
+		log.Print("Anon MQTT auth")
 	}
 	mqttClientOptions.SetClientID("growselocator")
 	mqttClientOptions.SetAutoReconnect(true)

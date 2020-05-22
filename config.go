@@ -23,12 +23,13 @@ type Configuration struct {
 	ClientSecret           string
 	Port                   int
 	MaxDBOpenConnections   int
-	MQTTURL                string
-	MQTTUsername           string
-	MQTTPassword           string
-	SearchIndexRoot        string
-	SearchPathPattern      string
-	AllowedAuthUsers       string
+	MQTTURL                string `json:"mqttUrl"`
+	MQTTUsername           string `json:"mqttUsername"`
+
+	MQTTPassword      string `json:"mqttPassword"`
+	SearchIndexRoot   string
+	SearchPathPattern string
+	AllowedAuthUsers  string
 }
 
 func getConfiguration() *Configuration {

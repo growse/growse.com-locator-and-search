@@ -41,5 +41,5 @@ func BuildRoutes(router *gin.Engine) {
 }
 
 func PingHandler(c *gin.Context) {
-	c.String(200, "")
+	c.Redirect(302,"https://tracker.growse.com/")
 }

@@ -30,6 +30,5 @@ vendor/
 !/static/css/solarizeddark.css
 testIndex
 
-test-results
-test-reports
 dist
+coverage.txt

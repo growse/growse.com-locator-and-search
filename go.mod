@@ -27,13 +27,11 @@ require (
 	github.com/lib/pq v1.5.2
 	github.com/mailgun/mailgun-go v1.1.1
 	github.com/martinlindhe/unit v0.0.0-20180817222220-284ab7627fae
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/radovskyb/watcher v1.0.7
 	github.com/spf13/viper v1.7.0
 	github.com/steveyen/gtreap v0.0.0-20150807155958-0abe01ef9be2 // indirect
-	github.com/stretchr/testify v1.5.1
+	github.com/stretchr/testify v1.6.0
 	github.com/stretchrcom/testify v1.2.2 // indirect
 	github.com/syndtr/goleveldb v0.0.0-20181105012736-f9080354173f // indirect
 	github.com/tecbot/gorocksdb v0.0.0-20181010114359-8752a9433481 // indirect

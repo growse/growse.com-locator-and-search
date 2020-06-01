@@ -30,7 +30,7 @@ build: $(addprefix dist/www-growse-com_linux_, $(foreach a, $(ARCH), $(a)))
 dist/www-growse-com_linux_%:
 	go mod vendor -v
 	GOOS=linux GOARCH=$* go build -ldflags=$(LDFLAGS) -o dist/www-growse-com_linux_$*
-	upx dist/www-growse-com_linux_$*
+	upx $@
 
 .PHONY: clean
 clean:

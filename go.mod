@@ -24,7 +24,7 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/grokify/html-strip-tags-go v0.0.0-20190921062105-daaa06bf1aaf
 	github.com/jmhodges/levigo v0.0.0-20161115193449-c42d9e0ca023 // indirect
-	github.com/lib/pq v1.7.1
+	github.com/lib/pq v1.8.0
 	github.com/mailgun/mailgun-go v1.1.1
 	github.com/martinlindhe/unit v0.0.0-20180817222220-284ab7627fae
 	github.com/pkg/errors v0.9.1

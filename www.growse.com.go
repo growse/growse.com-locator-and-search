@@ -89,6 +89,7 @@ func main() {
 		}
 		GeocodingWorkQueue = make(chan bool, 100)
 		go UpdateLatestLocationWithGeocoding(GeocodingWorkQueue)
+		go GeocodingCrawler(quit)
 		go SubscribeMQTT(quit)
 		DoDatabaseMigrations(db, configuration.DatabaseMigrationsPath)
 	} else {

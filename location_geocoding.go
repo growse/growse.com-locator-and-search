@@ -133,26 +133,28 @@ func UpdateLatestLocationWithGeocoding(workChan <-chan bool) {
 func GeocodingCrawler(quitChan <-chan bool) {
 	log.Print("Starting geocoding backlog crawler")
 	ticker := time.NewTicker(10 * time.Second)
-	select {
-	case <-ticker.C:
-		var location Location
-		var id int
-		err := db.QueryRow("select id,ST_Y(ST_AsText(point)),ST_X(ST_AsText(point)) from locations where geocoding is null order by devicetimestamp desc limit 1").Scan(&id, &location.Latitude, &location.Longitude)
-		if err != nil {
-			log.Print("Error fetching latest location without geocode")
-		}
-		geocoding := location.GetGeocoding()
-		if geocoding != "" {
-			_, err = db.Exec("update locations set geocoding=$1 where id=$2", geocoding, id)
+	for {
+		select {
+		case <-ticker.C:
+			var location Location
+			var id int
+			err := db.QueryRow("select id,ST_Y(ST_AsText(point)),ST_X(ST_AsText(point)) from locations where geocoding is null and devicetimestamp<CURRENT_DATE - 1 order by devicetimestamp desc limit 1").Scan(&id, &location.Latitude, &location.Longitude)
 			if err != nil {
-				log.Printf("Location that caused fail is: %s", geocoding)
-			} else {
-				log.Printf("Geocoded location id=%v", id)
+				log.Print("Error fetching latest location without geocode")
 			}
-		}
-	case <-quitChan:
+			geocoding := location.GetGeocoding()
+			if geocoding != "" {
+				_, err = db.Exec("update locations set geocoding=$1 where id=$2", geocoding, id)
+				if err != nil {
+					log.Printf("Location that caused fail is: %s", geocoding)
+				} else {
+					log.Printf("Geocoded location id=%v", id)
+				}
+			}
+		case <-quitChan:
 
-		log.Print("Clos")
-		return
+			log.Print("Clos")
+			return
+		}
 	}
 }

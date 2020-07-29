@@ -25,11 +25,11 @@ type Configuration struct {
 	MaxDBOpenConnections   int
 	MQTTURL                string `json:"mqttUrl"`
 	MQTTUsername           string `json:"mqttUsername"`
-
-	MQTTPassword      string `json:"mqttPassword"`
-	SearchIndexRoot   string
-	SearchPathPattern string
-	AllowedAuthUsers  string
+	MQTTPassword           string `json:"mqttPassword"`
+	SearchIndexRoot        string
+	SearchPathPattern      string
+	AllowedAuthUsers       string
+	EnableGeocodingCrawler bool
 }
 
 func getConfiguration() *Configuration {

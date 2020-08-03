@@ -6,7 +6,8 @@ import (
 	"github.com/braintree/manners"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
-	"github.com/mailgun/mailgun-go"
+	"github.com/sendgrid/sendgrid-go"
+	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"log"
@@ -21,7 +22,6 @@ import (
 var (
 	db                 *sql.DB
 	configuration      Configuration
-	gun                mailgun.Mailgun
 	oAuthConf          *oauth2.Config
 	GeocodingWorkQueue chan bool
 )
@@ -30,13 +30,22 @@ func InternalError(err error) {
 	log.Printf("%v", err)
 	debug.PrintStack()
 	if configuration.Production {
-		m := gun.NewMessage("Sender <blogbot@growse.com>", "ERROR: www.growse.com", fmt.Sprintf("%v\n%v", err, string(debug.Stack())), "sysadmin@growse.com")
-		log.Printf("Emailing stack: %v\n", m)
-		response, id, _ := gun.Send(m)
-		log.Printf("Response ID: %s\n", id)
-		log.Printf("Message from server: %s\n", response)
+		client := sendgrid.NewSendClient(configuration.SendGridKey)
+		message := mail.NewSingleEmail(
+			mail.NewEmail("Blogface", "blogbot@growse.com"),
+			"ERROR: www.growse.com",
+			mail.NewEmail("Sysamin", "sysadmin@growse.com"),
+			fmt.Sprintf("%v\n%v", err, string(debug.Stack())),
+			"")
+		log.Printf("Emailing stack: %v\n", message)
+		response, err := client.Send(message)
+		if err != nil {
+			log.Printf("Error sending mail: %v", err)
+		} else {
+			log.Printf("Email sent: %v\n", response)
+		}
 	} else {
-		log.Print("Non production, not sending\n")
+		log.Println("Non production, not sending")
 	}
 }
 
@@ -78,8 +87,6 @@ func main() {
 		log.Printf("Error building regex %v: %v", configuration.SearchPathPattern, err)
 	}
 	BleveInit(configuration.SearchIndexRoot, pathPattern)
-
-	gun = mailgun.NewMailgun("growse.com", configuration.MailgunKey, "")
 
 	// Database time
 	if configuration.DbHost != "" {

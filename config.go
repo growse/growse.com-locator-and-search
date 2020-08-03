@@ -14,7 +14,7 @@ type Configuration struct {
 	DbHost                 string
 	DatabaseMigrationsPath string
 	GeocodeApiURL          string
-	MailgunKey             string
+	SendGridKey            string
 	Production             bool
 	CookieSeed             string
 	OAuth2CallbackUrl      string
@@ -50,7 +50,7 @@ func getConfiguration() *Configuration {
 		DbHost:                 "",
 		DatabaseMigrationsPath: "databasemigrations",
 		GeocodeApiURL:          "",
-		MailgunKey:             "",
+		SendGridKey:            "",
 		Production:             false,
 		CookieSeed:             getRandomString(),
 		OAuth2CallbackUrl:      "https://www.growse.com/oauth2callback",

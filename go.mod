@@ -29,7 +29,7 @@ require (
 	github.com/martinlindhe/unit v0.0.0-20180817222220-284ab7627fae
 	github.com/pkg/errors v0.9.1
 	github.com/radovskyb/watcher v1.0.7
-	github.com/spf13/viper v1.7.0
+	github.com/spf13/viper v1.7.1
 	github.com/steveyen/gtreap v0.0.0-20150807155958-0abe01ef9be2 // indirect
 	github.com/stretchr/testify v1.6.1
 	github.com/stretchrcom/testify v1.2.2 // indirect

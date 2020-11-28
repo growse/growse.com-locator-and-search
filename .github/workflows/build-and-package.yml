@@ -57,6 +57,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           DEBSIGN: ${{ secrets.DEBSIGN }}
+          BUILD_NUMBER: ${{ env.GITHUB_RUN_NUMBER }}
         run: |
           echo 'aaaaaaaa' > passphrase_file
           echo $DEBSIGN | base64 -d | gpg --import --batch

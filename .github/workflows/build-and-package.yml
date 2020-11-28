@@ -50,10 +50,6 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: dist
-      - name: Get Build number
-        uses: einaregilsson/build-number@v1
-        with:
-          token: ${{secrets.github_token}}
       - name: Package
         run: make package
       - name: Upload to S3 Apt repo

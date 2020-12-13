@@ -19,6 +19,12 @@ jobs:
         with:
           go-version: 1.15
         id: go
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
       - name: Build
         run: make build
       - name: Test
@@ -54,14 +60,12 @@ jobs:
         run: make package
         env:
           BUILD_NUMBER: ${{ github.run_number }}
-      - name: Upload to S3 Apt repo
+      - name: Upload to Apt repo
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          DEBSIGN: ${{ secrets.DEBSIGN }}
-          BUILD_NUMBER: ${{ env.GITHUB_RUN_NUMBER }}
+          KEY_PASSPHRASE: ${{ secrets.DEBSIGN_KEY_PASSPHRASE }}
+          APT_CREDENTIALS: ${{ secrets.APT_CREDENTIALS }}
         run: |
-          echo 'aaaaaaaa' > passphrase_file
-          echo $DEBSIGN | base64 -d | gpg --import --batch
-          gpg --list-secret-keys
-          bundle exec deb-s3 upload --s3-region=eu-north-1 --sign=6A2561804E290210909454E69640EFFBAA3B94A5 --gpg-options="\-\-pinentry\-mode=loopback \-\-passphrase\-file passphrase_file \-\-batch" --suite stable --origin "Andrew Rowson" --bucket apt.growse.com "*.deb"
+          echo $APT_CREDENTIALS > aptly-auth
+          find -name "*.deb" -exec curl --netrc-file aptly-auth -XPOST -F file=@{} https://apttoo.growse.com/api/files/locator-and-search \;
+          curl --netrc-file aptly-auth -X POST https://apttoo.growse.com/api/repos/defaultrepo/file/locator-and-search
+          curl --netrc-file aptly-auth -X PUT https://apttoo.growse.com/api/publish/:./stablish

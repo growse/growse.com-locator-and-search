@@ -16,7 +16,7 @@ package: $(addsuffix .deb, $(addprefix $(PKGNAME)_$(VERSION)-$(BUILD_NUMBER)_, $
 
 $(PKGNAME)_$(VERSION)-$(BUILD_NUMBER)_%.deb: dist/www-growse-com_linux_%
 	chmod +x $<
-	bundle exec fpm -f -s dir -t deb --url https://www.growse.com/ --description "growse.com dynamic content (locator, search)" --deb-systemd www-growse-com.service -n $(PKGNAME) --config-files /etc/www-growse-com.conf.json -p . -a $* -v $(DEBVERSION) $<=/usr/bin/www.growse.com www-growse-com.conf.json=/etc/www-growse-com.conf.json databasemigrations/=/var/www/growse-web/databasemigrations
+	bundle exec fpm -f -s dir -t deb --deb-priority optional --maintainer github@growse.com --vendor github@growse.com --url https://www.growse.com/ --description "growse.com dynamic content (locator, search)" --deb-systemd www-growse-com.service -n $(PKGNAME) --config-files /etc/www-growse-com.conf.json -p . -a $* -v $(DEBVERSION) $<=/usr/bin/www.growse.com www-growse-com.conf.json=/etc/www-growse-com.conf.json databasemigrations/=/var/www/growse-web/databasemigrations
 
 .PHONY: test
 test: $(TEST_COVERAGE)

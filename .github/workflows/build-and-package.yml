@@ -66,6 +66,9 @@ jobs:
           APT_CREDENTIALS: ${{ secrets.APT_CREDENTIALS }}
         run: |
           echo $APT_CREDENTIALS > aptly-auth
-          find -name "*.deb" -exec curl --netrc-file aptly-auth -XPOST -F file=@{} https://apttoo.growse.com/api/files/locator-and-search \;
-          curl --netrc-file aptly-auth -X POST https://apttoo.growse.com/api/repos/defaultrepo/file/locator-and-search
-          curl --netrc-file aptly-auth -X PUT https://apttoo.growse.com/api/publish/:./stablish
+          find -type f -name "*.deb" -exec curl -f --netrc-file aptly-auth -XPOST -F file=@{} https://apttoo.growse.com/api/files/locator-and-search \;
+          export result=$(curl -f --netrc-file aptly-auth -X POST https://apttoo.growse.com/api/repos/defaultrepo/file/locator-and-search)
+          echo $result
+          export failed=$(echo $result | jq '.FailedFiles | length')
+          if [[ "$failed" != "0" ]]; then exit 1; fi
+          curl -f --netrc-file aptly-auth -X PUT https://apttoo.growse.com/api/publish/:./stablish

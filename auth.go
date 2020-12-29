@@ -35,7 +35,6 @@ func AuthRequired() gin.HandlerFunc {
 		}
 		log.Printf("Cookie contents: %v", cookieContent)
 		c.Next()
-
 	}
 }
 

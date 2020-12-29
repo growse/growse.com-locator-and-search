@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/dustin/go-humanize"
 	"github.com/gin-gonic/gin"
@@ -32,6 +33,9 @@ type Location struct {
 }
 
 func GetLastLocation() (*Location, error) {
+	if db == nil {
+		return nil, errors.New("No database connection available")
+	}
 	var location Location
 	defer timeTrack(time.Now())
 	query := "select " +
@@ -47,6 +51,9 @@ func GetLastLocation() (*Location, error) {
 }
 
 func GetTotalDistanceInMiles() (float64, error) {
+	if db == nil {
+		return 0, errors.New("No database connection available")
+	}
 	var distance float64
 	defer timeTrack(time.Now())
 	err := db.QueryRow("select distance from locations_distance_this_year").Scan(&distance)
@@ -58,6 +65,9 @@ func GetTotalDistanceInMiles() (float64, error) {
 }
 
 func GetLocationsBetweenDates(from time.Time, to time.Time) (*[]Location, error) {
+	if db == nil {
+		return nil, errors.New("No database connection available")
+	}
 	defer timeTrack(time.Now())
 	query := "select " +
 		"coalesce(geocoding -> 'results' -> 0 ->> 'formatted_address', ''), " +
@@ -104,6 +114,7 @@ func LocationHandler(c *gin.Context) {
 	distance, err := GetTotalDistanceInMiles()
 	if err != nil {
 		c.String(500, err.Error())
+		return
 	}
 	c.Header("Last-modified", location.Timestamp.Format("Mon, 02 Jal 2006 15:04:05 GMT"))
 	c.JSON(200, gin.H{
@@ -118,6 +129,7 @@ func LocationHeadHandler(c *gin.Context) {
 	location, err := GetLastLocation()
 	if err != nil {
 		c.String(500, err.Error())
+		return
 	}
 	c.Header("Last-modified", location.Timestamp.Format("Mon, 02 Jal 2006 15:04:05 GMT"))
 	c.Status(200)

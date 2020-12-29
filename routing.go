@@ -7,11 +7,15 @@ import (
 )
 
 func BuildRoutes(router *gin.Engine) {
-	authorized := router.Group("/auth/")
+	authorized := router.Group("/where/")
 	authorized.Use(AuthRequired())
 	{
-		authorized.GET("", PingHandler)
-		otRecorderAPI := authorized.Group("location")
+		authorized.GET("", func(c *gin.Context) {
+			c.Redirect(301, "/where/ui/")
+		})
+		//authorized.GET("", PingHandler)
+		authorized.Static("ui", "/var/www/owntracks-frontend")
+		otRecorderAPI := authorized.Group("data")
 		{
 			restAPI := otRecorderAPI.Group("api/0")
 			{
@@ -29,10 +33,6 @@ func BuildRoutes(router *gin.Engine) {
 		}
 	}
 	router.GET("/oauth2callback", OauthCallback)
-
-	router.GET("/where/", func(c *gin.Context) {
-		c.Redirect(301, "/auth/where/")
-	})
 
 	router.POST("/search/", BleveSearchQuery)
 	router.GET("/location/", LocationHandler)

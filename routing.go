@@ -8,7 +8,6 @@ import (
 )
 
 const (
-	owntracksFrontendDir    = "/Users/andrew/Projects/frontend/dist"
 	owntracksFrontendConfig = `var yesterday = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
 window.owntracks = window.owntracks || {};
 window.owntracks.config = {
@@ -28,7 +27,7 @@ window.owntracks.config = {
 )
 
 func BuildRoutes(router *gin.Engine) {
-	router.Use(static.ServeRoot("/where/ui/", owntracksFrontendDir))
+	router.Use(static.ServeRoot("/where/ui/", configuration.OwntracksFrontendDir))
 	authorized := router.Group("/where/")
 	authorized.Use(AuthRequired())
 	{

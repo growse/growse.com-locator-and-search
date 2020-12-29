@@ -30,6 +30,7 @@ type Configuration struct {
 	SearchPathPattern      string
 	AllowedAuthUsers       string
 	EnableGeocodingCrawler bool
+	OwntracksFrontendDir   string
 }
 
 func getConfiguration() *Configuration {
@@ -65,6 +66,7 @@ func getConfiguration() *Configuration {
 		SearchIndexRoot:        "/var/www/growse-jekyll",
 		SearchPathPattern:      "\\d{4}/\\d{2}/\\d{2}/.+?\\.html$",
 		AllowedAuthUsers:       "growse@gmail.com",
+		OwntracksFrontendDir:   "/var/www/owntracks-frontend",
 	}
 	err = viper.Unmarshal(&defaultConfig)
 	if err != nil {

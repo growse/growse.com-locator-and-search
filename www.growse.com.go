@@ -114,7 +114,11 @@ func main() {
 	}()
 
 	//Get the router
-	gin.SetMode(gin.ReleaseMode)
+	if configuration.Production {
+		gin.SetMode(gin.ReleaseMode)
+	} else {
+		gin.SetMode(gin.DebugMode)
+	}
 	router := gin.Default()
 	BuildRoutes(router)
 	log.Printf("Listening on port %d", configuration.Port)

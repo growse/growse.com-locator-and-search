@@ -1,10 +1,11 @@
 package main
 
 import (
+	"fmt"
+	"github.com/gin-contrib/location"
 	"github.com/gin-contrib/static"
-	_ "time"
-
 	"github.com/gin-gonic/gin"
+	_ "time"
 )
 
 const (
@@ -12,7 +13,7 @@ const (
 window.owntracks = window.owntracks || {};
 window.owntracks.config = {
   api: {
-       baseUrl: "https://www.growse.com/where/data",
+       baseUrl: "%s",
        fetchOptions: { credentials: "include" }
   },
   map: {
@@ -22,20 +23,25 @@ window.owntracks.config = {
        }
   },
   startDateTime: yesterday,
-  verbose: true
+  verbose: true,
+  router: {
+    basePath: "%s",
+  },
 };`
 )
 
 func BuildRoutes(router *gin.Engine) {
+	router.Use(location.New(location.Config{Scheme: "http", Host: "localhost", Base: "/where/data"}))
 	router.Use(static.ServeRoot("/where/ui/", configuration.OwntracksFrontendDir))
 	authorized := router.Group("/where/")
 	authorized.Use(AuthRequired())
 	{
-		authorized.GET("", func(c *gin.Context) {
-			c.Redirect(301, "/where/ui/")
-		})
+		//authorized.GET("", func(c *gin.Context) {
+		//	c.Redirect(301, "/where/ui/")
+		//})
 		authorized.GET("ui/config/config.js", func(c *gin.Context) {
-			c.String(200, owntracksFrontendConfig)
+			fmt.Printf("API location: %v\n", location.Get(c))
+			c.String(200, owntracksFrontendConfig, location.Get(c), location.Get(c).Path)
 		})
 
 		otRecorderAPI := authorized.Group("data")

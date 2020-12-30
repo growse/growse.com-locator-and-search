@@ -3,12 +3,13 @@
   "clientID": "",
   "clientSecret": "",
   "cpuProfile": "pprof.cpu",
-  "dbHost": "/tmp",
+  "dbHost": "",
   "dbName": "www_growse_com",
   "dbPassword": "parp",
   "dbUser": "www_growse_com",
   "databaseMigrationsPath": "databasemigrations/",
   "geocodeApiUrl": "",
   "port": 3030,
-  "production": false
+  "production": false,
+  "OwntracksFrontendDir": "/Users/andrew/Projects/frontend/dist/"
 }

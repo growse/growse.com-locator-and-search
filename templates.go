@@ -26,7 +26,7 @@ const (
 <ol>
 {{ range .results }}
 <li>
-{{.Date.Format "2006-02-01"}}: {{printf "%.2f" .Distance}}km (<a href="/where/ui/?start={{.Date.Format "2006-02-01"}}T00%3A00%3A00&end={{.Date.Format "2006-02-01"}}T23%3A59%3A59&layers=last,line,points" title="Map">Map</a>)
+{{.Date.Format "2006-01-02"}}: {{printf "%.2f" .Distance}}km (<a href="/where/ui/?start={{.Date.Format "2006-01-02"}}T00%3A00%3A00&end={{.Date.Format "2006-01-02"}}T23%3A59%3A59&layers=last,line,points" title="Map">Map</a>)
 </li>
 {{ end }}
 </ol>

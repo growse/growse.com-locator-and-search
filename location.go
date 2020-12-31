@@ -411,6 +411,7 @@ func PlaceHandler(c *gin.Context) {
 		return
 	}
 	var geocoding GeocodingResponse
+	log.Print(geocodingResponse)
 	err = json.Unmarshal([]byte(geocodingResponse), &geocoding)
 	if err != nil {
 		InternalError(err)

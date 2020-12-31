@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -73,8 +74,8 @@ func GetGeocoding(place string) (string, error) {
 		InternalError(err)
 		return "", err
 	}
-	url := fmt.Sprintf(configuration.GeocodeApiURL, place)
-	return fetchGeocodingResponse(url)
+	geocodingUrl := fmt.Sprintf(configuration.GeocodeApiURL, url.QueryEscape(place))
+	return fetchGeocodingResponse(geocodingUrl)
 }
 
 func (location *Location) GetReverseGeocoding() (string, error) {
@@ -83,8 +84,8 @@ func (location *Location) GetReverseGeocoding() (string, error) {
 		InternalError(err)
 		return "", err
 	}
-	url := fmt.Sprintf(configuration.ReverseGeocodeApiURL, location.Latitude, location.Longitude)
-	return fetchGeocodingResponse(url)
+	geocodingUrl := fmt.Sprintf(configuration.ReverseGeocodeApiURL, location.Latitude, location.Longitude)
+	return fetchGeocodingResponse(geocodingUrl)
 }
 
 func fetchGeocodingResponse(geocodingUrl string) (string, error) {

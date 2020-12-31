@@ -29,13 +29,17 @@ window.owntracks.config = {
 )
 
 func BuildRoutes(router *gin.Engine) {
-	router.Use(static.ServeRoot("/where/ui/", configuration.OwntracksFrontendDir))
+	router.SetHTMLTemplate(BuildTemplates())
 	authorized := router.Group("/where/")
 	authorized.Use(AuthRequired())
 	{
 		authorized.GET("", func(c *gin.Context) {
 			c.Redirect(301, "/where/ui/")
 		})
+		authorized.GET("place/", func(c *gin.Context) {
+			c.HTML(200, "place", nil)
+		})
+		authorized.POST("place/", PlaceHandler)
 		authorized.GET("ui/config/config.js", func(c *gin.Context) {
 			c.Data(200, "text/javascript", []byte(owntracksFrontendConfig))
 		})
@@ -57,6 +61,7 @@ func BuildRoutes(router *gin.Engine) {
 			}
 		}
 	}
+	router.Use(static.ServeRoot("/where/ui/", configuration.OwntracksFrontendDir))
 	router.GET("/oauth2callback", OauthCallback)
 	router.POST("/search/", BleveSearchQuery)
 	router.GET("/location/", LocationHandler)

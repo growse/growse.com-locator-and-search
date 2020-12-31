@@ -8,8 +8,9 @@
   "dbPassword": "parp",
   "dbUser": "www_growse_com",
   "databaseMigrationsPath": "databasemigrations/",
+  "reverseGeocodeApiUrl": "",
   "geocodeApiUrl": "",
   "port": 3030,
   "production": false,
-  "OwntracksFrontendDir": "/Users/andrew/Projects/frontend/dist/"
+  "owntracksFrontendDir": "/Users/andrew/Projects/frontend/dist/"
 }

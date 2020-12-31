@@ -62,33 +62,58 @@ func (location *Location) Name() string {
 
 }
 
-func (location *Location) GetGeocoding() string {
-
+func GetGeocoding(place string) (string, error) {
 	if configuration.GeocodeApiURL == "" {
-		InternalError(errors.New("Geocoding API should not be blank"))
-		return ""
+		err := errors.New("Geocoding API should not be blank")
+		InternalError(err)
+		return "", err
 	}
+	if place == "" {
+		err := errors.New("Place should not be blank")
+		InternalError(err)
+		return "", err
+	}
+	url := fmt.Sprintf(configuration.GeocodeApiURL, place)
+	return fetchGeocodingResponse(url)
+}
+
+func (location *Location) GetReverseGeocoding() (string, error) {
+	if configuration.ReverseGeocodeApiURL == "" {
+		err := errors.New("Reverse Geocoding API should not be blank")
+		InternalError(err)
+		return "", err
+	}
+	url := fmt.Sprintf(configuration.ReverseGeocodeApiURL, location.Latitude, location.Longitude)
+	return fetchGeocodingResponse(url)
+}
+
+func fetchGeocodingResponse(geocodingUrl string) (string, error) {
 	defer timeTrack(time.Now())
-	geocodingUrl := fmt.Sprintf(configuration.GeocodeApiURL, location.Latitude, location.Longitude)
+
+	log.Print(geocodingUrl)
 	response, err := http.Get(geocodingUrl)
 
 	if err != nil {
 		log.Printf("Error getting geolocation from API: %v", err)
-		return ""
+		return "", err
 	}
 
 	defer response.Body.Close()
-	if response.StatusCode != 200 {
-		InternalError(errors.New(fmt.Sprintf("invalid response from Geolocation API: %v %v", response.StatusCode, response.Body)))
-		return ""
-	}
 	body, err := ioutil.ReadAll(response.Body)
+	if response.StatusCode != 200 {
+		if err == nil {
+			body = []byte("")
+		}
+		err := errors.New(fmt.Sprintf("invalid response from Geolocation API: %v %v", response.StatusCode, body))
+		InternalError(err)
+		return "", err
+	}
 
 	if err != nil {
 		InternalError(err)
-		return ""
+		return "", err
 	}
-	return string(body)
+	return string(body), nil
 }
 
 func UpdateLatestLocationWithGeocoding(workChan <-chan bool) {
@@ -107,8 +132,10 @@ func UpdateLatestLocationWithGeocoding(workChan <-chan bool) {
 			if err != nil {
 				InternalError(err)
 			}
-			geocoding := location.GetGeocoding()
-			if geocoding != "" {
+			geocoding, err := location.GetReverseGeocoding()
+			if err != nil {
+				InternalError(err)
+			} else {
 				_, err = tx.Exec("update locations set geocoding=$1 where id=$2", geocoding, id)
 				if err != nil {
 					log.Printf("Location that caused fail is: %s", geocoding)
@@ -141,9 +168,13 @@ func GeocodingCrawler(quitChan <-chan bool) {
 			err := db.QueryRow("select id,ST_Y(ST_AsText(point)),ST_X(ST_AsText(point)) from locations where geocoding is null and devicetimestamp<CURRENT_DATE - 1 order by devicetimestamp desc limit 1").Scan(&id, &location.Latitude, &location.Longitude)
 			if err != nil {
 				log.Print("Error fetching latest location without geocode")
+				break
 			}
-			geocoding := location.GetGeocoding()
-			if geocoding != "" {
+			geocoding, err := location.GetReverseGeocoding()
+			if err != nil {
+				log.Printf("Error reversing geocode for: %v", location)
+				break
+			} else {
 				_, err = db.Exec("update locations set geocoding=$1 where id=$2", geocoding, id)
 				if err != nil {
 					log.Printf("Location that caused fail is: %s", geocoding)

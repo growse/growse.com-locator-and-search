@@ -14,6 +14,7 @@ type Configuration struct {
 	DbHost                 string
 	DatabaseMigrationsPath string
 	GeocodeApiURL          string
+	ReverseGeocodeApiURL   string
 	SendGridKey            string
 	Production             bool
 	CookieSeed             string

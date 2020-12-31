@@ -287,7 +287,7 @@ func PlaceHandler(c *gin.Context) {
 	}
 	if len(geocoding.Results) >= 1 {
 		geometry := geocoding.Results[0].Geometry
-		rows, err := db.Query("select avg(st_distance(POINT,ST_SetSRID(ST_MakePoint($1, $2),4326)))/1000 as distance,date(devicetimestamp) from locations group by date(devicetimestamp) order by distance asc limit 30;", geometry.Lng, geometry.Lat)
+		rows, err := db.Query("select min(st_distance(POINT,ST_SetSRID(ST_MakePoint($1, $2),4326)))/1000 as distance,date(devicetimestamp) from locations group by date(devicetimestamp) order by distance asc limit 30;", geometry.Lng, geometry.Lat)
 		if err != nil {
 			InternalError(err)
 			c.String(500, err.Error())

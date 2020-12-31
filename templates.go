@@ -4,6 +4,9 @@ import "html/template"
 
 const (
 	placeTemplate = `<html>
+<head>
+<link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css" integrity="sha384-4ZPLezkTZTsojWFhpdFembdzFudphhoOzIunR1wH6g1WQDzCAiPvDyitaK67mp0+" crossorigin="anonymous">
+</head>
 <body>
 <h1>Places!</h1>
 <form method="post">
@@ -15,6 +18,9 @@ const (
 </html>
 `
 	placeResultsTemplate = `<html>
+<head>
+<link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css" integrity="sha384-4ZPLezkTZTsojWFhpdFembdzFudphhoOzIunR1wH6g1WQDzCAiPvDyitaK67mp0+" crossorigin="anonymous">
+</head>
 <body>
 <h1>Places!</h1>
 <form method="post">

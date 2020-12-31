@@ -23,13 +23,24 @@ const (
 </fieldset>
 </form>
 <h2>Results</h2>
-<ol>
-{{ range .results }}
-<li>
-{{.Date.Format "2006-01-02"}}: {{printf "%.2f" .Distance}}km (<a href="/where/ui/?start={{.Date.Format "2006-01-02"}}T00%3A00%3A00&end={{.Date.Format "2006-01-02"}}T23%3A59%3A59&layers=last,line,points" title="Map">Map</a>)
-</li>
+<table>
+
+<tr>
+<th></th>
+<th>Date</th>
+<th>Distance</th>
+<th></th>
+</tr>
+
+{{ range $i, $result := .results }}
+<tr>
+<td>{{$i}}</td>
+<td>{{$result.Date.Format "2006-01-02"}}</td>
+<td>{{printf "%.2f" $result.Distance}}km</td>
+<td><a href="/where/ui/?start={{$result.Date.Format "2006-01-02"}}T00%3A00%3A00&end={{$result.Date.Format "2006-01-02"}}T23%3A59%3A59&layers=last,line,points" title="Map">Map</a></td>
+</tr>
 {{ end }}
-</ol>
+</table>
 </body>
 </html>
 `

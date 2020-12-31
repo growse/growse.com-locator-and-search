@@ -89,8 +89,6 @@ func (location *Location) GetReverseGeocoding() (string, error) {
 
 func fetchGeocodingResponse(geocodingUrl string) (string, error) {
 	defer timeTrack(time.Now())
-
-	log.Print(geocodingUrl)
 	response, err := http.Get(geocodingUrl)
 
 	if err != nil {

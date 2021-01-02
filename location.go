@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -270,178 +271,99 @@ func PlaceHandler(c *gin.Context) {
 		return
 	}
 	place := c.PostForm("place")
-	geocodingResponse, err := GetGeocoding(place)
+	geocoding, err := GetGeocoding(place)
 	if err != nil {
 		InternalError(err)
 		c.String(500, err.Error())
 		c.Abort()
 		return
 	}
-	var geocoding GeocodingResponse
-	err = json.Unmarshal([]byte(geocodingResponse), &geocoding)
+
+	if len(geocoding.Features) == 0 {
+		c.HTML(200, "placeResults", gin.H{"results": nil, "place": place})
+		c.Abort()
+		return
+	}
+	feature := geocoding.Features[0]
+	var rows *sql.Rows
+	if feature.Properties["bounds"] != nil {
+		bounds := feature.Properties["bounds"].(map[string]interface{})
+		rows, err = db.Query(`
+select 
+count(*) as c,
+date(devicetimestamp) 
+from locations 
+where point && ST_SetSRID(ST_MakeBox2D(ST_Point($1,$2),	ST_Point($3,$4)),4326)
+group by date(devicetimestamp) order by c desc limit 20
+`,
+			bounds["northeast"].(map[string]interface{})["lng"],
+			bounds["northeast"].(map[string]interface{})["lat"],
+			bounds["southwest"].(map[string]interface{})["lng"],
+			bounds["southwest"].(map[string]interface{})["lat"])
+	} else if feature.Geometry.IsPoint() && feature.Properties["confidence"] != nil && feature.Properties["confidence"].(float64) >= 1 && feature.Properties["confidence"].(float64) <= 10 {
+		var radius int
+		switch confidence := feature.Properties["confidence"].(float64); confidence {
+		case 10:
+			radius = 250
+		case 9:
+			radius = 500
+		case 8:
+			radius = 1000
+		case 7:
+			radius = 5000
+		case 6:
+			radius = 7500
+		case 5:
+			radius = 10000
+		case 4:
+			radius = 15000
+		case 3:
+			radius = 20000
+		case 2:
+			fallthrough
+		case 1:
+			fallthrough
+		default:
+			radius = 25000
+		}
+		rows, err = db.Query(`
+select 
+count(*) as c,
+date(devicetimestamp) 
+from locations 
+where ST_DWithin(point,ST_SetSRID(ST_Point( $1, $2),4326),$3)
+group by date(devicetimestamp) order by c desc limit 20
+`, feature.Geometry.Point[0], feature.Geometry.Point[1], radius)
+	} else {
+		c.String(500, "No valid geometries found in geocoding response", geocoding)
+		c.Abort()
+		return
+	}
 	if err != nil {
 		InternalError(err)
 		c.String(500, err.Error())
 		c.Abort()
 		return
 	}
-	if len(geocoding.Results) >= 1 {
-		geometry := geocoding.Results[0].Geometry
-		rows, err := db.Query("select min(st_distance(POINT,ST_SetSRID(ST_MakePoint($1, $2),4326)))/1000 as distance,date(devicetimestamp) from locations group by date(devicetimestamp) order by distance asc limit 30;", geometry.Lng, geometry.Lat)
+	defer rows.Close()
+	var results []LocationCountPerDay
+	for rows.Next() {
+		var result LocationCountPerDay
+		err := rows.Scan(&result.LocationCount, &result.Date)
 		if err != nil {
 			InternalError(err)
-			c.String(500, err.Error())
+			c.String(500, "Error fetching values from database: %v", err)
 			c.Abort()
 			return
 		}
-		defer rows.Close()
-		var results []DistanceResult
-		for rows.Next() {
-			var result DistanceResult
-			rows.Scan(&result.Distance, &result.Date)
-			results = append(results, result)
-		}
-		c.HTML(200, "placeResults", gin.H{"results": results})
-	} else {
-		c.String(400, "No results found")
+		results = append(results, result)
 	}
+	c.HTML(200, "placeResults", gin.H{"results": results, "place": place, "formatted": feature.Properties["formatted"]})
 }
 
 type (
-	DistanceResult struct {
-		Distance float64
-		Date     time.Time
-	}
-	GeocodingResponse struct {
-		Documentation string `json:"documentation"`
-		Licenses      []struct {
-			Name string `json:"name"`
-			URL  string `json:"url"`
-		} `json:"licenses"`
-		Rate struct {
-			Limit     int `json:"limit"`
-			Remaining int `json:"remaining"`
-			Reset     int `json:"reset"`
-		} `json:"rate"`
-		Results []struct {
-			Annotations struct {
-				DMS struct {
-					Lat string `json:"lat"`
-					Lng string `json:"lng"`
-				} `json:"DMS"`
-				MGRS       string `json:"MGRS"`
-				Maidenhead string `json:"Maidenhead"`
-				Mercator   struct {
-					X float64 `json:"x"`
-					Y float64 `json:"y"`
-				} `json:"Mercator"`
-				OSM struct {
-					EditURL string `json:"edit_url"`
-					NoteURL string `json:"note_url"`
-					URL     string `json:"url"`
-				} `json:"OSM"`
-				UNM49 struct {
-					Regions struct {
-						EUROPE         string `json:"EUROPE"`
-						PT             string `json:"PT"`
-						SOUTHERNEUROPE string `json:"SOUTHERN_EUROPE"`
-						WORLD          string `json:"WORLD"`
-					} `json:"regions"`
-					StatisticalGroupings []string `json:"statistical_groupings"`
-				} `json:"UN_M49"`
-				Callingcode int `json:"callingcode"`
-				Currency    struct {
-					AlternateSymbols     []interface{} `json:"alternate_symbols"`
-					DecimalMark          string        `json:"decimal_mark"`
-					HTMLEntity           string        `json:"html_entity"`
-					IsoCode              string        `json:"iso_code"`
-					IsoNumeric           string        `json:"iso_numeric"`
-					Name                 string        `json:"name"`
-					SmallestDenomination int           `json:"smallest_denomination"`
-					Subunit              string        `json:"subunit"`
-					SubunitToUnit        int           `json:"subunit_to_unit"`
-					Symbol               string        `json:"symbol"`
-					SymbolFirst          int           `json:"symbol_first"`
-					ThousandsSeparator   string        `json:"thousands_separator"`
-				} `json:"currency"`
-				Flag     string  `json:"flag"`
-				Geohash  string  `json:"geohash"`
-				Qibla    float64 `json:"qibla"`
-				Roadinfo struct {
-					DriveOn string `json:"drive_on"`
-					SpeedIn string `json:"speed_in"`
-				} `json:"roadinfo"`
-				Sun struct {
-					Rise struct {
-						Apparent     int `json:"apparent"`
-						Astronomical int `json:"astronomical"`
-						Civil        int `json:"civil"`
-						Nautical     int `json:"nautical"`
-					} `json:"rise"`
-					Set struct {
-						Apparent     int `json:"apparent"`
-						Astronomical int `json:"astronomical"`
-						Civil        int `json:"civil"`
-						Nautical     int `json:"nautical"`
-					} `json:"set"`
-				} `json:"sun"`
-				Timezone struct {
-					Name         string `json:"name"`
-					NowInDst     int    `json:"now_in_dst"`
-					OffsetSec    int    `json:"offset_sec"`
-					OffsetString string `json:"offset_string"`
-					ShortName    string `json:"short_name"`
-				} `json:"timezone"`
-				What3Words struct {
-					Words string `json:"words"`
-				} `json:"what3words"`
-				Wikidata string `json:"wikidata"`
-			} `json:"annotations"`
-			Bounds struct {
-				Northeast struct {
-					Lat float64 `json:"lat"`
-					Lng float64 `json:"lng"`
-				} `json:"northeast"`
-				Southwest struct {
-					Lat float64 `json:"lat"`
-					Lng float64 `json:"lng"`
-				} `json:"southwest"`
-			} `json:"bounds"`
-			Components struct {
-				ISO31661Alpha2 string `json:"ISO_3166-1_alpha-2"`
-				ISO31661Alpha3 string `json:"ISO_3166-1_alpha-3"`
-				Category       string `json:"_category"`
-				Type           string `json:"_type"`
-				City           string `json:"city"`
-				Continent      string `json:"continent"`
-				Country        string `json:"country"`
-				CountryCode    string `json:"country_code"`
-				County         string `json:"county"`
-				CountyCode     string `json:"county_code"`
-				PoliticalUnion string `json:"political_union"`
-				State          string `json:"state"`
-				StateDistrict  string `json:"state_district"`
-			} `json:"components"`
-			Confidence int    `json:"confidence"`
-			Formatted  string `json:"formatted"`
-			Geometry   struct {
-				Lat float64 `json:"lat"`
-				Lng float64 `json:"lng"`
-			} `json:"geometry"`
-		} `json:"results"`
-		Status struct {
-			Code    int    `json:"code"`
-			Message string `json:"message"`
-		} `json:"status"`
-		StayInformed struct {
-			Blog    string `json:"blog"`
-			Twitter string `json:"twitter"`
-		} `json:"stay_informed"`
-		Thanks    string `json:"thanks"`
-		Timestamp struct {
-			CreatedHTTP string `json:"created_http"`
-			CreatedUnix int    `json:"created_unix"`
-		} `json:"timestamp"`
-		TotalResults int `json:"total_results"`
+	LocationCountPerDay struct {
+		LocationCount int
+		Date          time.Time
 	}
 )

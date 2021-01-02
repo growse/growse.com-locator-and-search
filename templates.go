@@ -3,57 +3,80 @@ package main
 import "html/template"
 
 const (
-	placeTemplate = `<html>
-<head>
-<link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css" integrity="sha384-4ZPLezkTZTsojWFhpdFembdzFudphhoOzIunR1wH6g1WQDzCAiPvDyitaK67mp0+" crossorigin="anonymous">
+	includesTemplate = `{{define "header"}} <html>
+	<head>
+	<link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css" integrity="sha384-cg6SkqEOCV1NbJoCu11+bm0NvBRc8IYLRGXkmNrqUBfTjmMYwNKPWBTIKyw9mHNJ" crossorigin="anonymous">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
+<style>
+    body {
+        margin:1rem;
+    }
+</style>
+{{ end }}
+{{define "form"}}
+<div class="pure-g">
+<div class="pure-u-1">
 <h1>Places!</h1>
-<form method="post">
+</div>
+</div>
+<div class="pure-g">
+<div class="pure-u-1">
+<form method="post" class="pure-form">
 <fieldset>
-<input type="text" placeholder="Search for place" name="place">
+<input type="text" placeholder="Search for place" name="place" value="{{.place}}">
 </fieldset>
 </form>
+</div>
+</div>
+{{end}}
+{{define "footer"}}
 </body>
 </html>
+{{end}}`
+	placeTemplate = `{{template "header"}}
+{{template "form"}}
+{{template "footer"}}
 `
-	placeResultsTemplate = `<html>
-<head>
-<link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css" integrity="sha384-4ZPLezkTZTsojWFhpdFembdzFudphhoOzIunR1wH6g1WQDzCAiPvDyitaK67mp0+" crossorigin="anonymous">
-</head>
-<body>
-<h1>Places!</h1>
-<form method="post">
-<fieldset>
-<input type="text" placeholder="Search for place" name="place">
-</fieldset>
-</form>
-<h2>Results</h2>
-<table>
+	placeResultsTemplate = `{{template "header"}}
+{{template "form"}}
+<div class="pure-g">
+<div class="pure-u-1">
+<h2>Results for "{{.place}}"</h2>
+<p>{{.formatted}}</p>
+</div>
+</div>
+<div class="pure-g">
+<div class="pure-u-1">
+<table class="pure-table">
 
 <tr>
-<th></th>
 <th>Date</th>
-<th>Distance</th>
-<th></th>
+<th>Number of locations</th>
+<th>Link</th>
 </tr>
 
 {{ range $i, $result := .results }}
 <tr>
-<td>{{$i}}</td>
-<td>{{$result.Date.Format "2006-01-02"}}</td>
-<td>{{printf "%.2f" $result.Distance}}km</td>
+<td>{{$result.Date.Format "2 January 2006"}}</td>
+<td>{{$result.LocationCount}}</td>
 <td><a href="/where/ui/?start={{$result.Date.Format "2006-01-02"}}T00%3A00%3A00&end={{$result.Date.Format "2006-01-02"}}T23%3A59%3A59&layers=last,line,points" title="Map">Map</a></td>
 </tr>
+{{ else }}
+<tr><td colspan="3">No results</td></tr>
 {{ end }}
+
 </table>
-</body>
-</html>
+</div>
+</div>
+{{template "footer"}}
 `
 )
 
 func BuildTemplates() *template.Template {
 	t := template.Must(template.New("place").Parse(placeTemplate))
 	t = template.Must(t.New("placeResults").Parse(placeResultsTemplate))
+	t = template.Must(t.New("placeResults").Parse(includesTemplate))
 	return t
 }

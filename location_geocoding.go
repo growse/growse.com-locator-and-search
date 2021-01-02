@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/paulmach/go.geojson"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -63,19 +64,28 @@ func (location *Location) Name() string {
 
 }
 
-func GetGeocoding(place string) (string, error) {
+func GetGeocoding(place string) (*geojson.FeatureCollection, error) {
 	if configuration.GeocodeApiURL == "" {
 		err := errors.New("Geocoding API should not be blank")
 		InternalError(err)
-		return "", err
+		return nil, err
 	}
 	if place == "" {
 		err := errors.New("Place should not be blank")
 		InternalError(err)
-		return "", err
+		return nil, err
 	}
 	geocodingUrl := fmt.Sprintf(configuration.GeocodeApiURL, url.QueryEscape(place))
-	return fetchGeocodingResponse(geocodingUrl)
+
+	geocodingResponse, err := fetchGeocodingResponse(geocodingUrl)
+	if err != nil {
+		return nil, err
+	}
+	featureColletion, err := geojson.UnmarshalFeatureCollection([]byte(geocodingResponse))
+	if err != nil {
+		return nil, err
+	}
+	return featureColletion, nil
 }
 
 func (location *Location) GetReverseGeocoding() (string, error) {

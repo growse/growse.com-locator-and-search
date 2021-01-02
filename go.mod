@@ -27,6 +27,7 @@ require (
 	github.com/jmhodges/levigo v0.0.0-20161115193449-c42d9e0ca023 // indirect
 	github.com/lib/pq v1.9.0
 	github.com/martinlindhe/unit v0.0.0-20180817222220-284ab7627fae
+	github.com/paulmach/go.geojson v1.4.0
 	github.com/pkg/errors v0.9.1
 	github.com/radovskyb/watcher v1.0.7
 	github.com/sendgrid/rest v2.6.0+incompatible // indirect

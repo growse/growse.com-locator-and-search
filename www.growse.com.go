@@ -28,7 +28,6 @@ var (
 
 func InternalError(err error) {
 	log.Printf("%v", err)
-	debug.PrintStack()
 	if configuration.Production {
 		client := sendgrid.NewSendClient(configuration.SendGridKey)
 		message := mail.NewSingleEmail(

@@ -34,7 +34,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.7.2+incompatible
 	github.com/spf13/viper v1.7.1
 	github.com/steveyen/gtreap v0.0.0-20150807155958-0abe01ef9be2 // indirect
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	github.com/stretchrcom/testify v1.2.2 // indirect
 	github.com/syndtr/goleveldb v0.0.0-20181105012736-f9080354173f // indirect
 	github.com/tecbot/gorocksdb v0.0.0-20181010114359-8752a9433481 // indirect

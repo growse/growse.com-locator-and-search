@@ -32,7 +32,7 @@ require (
 	github.com/radovskyb/watcher v1.0.7
 	github.com/sendgrid/rest v2.6.0+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.7.2+incompatible
-	github.com/spf13/viper v1.8.0
+	github.com/spf13/viper v1.8.1
 	github.com/steveyen/gtreap v0.0.0-20150807155958-0abe01ef9be2 // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/stretchrcom/testify v1.2.2 // indirect
